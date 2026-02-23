@@ -1,0 +1,77 @@
+{
+    "nav": {
+        "projects": "Projects",
+        "vision": "Vision",
+        "blog": "Blog",
+        "contact": "Contact",
+        "cta": "Access Rise & Reward"
+    },
+    "hero": {
+        "tagline": "Free your time • Create your way",
+        "title": "AI in service of your freedom.",
+        "subtitle": "We forge intelligent tools to automate the necessary and let you live the essential.",
+        "cta": "See our projects"
+    },
+    "projects": {
+        "title": "Our Projects",
+        "subtitle": "Tools designed to transform your everyday life.",
+        "rr": {
+            "badge": "SaaS • Gamification • Supabase",
+            "title": "Rise & Reward",
+            "description": "A collective discipline gamification app. Turn your habits into shared challenges, grow together, and reward the effort.",
+            "cta": "Discover"
+        }
+    },
+    "vision": {
+        "quote": "Artificial intelligence should not replace us, but set us free.",
+        "quoteAuthor": "EkstremAI",
+        "title": "Our Vision",
+        "subtitle": "Three pillars guide every creation we build.",
+        "pillars": {
+            "simplicity": {
+                "title": "Simplicity",
+                "desc": "Minimalist interfaces that fade away to put the experience first."
+            },
+            "impact": {
+                "title": "Impact",
+                "desc": "Tools that produce real results in the real lives of our users."
+            },
+            "aesthetics": {
+                "title": "Aesthetics",
+                "desc": "Beauty is not a luxury. It is proof that the details were cared for."
+            }
+        }
+    },
+    "contact": {
+        "title": "Let's Connect",
+        "subtitle": "A project, a collaboration, an idea? We're listening.",
+        "name": "Your name",
+        "email": "Your email",
+        "message": "Your message",
+        "send": "Send message",
+        "sending": "Sending...",
+        "success": "Message sent! We'll get back to you shortly.",
+        "namePlaceholder": "John Doe",
+        "emailPlaceholder": "john@example.com",
+        "messagePlaceholder": "Tell us about your project..."
+    },
+    "footer": {
+        "tagline": "Forged for freedom.",
+        "rights": "All rights reserved."
+    },
+    "login": {
+        "title": "Access Rise & Reward",
+        "subtitle": "Sign in to your EkstremAI space",
+        "email": "Email",
+        "password": "Password",
+        "submit": "Sign in",
+        "noAccount": "No account yet?",
+        "contact": "Contact us"
+    },
+    "dashboard": {
+        "welcome": "Welcome",
+        "title": "Rise & Reward",
+        "subtitle": "Your collective discipline gamification space.",
+        "comingSoon": "Coming soon — currently in development."
+    }
+}

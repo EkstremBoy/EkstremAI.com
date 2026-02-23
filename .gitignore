@@ -1,0 +1,31 @@
+# Dépendances
+node_modules/
+
+# Build
+.next/
+out/
+dist/
+build/
+
+# Variables d'environnement (NE JAMAIS COMMITTER)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Sécurité
+*.pem
+
+# Déploiement
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
