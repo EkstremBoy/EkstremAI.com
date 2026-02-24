@@ -50,9 +50,9 @@ export default function Navbar() {
                     <Image
                         src="/images/logo.png"
                         alt="EkstremAI"
-                        width={140}
-                        height={48}
-                        className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]"
+                        width={200}
+                        height={72}
+                        className="h-16 w-auto object-contain -my-2 group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_16px_rgba(0,212,255,0.4)]"
                         priority
                     />
                 </Link>
