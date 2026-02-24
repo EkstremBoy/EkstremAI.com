@@ -129,7 +129,7 @@ export default function RnRHero() {
                 >
                     {/* Primary — Se connecter */}
                     <Link
-                        href="/auth/login"
+                        href="/fr/login"
                         className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-300 glow-cyan"
                     >
                         Se connecter
@@ -138,7 +138,7 @@ export default function RnRHero() {
 
                     {/* Secondary — Créer un compte */}
                     <Link
-                        href="/auth/register"
+                        href="/fr/signup"
                         className="group relative flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-white border border-white/10 hover:border-brand-violet/50 hover:bg-brand-violet/10 transition-all duration-300"
                     >
                         <span

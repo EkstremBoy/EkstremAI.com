@@ -63,7 +63,7 @@ export default function RnRFooterCTA() {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
-                            href="/auth/register"
+                            href="/fr/signup"
                             className="group flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-300 glow-cyan"
                         >
                             Créer un compte gratuit
@@ -71,7 +71,7 @@ export default function RnRFooterCTA() {
                         </Link>
 
                         <Link
-                            href="/auth/login"
+                            href="/fr/login"
                             className="flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-white/70 border border-white/10 hover:border-white/20 hover:text-white transition-all duration-300"
                         >
                             Se connecter
@@ -90,7 +90,7 @@ export default function RnRFooterCTA() {
                     <span>© 2026 EkstremAI — Rise & Reward</span>
                     <div className="flex gap-5">
                         <Link href="/" className="hover:text-white/50 transition-colors">Retour au site principal</Link>
-                        <Link href="/auth/login" className="hover:text-white/50 transition-colors">Connexion</Link>
+                        <Link href="/fr/login" className="hover:text-white/50 transition-colors">Connexion</Link>
                     </div>
                 </motion.div>
             </div>

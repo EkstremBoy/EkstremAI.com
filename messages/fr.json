@@ -68,7 +68,24 @@
         "password": "Mot de passe",
         "submit": "Se connecter",
         "noAccount": "Pas encore de compte ?",
-        "contact": "Contactez-nous"
+        "signUp": "Créer un compte"
+    },
+    "signup": {
+        "title": "Créer votre compte",
+        "subtitle": "Rejoignez la communauté EkstremAI",
+        "firstName": "Prénom",
+        "firstNamePlaceholder": "Alex",
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirm": "Confirmer le mot de passe",
+        "submit": "Créer mon compte",
+        "hasAccount": "Déjà un compte ?",
+        "login": "Se connecter",
+        "successTitle": "Vérifiez votre courriel !",
+        "successBody": "Un lien de confirmation vous a été envoyé. Cliquez dessus pour activer votre compte et commencer à utiliser Rise & Reward.",
+        "goLogin": "Aller à la connexion",
+        "errorMatch": "Les mots de passe ne correspondent pas.",
+        "errorShort": "Le mot de passe doit contenir au moins 8 caractères."
     },
     "dashboard": {
         "welcome": "Bienvenue",

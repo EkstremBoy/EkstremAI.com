@@ -33,7 +33,7 @@ export default function LoginPage() {
             setError(authError.message);
             setLoading(false);
         } else {
-            router.push(`/${locale}/dashboard/rise-reward`);
+            router.push('/riseandreward');
             router.refresh();
         }
     };
@@ -151,8 +151,8 @@ export default function LoginPage() {
                     {/* Footer */}
                     <p className="text-center text-xs text-white/30 mt-6">
                         {t('noAccount')}{' '}
-                        <Link href={`/${locale}#contact`} className="text-brand-cyan hover:text-brand-cyan/80 transition-colors font-medium">
-                            {t('contact')}
+                        <Link href={`/${locale}/signup`} className="text-brand-cyan hover:text-brand-cyan/80 transition-colors font-medium">
+                            {t('signUp')}
                         </Link>
                     </p>
                 </div>
