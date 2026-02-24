@@ -26,6 +26,7 @@ interface FormState {
     penaltyAmount: string;
     startDate: string;
     validationMode: ValidationMode;
+    selectedColor: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -45,6 +46,18 @@ const STEPS = [
     { number: 1, label: 'Le Défi', icon: <Flame size={14} /> },
     { number: 2, label: "L'Objectif", icon: <Target size={14} /> },
     { number: 3, label: 'Les Règles', icon: <Shield size={14} /> },
+    { number: 4, label: 'Ma Couleur', icon: <Zap size={14} /> },
+];
+
+const COLORS = [
+    { name: 'Bleu', hex: '#3b82f6', border: 'border-blue-500/30', bg: 'bg-blue-500/10', text: 'text-blue-400' },
+    { name: 'Cyan', hex: '#06b6d4', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
+    { name: 'Violet', hex: '#8b5cf6', border: 'border-violet-500/30', bg: 'bg-violet-500/10', text: 'text-violet-400' },
+    { name: 'Rose', hex: '#ec4899', border: 'border-pink-500/30', bg: 'bg-pink-500/10', text: 'text-pink-400' },
+    { name: 'Rouge', hex: '#ef4444', border: 'border-red-500/30', bg: 'bg-red-500/10', text: 'text-red-400' },
+    { name: 'Orange', hex: '#f97316', border: 'border-orange-500/30', bg: 'bg-orange-500/10', text: 'text-orange-400' },
+    { name: 'Jaune', hex: '#eab308', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
+    { name: 'Vert', hex: '#22c55e', border: 'border-green-500/30', bg: 'bg-green-500/10', text: 'text-green-400' },
 ];
 
 const GROUP_TYPES: { label: GroupType; icon: React.ReactNode }[] = [
@@ -81,6 +94,7 @@ export default function RnRCreateChallenge() {
         penaltyAmount: '',
         startDate: new Date().toISOString().split('T')[0],
         validationMode: null,
+        selectedColor: COLORS[0].hex,
     });
 
     const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
@@ -96,6 +110,7 @@ export default function RnRCreateChallenge() {
         if (step === 1) return form.challengeType !== null && form.name.trim().length > 0;
         if (step === 2) return form.reward.trim().length > 0 && Number(form.goalAmount) > 0 && Number(form.penaltyAmount) > 0;
         if (step === 3) return form.startDate !== '' && form.validationMode !== null;
+        if (step === 4) return form.selectedColor !== '';
         return false;
     };
 
@@ -129,13 +144,14 @@ export default function RnRCreateChallenge() {
 
             if (challengeError) throw challengeError;
 
-            // 2. Ajouter le créateur comme membre avec rôle 'admin'
+            // 2. Ajouter le créateur comme membre avec rôle 'admin' et sa couleur
             const { error: memberError } = await supabase
                 .from('challenge_members')
                 .insert({
                     challenge_id: challenge.id,
                     user_id: user.id,
-                    role: 'admin'
+                    role: 'admin',
+                    color: form.selectedColor
                 });
 
             if (memberError) throw memberError;
@@ -611,6 +627,65 @@ export default function RnRCreateChallenge() {
                                 )}
                             </motion.div>
                         )}
+                        {/* ═══ ÉTAPE 4 — Ma Couleur ═══════════════════════════ */}
+                        {step === 4 && (
+                            <motion.div
+                                key="step4"
+                                custom={direction}
+                                variants={slideVariants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+                                className="flex flex-col gap-8"
+                            >
+                                <div>
+                                    <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
+                                        Identité Visuelle
+                                    </p>
+                                    <div className="glass border border-white/8 rounded-2xl p-6">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold shadow-inner transition-colors duration-500"
+                                                style={{ backgroundColor: `${form.selectedColor}20`, color: form.selectedColor, border: `1px solid ${form.selectedColor}40` }}
+                                            >
+                                                P
+                                            </div>
+                                            <div>
+                                                <h3 className="text-white font-bold text-base">Votre couleur dans le défi</h3>
+                                                <p className="text-white/40 text-xs">Cette couleur vous représentera sur le calendrier.</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
+                                            {COLORS.map((c) => (
+                                                <button
+                                                    key={c.hex}
+                                                    onClick={() => set('selectedColor', c.hex)}
+                                                    className={`w-full aspect-square rounded-xl border-2 transition-all duration-300 hover:scale-110 flex items-center justify-center ${form.selectedColor === c.hex ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                                    title={c.name}
+                                                    style={{ backgroundColor: c.hex }}
+                                                >
+                                                    {form.selectedColor === c.hex && (
+                                                        <CheckCircle size={14} className="text-white drop-shadow-md" />
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 bg-brand-violet/5 border border-brand-violet/20 rounded-2xl p-6 text-center">
+                                        <div className="w-10 h-10 rounded-full bg-brand-violet/20 flex items-center justify-center mx-auto mb-3">
+                                            <Zap size={18} className="text-brand-violet-light" fill="currentColor" />
+                                        </div>
+                                        <h4 className="text-white font-bold mb-1">Prêt à lancer le défi ?</h4>
+                                        <p className="text-white/40 text-xs px-10">
+                                            Tous les paramètres sont configurés. Vos amis peuvent vous rejoindre dès l&apos;étape suivante.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </AnimatePresence>
                 </div>
 
@@ -629,7 +704,7 @@ export default function RnRCreateChallenge() {
                         <div />
                     )}
 
-                    {step < 3 ? (
+                    {step < 4 ? (
                         <button
                             onClick={() => goTo(step + 1)}
                             disabled={!canProceed()}
@@ -642,7 +717,7 @@ export default function RnRCreateChallenge() {
                         <button
                             onClick={handleCreate}
                             disabled={!canProceed() || isSubmitting}
-                            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-base text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-base text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed group relative overflow-hidden"
                             style={{
                                 background: canProceed() && !isSubmitting
                                     ? 'linear-gradient(135deg, #8B3AF7, #C026D3, #00D4FF)'
@@ -652,6 +727,7 @@ export default function RnRCreateChallenge() {
                                     : 'none',
                             }}
                         >
+                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 slant" />
                             {isSubmitting ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1" />
                             ) : (
