@@ -123,7 +123,7 @@ export default function RnRDashboard() {
                     <div className="flex items-center justify-between mb-5">
                         <h2 className="text-lg font-bold text-white">Mes défis</h2>
                         <Link
-                            href="/riseandreward/challenges/new"
+                            href="/riseandreward/nouveau"
                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all glow-cyan"
                         >
                             <Plus size={13} />
@@ -163,7 +163,7 @@ export default function RnRDashboard() {
                                             </div>
                                         </div>
                                         <Link
-                                            href={`/riseandreward/challenges/${cm.challenge_id}`}
+                                            href={`/riseandreward/nouveau`}
                                             className="flex items-center gap-1 text-xs text-white/40 hover:text-brand-cyan transition-colors group-hover:text-white/70 mt-1"
                                         >
                                             Voir

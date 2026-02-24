@@ -160,7 +160,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                     ) : (
                         /* Cas B — Connecté, 0 défi */
                         <Link
-                            href="/riseandreward/challenges/new"
+                            href="/riseandreward/nouveau"
                             className="group flex items-center gap-3 px-10 py-5 rounded-2xl font-bold text-lg text-white transition-all duration-300"
                             style={{
                                 background: 'linear-gradient(135deg, #8B3AF7, #C026D3, #00D4FF)',

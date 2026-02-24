@@ -40,15 +40,19 @@ export default function SignUpPage() {
         setLoading(true);
         const supabase = createClient();
 
+        // Récupérer le code d'invitation depuis l'URL si présent
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteCode = urlParams.get('invite');
+        const redirectTo = inviteCode
+            ? `${window.location.origin}/join/${inviteCode}`
+            : `${window.location.origin}/riseandreward`;
+
         const { error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                // Le prénom est stocké dans user_metadata — le trigger handle_new_user
-                // utilise la partie avant @ de l'email comme username par défaut dans profiles.
-                // On passera le prénom en metadata pour qu'il soit disponible via auth.users.
                 data: { first_name: firstName.trim() },
-                emailRedirectTo: `${window.location.origin}/riseandreward`,
+                emailRedirectTo: redirectTo,
             },
         });
 
