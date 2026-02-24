@@ -403,7 +403,7 @@ export default function RnRCreateChallenge() {
                                             value={form.goalAmount}
                                             onChange={e => set('goalAmount', e.target.value)}
                                             placeholder="ex. 200"
-                                            className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20"
+                                            className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20 appearance-none"
                                         />
                                     </div>
                                     <div className="flex items-start gap-2 bg-brand-cyan/5 border border-brand-cyan/15 rounded-xl px-4 py-3 mt-1">
@@ -435,7 +435,7 @@ export default function RnRCreateChallenge() {
                                             value={form.penaltyAmount}
                                             onChange={e => set('penaltyAmount', e.target.value)}
                                             placeholder="ex. 2, 5, 10..."
-                                            className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20"
+                                            className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20 appearance-none"
                                         />
                                     </div>
 
