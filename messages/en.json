@@ -10,7 +10,9 @@
         "tagline": "Free your time • Create your way",
         "title": "AI in service of your freedom.",
         "subtitle": "We forge intelligent tools to automate the necessary and let you live the essential.",
-        "cta": "See our projects"
+        "cta": "See our projects",
+        "visionCta": "Our vision",
+        "forgedWith": "Tools forged with"
     },
     "projects": {
         "title": "Our Projects",

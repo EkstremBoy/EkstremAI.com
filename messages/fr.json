@@ -10,7 +10,9 @@
         "tagline": "Libérez votre temps • Créez à votre image",
         "title": "L'IA au service de votre liberté.",
         "subtitle": "Nous forgeons des outils intelligents pour automatiser l'utile et vous permettre de vivre l'essentiel.",
-        "cta": "Voir nos projets"
+        "cta": "Voir nos projets",
+        "visionCta": "Notre vision",
+        "forgedWith": "Outils forgés avec"
     },
     "projects": {
         "title": "Nos Projets",

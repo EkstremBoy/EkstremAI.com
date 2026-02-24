@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -17,7 +17,7 @@ export default function HeroSection() {
     const t = useTranslations('hero');
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden animated-bg">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden animated-bg pt-28">
             {/* Decorative orbs */}
             <div
                 aria-hidden
@@ -47,7 +47,6 @@ export default function HeroSection() {
                     animate="visible"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-cyan/20 text-brand-cyan text-sm font-medium mb-8"
                 >
-                    <Sparkles size={14} />
                     {t('tagline')}
                 </motion.div>
 
@@ -92,7 +91,7 @@ export default function HeroSection() {
                         href="#vision"
                         className="px-7 py-3.5 rounded-2xl border border-white/10 text-white/70 font-medium text-base hover:border-white/20 hover:text-white transition-all duration-200"
                     >
-                        Notre vision
+                        {t('visionCta')}
                     </a>
                 </motion.div>
 
@@ -113,7 +112,7 @@ export default function HeroSection() {
                         ))}
                     </div>
                     <div className="text-left">
-                        <p className="text-xs text-white/40 font-medium">Outils forgés avec</p>
+                        <p className="text-xs text-white/40 font-medium">{t('forgedWith')}</p>
                         <p className="text-sm text-white font-semibold">IA • Supabase • Next.js</p>
                     </div>
                 </motion.div>
