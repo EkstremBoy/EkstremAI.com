@@ -388,10 +388,10 @@ export default function RnRCreateChallenge() {
                                         <Target size={12} className="text-brand-violet-light" />
                                         Quel est l&apos;objectif financier ?
                                     </label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 font-bold text-base flex items-center justify-center pointer-events-none">
+                                    <div className="flex items-center input-glass !p-0 focus-within:border-brand-cyan/50 focus-within:ring-3 focus-within:ring-brand-cyan/8 transition-all overflow-hidden">
+                                        <div className="w-12 h-full flex items-center justify-center border-r border-white/5 text-white/40 font-bold shrink-0">
                                             $
-                                        </span>
+                                        </div>
                                         <input
                                             id="rr-fld-m29"
                                             name="rr-fld-m29"
@@ -403,7 +403,7 @@ export default function RnRCreateChallenge() {
                                             value={form.goalAmount}
                                             onChange={e => set('goalAmount', e.target.value)}
                                             placeholder="ex. 200"
-                                            className="input-glass pl-14"
+                                            className="flex-1 bg-transparent border-none outline-none py-3 px-4 text-white"
                                         />
                                     </div>
                                     <div className="flex items-start gap-2 bg-brand-cyan/5 border border-brand-cyan/15 rounded-xl px-4 py-3 mt-1">
@@ -420,10 +420,10 @@ export default function RnRCreateChallenge() {
                                         <DollarSign size={12} className="text-red-400" />
                                         Coût d&apos;un échec quotidien
                                     </label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-white/40 font-bold text-base flex items-center justify-center pointer-events-none">
+                                    <div className="flex items-center input-glass !p-0 focus-within:border-brand-cyan/50 focus-within:ring-3 focus-within:ring-brand-cyan/8 transition-all overflow-hidden">
+                                        <div className="w-12 h-full flex items-center justify-center border-r border-white/5 text-white/40 font-bold shrink-0">
                                             $
-                                        </span>
+                                        </div>
                                         <input
                                             id="rr-fld-p77"
                                             name="rr-fld-p77"
@@ -435,7 +435,7 @@ export default function RnRCreateChallenge() {
                                             value={form.penaltyAmount}
                                             onChange={e => set('penaltyAmount', e.target.value)}
                                             placeholder="ex. 2, 5, 10..."
-                                            className="input-glass pl-14"
+                                            className="flex-1 bg-transparent border-none outline-none py-3 px-4 text-white"
                                         />
                                     </div>
 
