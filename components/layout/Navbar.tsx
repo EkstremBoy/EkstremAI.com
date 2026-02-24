@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
     const t = useTranslations('nav');
@@ -39,22 +40,21 @@ export default function Navbar() {
     return (
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-                    ? 'glass border-b border-white/5 py-3'
-                    : 'bg-transparent py-5'
+                ? 'glass border-b border-white/5 py-3'
+                : 'bg-transparent py-5'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href={`/${locale}`} className="flex items-center gap-2 group">
-                    <div className="relative">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet flex items-center justify-center text-white font-black text-sm group-hover:scale-110 transition-transform duration-300">
-                            E
-                        </div>
-                        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-cyan to-brand-violet opacity-0 group-hover:opacity-30 blur-md transition-opacity duration-300" />
-                    </div>
-                    <span className="font-bold text-lg tracking-tight">
-                        Ekstrem<span className="gradient-text">AI</span>
-                    </span>
+                <Link href={`/${locale}`} className="flex items-center group">
+                    <Image
+                        src="/images/logo.png"
+                        alt="EkstremAI"
+                        width={140}
+                        height={48}
+                        className="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]"
+                        priority
+                    />
                 </Link>
 
                 {/* Desktop nav */}
