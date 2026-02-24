@@ -122,7 +122,7 @@ export default function RnRSuccessPage() {
                         <CheckCircle size={32} className="text-green-400" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-white mb-2 leading-tight">
-                        Ton défi est officiellement lancé ! 🎉
+                        Défi lancé ! 🎉
                     </h1>
                     <p className="text-white/40">
                         Il est temps de recruter tes coéquipiers pour remplir la cagnotte.

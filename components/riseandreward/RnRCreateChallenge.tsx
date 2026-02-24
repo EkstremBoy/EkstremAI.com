@@ -311,16 +311,16 @@ export default function RnRCreateChallenge() {
                                             transition={{ duration: 0.3 }}
                                             className="flex flex-col gap-2"
                                         >
-                                            <label htmlFor="rr-challenge-title" className="text-xs font-semibold text-white/40 tracking-wider uppercase">
+                                            <label htmlFor="rr-fld-v92" className="text-xs font-semibold text-white/40 tracking-wider uppercase">
                                                 {form.challengeType === 'collective'
                                                     ? 'Quel est le défi quotidien du groupe ?'
                                                     : 'Donnez un nom à votre groupe'}
                                             </label>
                                             <input
-                                                id="rr-challenge-title"
-                                                name="rr-challenge-title"
+                                                id="rr-fld-v92"
+                                                name="rr-fld-v92"
                                                 type="text"
-                                                autoComplete="off"
+                                                autoComplete="one-time-code"
                                                 data-lpignore="true"
                                                 data-dashlane-ignore="true"
                                                 value={form.name}
@@ -364,15 +364,15 @@ export default function RnRCreateChallenge() {
                             >
                                 {/* Récompense */}
                                 <div className="flex flex-col gap-2">
-                                    <label htmlFor="rr-reward-desc" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
+                                    <label htmlFor="rr-fld-k31" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <Star size={12} className="text-brand-cyan" />
                                         Que va-t-on se payer avec la cagnotte ?
                                     </label>
                                     <input
-                                        id="rr-reward-desc"
-                                        name="rr-reward-desc"
+                                        id="rr-fld-k31"
+                                        name="rr-fld-k31"
                                         type="text"
-                                        autoComplete="off"
+                                        autoComplete="one-time-code"
                                         data-lpignore="true"
                                         data-dashlane-ignore="true"
                                         value={form.reward}
@@ -384,18 +384,18 @@ export default function RnRCreateChallenge() {
 
                                 {/* Cagnotte cible */}
                                 <div className="flex flex-col gap-2">
-                                    <label htmlFor="rr-goal-val" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
+                                    <label htmlFor="rr-fld-m29" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <Target size={12} className="text-brand-violet-light" />
                                         Quel est l&apos;objectif financier ?
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold text-base">$</span>
                                         <input
-                                            id="rr-goal-val"
-                                            name="rr-goal-val"
+                                            id="rr-fld-m29"
+                                            name="rr-fld-m29"
                                             type="number"
                                             min={1}
-                                            autoComplete="off"
+                                            autoComplete="one-time-code"
                                             data-lpignore="true"
                                             data-dashlane-ignore="true"
                                             value={form.goalAmount}
@@ -414,18 +414,18 @@ export default function RnRCreateChallenge() {
 
                                 {/* Amende */}
                                 <div className="flex flex-col gap-2">
-                                    <label htmlFor="rr-penalty-val" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
+                                    <label htmlFor="rr-fld-p77" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <DollarSign size={12} className="text-red-400" />
                                         Coût d&apos;un échec quotidien
                                     </label>
                                     <div className="relative">
                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold text-base">$</span>
                                         <input
-                                            id="rr-penalty-val"
-                                            name="rr-penalty-val"
+                                            id="rr-fld-p77"
+                                            name="rr-fld-p77"
                                             type="number"
                                             min={1}
-                                            autoComplete="off"
+                                            autoComplete="one-time-code"
                                             data-lpignore="true"
                                             data-dashlane-ignore="true"
                                             value={form.penaltyAmount}
@@ -471,15 +471,15 @@ export default function RnRCreateChallenge() {
                             >
                                 {/* Date de départ */}
                                 <div className="flex flex-col gap-2">
-                                    <label htmlFor="rr-start-dt" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
+                                    <label htmlFor="rr-fld-d14" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <CalendarDays size={12} className="text-brand-cyan" />
                                         Date de départ
                                     </label>
                                     <input
-                                        id="rr-start-dt"
-                                        name="rr-start-dt"
+                                        id="rr-fld-d14"
+                                        name="rr-fld-d14"
                                         type="date"
-                                        autoComplete="off"
+                                        autoComplete="one-time-code"
                                         data-lpignore="true"
                                         data-dashlane-ignore="true"
                                         value={form.startDate}

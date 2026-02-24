@@ -48,9 +48,11 @@ export default function RnRNavbar({ minimal = false }: RnRNavbarProps) {
                 </Link>
 
                 {/* Rise & Reward label */}
-                <div className={`${minimal ? 'flex' : 'hidden md:flex'} items-center gap-2 px-3 py-1.5 rounded-full glass border border-brand-violet/25`}>
-                    <span className="text-xs font-bold text-brand-violet-light tracking-widest uppercase">Rise & Reward</span>
-                </div>
+                {!minimal && (
+                    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-brand-violet/25">
+                        <span className="text-xs font-bold text-brand-violet-light tracking-widest uppercase">Rise & Reward</span>
+                    </div>
+                )}
 
                 {/* Desktop nav */}
                 {!minimal && (
