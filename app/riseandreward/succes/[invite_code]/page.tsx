@@ -8,7 +8,7 @@ import RnRNavbar from '@/components/riseandreward/RnRNavbar';
 import {
     CheckCircle, Copy, Share2, Users,
     ArrowRight, MessageCircle, Send,
-    PartyPopper, Sparkles
+    PartyPopper, Sparkles, Zap
 } from 'lucide-react';
 
 interface Challenge {
@@ -153,8 +153,8 @@ export default function RnRSuccessPage() {
                                 <button
                                     onClick={() => copyToClipboard(inviteLink)}
                                     className={`shrink-0 h-auto px-4 rounded-xl flex items-center justify-center transition-all ${copied
-                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                            : 'bg-brand-cyan text-brand-black hover:scale-105 active:scale-95 font-bold text-xs'
+                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                        : 'bg-brand-cyan text-brand-black hover:scale-105 active:scale-95 font-bold text-xs'
                                         }`}
                                 >
                                     {copied ? <CheckCircle size={18} /> : 'COPIER LE LIEN'}
