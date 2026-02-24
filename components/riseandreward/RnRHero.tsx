@@ -2,7 +2,12 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight, Zap, Flame } from 'lucide-react';
+
+interface RnRHeroProps {
+    /** 'guest' = not logged in (default), 'new-user' = logged in but 0 challenges */
+    ctaMode?: 'guest' | 'new-user';
+}
 
 const fadeUp = {
     hidden: { opacity: 0, y: 32 },
@@ -13,7 +18,7 @@ const fadeUp = {
     }),
 };
 
-export default function RnRHero() {
+export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
             {/* Background gradient orbs */}
@@ -127,28 +132,46 @@ export default function RnRHero() {
                     animate="visible"
                     className="flex flex-col sm:flex-row gap-4 items-center justify-center"
                 >
-                    {/* Primary — Se connecter */}
-                    <Link
-                        href="/fr/login"
-                        className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-300 glow-cyan"
-                    >
-                        Se connecter
-                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
-                    </Link>
+                    {ctaMode === 'guest' ? (
+                        <>
+                            {/* Primary — Se connecter */}
+                            <Link
+                                href="/fr/login"
+                                className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-300 glow-cyan"
+                            >
+                                Se connecter
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
+                            </Link>
 
-                    {/* Secondary — Créer un compte */}
-                    <Link
-                        href="/fr/signup"
-                        className="group relative flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-white border border-white/10 hover:border-brand-violet/50 hover:bg-brand-violet/10 transition-all duration-300"
-                    >
-                        <span
-                            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            {/* Secondary — Créer un compte */}
+                            <Link
+                                href="/fr/signup"
+                                className="group relative flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-white border border-white/10 hover:border-brand-violet/50 hover:bg-brand-violet/10 transition-all duration-300"
+                            >
+                                <span
+                                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    style={{
+                                        background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,58,247,0.15), transparent)',
+                                    }}
+                                />
+                                <span className="relative z-10">Créer un compte</span>
+                            </Link>
+                        </>
+                    ) : (
+                        /* Cas B — Connecté, 0 défi */
+                        <Link
+                            href="/riseandreward/challenges/new"
+                            className="group flex items-center gap-3 px-10 py-5 rounded-2xl font-bold text-lg text-white transition-all duration-300"
                             style={{
-                                background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,58,247,0.15), transparent)',
+                                background: 'linear-gradient(135deg, #8B3AF7, #C026D3, #00D4FF)',
+                                boxShadow: '0 0 40px rgba(139,58,247,0.4), 0 0 80px rgba(0,212,255,0.15)',
                             }}
-                        />
-                        <span className="relative z-10">Créer un compte</span>
-                    </Link>
+                        >
+                            <Flame size={20} className="group-hover:scale-110 transition-transform" />
+                            Créer mon premier défi de groupe
+                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
+                        </Link>
+                    )}
                 </motion.div>
 
                 {/* Social proof pill */}
