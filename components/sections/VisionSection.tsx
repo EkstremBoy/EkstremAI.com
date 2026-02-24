@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { Minimize2, Zap, Gem } from 'lucide-react';
+import { Lightbulb, Zap, Gem } from 'lucide-react';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -11,14 +11,14 @@ const fadeUp = {
 
 const pillars = [
     {
-        key: 'simplicity' as const,
-        icon: <Minimize2 size={24} />,
+        key: 'intuitivite' as const,
+        icon: <Lightbulb size={24} />,
         gradient: 'from-brand-cyan/20 to-brand-blue/10',
         iconColor: 'text-brand-cyan',
         borderHover: 'group-hover:border-brand-cyan/30',
     },
     {
-        key: 'impact' as const,
+        key: 'efficacite' as const,
         icon: <Zap size={24} />,
         gradient: 'from-brand-violet/20 to-brand-navy/10',
         iconColor: 'text-brand-violet-light',

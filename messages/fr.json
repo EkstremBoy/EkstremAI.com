@@ -30,17 +30,17 @@
         "title": "Notre Vision",
         "subtitle": "Trois piliers guident chacune de nos créations.",
         "pillars": {
-            "simplicity": {
-                "title": "Simplicité",
-                "desc": "Des interfaces épurées qui s'effacent pour mettre en valeur l'expérience."
+            "intuitivite": {
+                "title": "L'Intuitivité",
+                "desc": "L'outil idéal n'a pas besoin de mode d'emploi. Nous croyons qu'un seul coup d'œil devrait suffire pour comprendre comment atteindre votre objectif. Notre priorité est de trouver l'équilibre parfait entre la clarté et la puissance pour que la technologie devienne une seconde nature."
             },
-            "impact": {
-                "title": "Impact",
-                "desc": "Des outils qui produisent de vrais résultats dans la vie réelle de nos utilisateurs."
+            "efficacite": {
+                "title": "L'Efficacité",
+                "desc": "L'art d'éliminer chaque étape superflue entre votre intention et le résultat. Nous ne développons pas seulement des outils, nous concevons des raccourcis vers l'excellence en supprimant la friction pour ne garder que la performance pure."
             },
             "aesthetics": {
-                "title": "Esthétique",
-                "desc": "La beauté n'est pas un luxe. Elle est la preuve que le détail a été pensé."
+                "title": "L'Esthétique",
+                "desc": "Quand la beauté rencontre la simplicité, la technologie offre ce qu'elle a de mieux. Pour nous, le design n'est pas un luxe, c'est la preuve que chaque détail a été pensé pour honorer l'expérience de celui qui l'utilise."
             }
         }
     },

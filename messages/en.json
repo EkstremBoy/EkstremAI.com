@@ -30,17 +30,17 @@
         "title": "Our Vision",
         "subtitle": "Three pillars guide every creation we build.",
         "pillars": {
-            "simplicity": {
-                "title": "Simplicity",
-                "desc": "Minimalist interfaces that fade away to put the experience first."
+            "intuitivite": {
+                "title": "Intuitiveness",
+                "desc": "The ideal tool needs no manual. We believe a single glance should be enough to understand how to reach your goal. Our priority is finding the perfect balance between clarity and power so that technology becomes second nature."
             },
-            "impact": {
-                "title": "Impact",
-                "desc": "Tools that produce real results in the real lives of our users."
+            "efficacite": {
+                "title": "Efficiency",
+                "desc": "The art of eliminating every unnecessary step between your intention and the result. We don't just build tools — we design shortcuts to excellence by removing friction and keeping only pure performance."
             },
             "aesthetics": {
                 "title": "Aesthetics",
-                "desc": "Beauty is not a luxury. It is proof that the details were cared for."
+                "desc": "When beauty meets simplicity, technology offers its very best. For us, design is not a luxury — it is proof that every detail was thoughtfully crafted to honor the experience of the person using it."
             }
         }
     },
