@@ -26,14 +26,14 @@ export default function RnRSuccessPage() {
     const [copied, setCopied] = useState(false);
     const [memberCount, setMemberCount] = useState(1);
 
-    const challengeId = params.id as string;
+    const inviteCodeParam = params.invite_code as string;
 
     useEffect(() => {
         async function loadChallenge() {
             const { data, error } = await supabase
                 .from('challenges')
                 .select('id, name, invite_code')
-                .eq('id', challengeId)
+                .eq('invite_code', inviteCodeParam)
                 .single();
 
             if (data) {
@@ -43,14 +43,14 @@ export default function RnRSuccessPage() {
                 const { count } = await supabase
                     .from('challenge_members')
                     .select('user_id', { count: 'exact', head: true })
-                    .eq('challenge_id', challengeId);
+                    .eq('challenge_id', data.id);
 
                 setMemberCount(count ?? 1);
             }
             setLoading(false);
         }
         loadChallenge();
-    }, [challengeId]);
+    }, [inviteCodeParam]);
 
     const inviteLink = typeof window !== 'undefined'
         ? `${window.location.origin}/join/${challenge?.invite_code}`
@@ -163,8 +163,8 @@ export default function RnRSuccessPage() {
                                     <button
                                         onClick={copyToClipboard}
                                         className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${copied
-                                                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                                                : 'bg-brand-cyan text-brand-black hover:scale-105 active:scale-95'
+                                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                            : 'bg-brand-cyan text-brand-black hover:scale-105 active:scale-95'
                                             }`}
                                     >
                                         {copied ? <CheckCircle size={18} /> : <Copy size={18} />}

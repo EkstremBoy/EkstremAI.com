@@ -129,18 +129,19 @@ export default function RnRCreateChallenge() {
 
             if (challengeError) throw challengeError;
 
-            // 2. Ajouter le créateur comme membre (admin/creator par défaut via created_by)
+            // 2. Ajouter le créateur comme membre avec rôle 'admin'
             const { error: memberError } = await supabase
                 .from('challenge_members')
                 .insert({
                     challenge_id: challenge.id,
                     user_id: user.id,
+                    role: 'admin'
                 });
 
             if (memberError) throw memberError;
 
-            // Rediriger vers la page de succès
-            router.push(`/riseandreward/succes/${challenge.id}`);
+            // Rediriger vers la page de succès via le invite_code
+            router.push(`/riseandreward/succes/${inviteCode}`);
         } catch (err: any) {
             console.error('Erreur lors de la création:', err);
             setError(err.message || 'Une erreur inattendue est survenue.');
@@ -288,8 +289,8 @@ export default function RnRCreateChallenge() {
                                                 key={gt.label}
                                                 onClick={() => set('groupType', gt.label)}
                                                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium border transition-all ${form.groupType === gt.label
-                                                        ? 'bg-brand-cyan/15 border-brand-cyan/50 text-brand-cyan'
-                                                        : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'
+                                                    ? 'bg-brand-cyan/15 border-brand-cyan/50 text-brand-cyan'
+                                                    : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'
                                                     }`}
                                             >
                                                 {gt.icon}
@@ -632,7 +633,7 @@ export default function RnRCreateChallenge() {
                             ) : (
                                 <Flame size={16} />
                             )}
-                            {isSubmitting ? 'Création...' : 'Lancer le défi !'}
+                            {isSubmitting ? 'Création en cours...' : 'Lancer le défi !'}
                             {!isSubmitting && <ArrowRight size={16} />}
                         </button>
                     )}

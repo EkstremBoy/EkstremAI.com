@@ -17,8 +17,8 @@ export default async function NouveauDefiPage() {
     }
 
     return (
-        <main className="relative bg-[#030712] text-[#f0f9ff] font-jakarta min-h-screen overflow-x-hidden">
-            <RnRNavbar />
+        <main className="bg-[#030712]">
+            <RnRNavbar minimal />
             <RnRCreateChallenge />
         </main>
     );
