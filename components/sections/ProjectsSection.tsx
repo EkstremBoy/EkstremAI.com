@@ -90,7 +90,7 @@ export default function ProjectsSection() {
                                 </motion.ul>
 
                                 <Link
-                                    href={`/${locale}/login`}
+                                    href="/riseandreward"
                                     className="group/btn inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-cyan text-brand-black font-semibold text-sm hover:bg-brand-cyan/90 transition-all duration-200 glow-cyan"
                                 >
                                     {t('rr.cta')}

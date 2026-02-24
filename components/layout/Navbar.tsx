@@ -81,14 +81,6 @@ export default function Navbar() {
                     >
                         {locale === 'fr' ? 'EN' : 'FR'}
                     </button>
-
-                    {/* CTA */}
-                    <Link
-                        href={`/${locale}/dashboard/rise-reward`}
-                        className="relative group px-5 py-2 rounded-xl text-sm font-semibold text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-200 glow-cyan"
-                    >
-                        <span className="relative z-10">{t('cta')}</span>
-                    </Link>
                 </div>
 
                 {/* Mobile hamburger */}
@@ -129,12 +121,6 @@ export default function Navbar() {
                                 >
                                     {locale === 'fr' ? 'EN' : 'FR'}
                                 </button>
-                                <Link
-                                    href={`/${locale}/dashboard/rise-reward`}
-                                    className="flex-1 text-center px-4 py-2 rounded-xl text-sm font-semibold text-brand-black bg-brand-cyan"
-                                >
-                                    {t('cta')}
-                                </Link>
                             </div>
                         </div>
                     </motion.div>
