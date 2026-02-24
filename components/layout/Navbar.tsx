@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import UserMenu from '@/components/auth/UserMenu';
 
 export default function Navbar() {
     const t = useTranslations('nav');
@@ -81,6 +82,7 @@ export default function Navbar() {
                     >
                         {locale === 'fr' ? 'EN' : 'FR'}
                     </button>
+                    <UserMenu locale={locale} />
                 </div>
 
                 {/* Mobile hamburger */}
@@ -121,6 +123,7 @@ export default function Navbar() {
                                 >
                                     {locale === 'fr' ? 'EN' : 'FR'}
                                 </button>
+                                <UserMenu locale={locale} />
                             </div>
                         </div>
                     </motion.div>

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import UserMenu from '@/components/auth/UserMenu';
 
 export default function RnRNavbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -63,19 +64,7 @@ export default function RnRNavbar() {
 
                 {/* Right CTA */}
                 <div className="hidden md:flex items-center gap-3">
-                    <Link
-                        href="/auth/login"
-                        className="text-sm font-medium text-white/60 hover:text-white transition-colors px-4 py-2"
-                    >
-                        Se connecter
-                    </Link>
-                    <Link
-                        href="/auth/register"
-                        className="group flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-semibold text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-200 glow-cyan"
-                    >
-                        Commencer
-                        <ChevronRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
+                    <UserMenu locale="fr" loginLabel="Se connecter" />
                 </div>
 
                 {/* Mobile hamburger */}
@@ -109,19 +98,8 @@ export default function RnRNavbar() {
                                     {link.label}
                                 </a>
                             ))}
-                            <div className="flex gap-3 pt-2 border-t border-white/5">
-                                <Link
-                                    href="/auth/login"
-                                    className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium text-white/70 border border-white/10"
-                                >
-                                    Se connecter
-                                </Link>
-                                <Link
-                                    href="/auth/register"
-                                    className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold text-brand-black bg-brand-cyan"
-                                >
-                                    Commencer
-                                </Link>
+                            <div className="flex gap-3 pt-2 border-t border-white/5 items-center">
+                                <UserMenu locale="fr" loginLabel="Se connecter" />
                             </div>
                         </div>
                     </motion.div>
