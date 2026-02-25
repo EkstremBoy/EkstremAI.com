@@ -364,8 +364,9 @@
             "member_role": "Member",
             "stats": {
                 "streak": "Streak",
-                "pool": "Contribution",
-                "generous": "Generous"
+                "pool": "Contribution pool",
+                "generous": "Generous",
+                "contribution": "Contribution"
             },
             "badges": {
                 "unstoppable": "Unstoppable",

@@ -365,7 +365,8 @@
             "stats": {
                 "streak": "Streak",
                 "pool": "Cagnotte",
-                "generous": "Généreux"
+                "generous": "Généreux",
+                "contribution": "Contribution"
             },
             "badges": {
                 "unstoppable": "Inarrêtable",

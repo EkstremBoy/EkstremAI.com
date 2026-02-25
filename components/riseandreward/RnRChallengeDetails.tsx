@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Trophy, Users, CalendarDays, Zap,
+    Trophy, Users, CalendarDays, Coins,
     Flame, Award, ShieldCheck, Timer,
     ChevronLeft, Plus, MessageSquare, Lock
 } from 'lucide-react';
@@ -192,7 +192,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                             </span>
                             <span>•</span>
                             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 text-[10px] uppercase font-bold tracking-wider">
-                                <Zap size={10} className="fill-brand-cyan" />
+                                <Coins size={10} className="fill-brand-cyan" />
                                 {totalPool}$ TOTAL
                             </span>
                             <span>•</span>
@@ -273,7 +273,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
 
                                     <div className="flex items-center justify-between p-3 rounded-xl bg-white/2 border border-white/5">
                                         <div className="flex items-center gap-2 text-white/40">
-                                            <Zap size={14} className="text-brand-cyan" />
+                                            <Coins size={14} className="text-brand-cyan" />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">{t('details.stats.contribution') || 'Contribution'}</span>
                                         </div>
                                         <span className="font-black text-brand-cyan italic">
@@ -378,8 +378,8 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     key={i}
                                     whileHover={!isFuture && !isLocked ? { scale: 1.02, borderColor: 'rgba(255,255,255,0.2)' } : {}}
                                     className={`relative aspect-[1.3/1] glass rounded-2xl flex flex-col items-center justify-center border transition-all overflow-hidden ${isFuture
-                                            ? 'border-white/10 opacity-60 pointer-events-none'
-                                            : 'border-white/5 hover:bg-white/2'
+                                        ? 'border-white/10 opacity-60 pointer-events-none'
+                                        : 'border-white/5 hover:bg-white/2'
                                         } ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                 >
                                     {/* Perfect Centering - Flex Column with gap */}
