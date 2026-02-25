@@ -13,6 +13,7 @@ export default function GeneralProfilePage() {
     const t = useTranslations('profile_page');
     const [userProfile, setUserProfile] = useState<any>(null);
     const [username, setUsername] = useState('');
+    const [tokens, setTokens] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -22,19 +23,29 @@ export default function GeneralProfilePage() {
         async function loadProfile() {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('id, username, avatar_url')
-                    .eq('id', user.id)
-                    .single();
+                const [{ data: profile }, { data: tokenData }] = await Promise.all([
+                    supabase.from('profiles').select('id, username, avatar_url').eq('id', user.id).single(),
+                    supabase.from('user_tokens').select('balance').eq('user_id', user.id).single()
+                ]);
 
                 setUserProfile({ ...user, ...profile });
                 setUsername(profile?.username || user.email?.split('@')[0] || '');
+
+                if (!tokenData) {
+                    const { data: newToken } = await supabase
+                        .from('user_tokens')
+                        .insert({ user_id: user.id, balance: 1 })
+                        .select('balance')
+                        .single();
+                    setTokens(newToken?.balance ?? 1);
+                } else {
+                    setTokens(tokenData.balance);
+                }
             }
             setLoading(false);
         }
         loadProfile();
-    }, []);
+    }, [supabase]);
 
     const handlePhotoUpdate = (url: string) => {
         setUserProfile((prev: any) => ({ ...prev, avatar_url: url }));
@@ -98,19 +109,39 @@ export default function GeneralProfilePage() {
                 </motion.div>
 
                 <div className="grid md:grid-cols-3 gap-8">
-                    {/* Left Col: Photo Upload */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="glass rounded-3xl p-8 border border-white/5 flex flex-col items-center"
-                    >
-                        <ProfilePhotoUpload
-                            userId={userProfile.id}
-                            currentAvatarUrl={userProfile.avatar_url}
-                            onUploadComplete={handlePhotoUpdate}
-                        />
-                    </motion.div>
+                    {/* Left Col: Photo & Tokens */}
+                    <div className="space-y-8">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="glass rounded-3xl p-8 border border-white/5 flex flex-col items-center"
+                        >
+                            <ProfilePhotoUpload
+                                userId={userProfile.id}
+                                currentAvatarUrl={userProfile.avatar_url}
+                                onUploadComplete={handlePhotoUpdate}
+                            />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.25 }}
+                            className="glass rounded-3xl p-6 border border-brand-cyan/20 bg-brand-cyan/5 group hover:border-brand-cyan/40 transition-all shadow-[0_0_20px_rgba(0,212,255,0.05)]"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="w-10 h-10 bg-brand-cyan/20 rounded-xl flex items-center justify-center text-brand-cyan glow-cyan">
+                                    <Sparkles size={20} />
+                                </div>
+                                <span className="text-2xl font-black text-white font-mono">{tokens ?? 0}</span>
+                            </div>
+                            <h3 className="text-sm font-bold text-white mb-1">{t('tokens')}</h3>
+                            <p className="text-[10px] text-white/40 leading-relaxed uppercase tracking-wider">
+                                {t('tokens_desc')}
+                            </p>
+                        </motion.div>
+                    </div>
 
                     {/* Right Col: Personal Info */}
                     <motion.div
