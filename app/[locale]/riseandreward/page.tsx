@@ -10,7 +10,8 @@ import RnRDashboard from '@/components/riseandreward/RnRDashboard';
 
 import { getTranslations } from 'next-intl/server';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'riseandreward.meta' });
     return {
         title: t('title'),
@@ -23,7 +24,8 @@ export async function generateMetadata({ params: { locale } }: { params: { local
     };
 }
 
-export default async function RiseAndRewardPage() {
+export default async function RiseAndRewardPage({ params }: { params: Promise<{ locale: string }> }) {
+    await params; // Accessing params even if not used to satisfy Next.js 15 requirements
     const supabase = await createClient();
 
     // 1. Vérifier l'état de connexion

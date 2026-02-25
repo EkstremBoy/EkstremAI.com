@@ -8,12 +8,13 @@ export const metadata: Metadata = {
     title: 'Nouveau défi — Rise & Reward',
 };
 
-export default async function NouveauDefiPage() {
+export default async function NouveauDefiPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        redirect('/fr/login');
+        redirect(`/${locale}/login`);
     }
 
     return (
