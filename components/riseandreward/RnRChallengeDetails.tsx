@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import {
     Trophy, Users, CalendarDays, Zap,
     Flame, Award, ShieldCheck, Timer,
-    ChevronLeft, Plus, MessageSquare
+    ChevronLeft, Plus, MessageSquare, Lock
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -40,6 +40,7 @@ interface Challenge {
     penalty_amount: number;
     goal_amount: number;
     max_members: number;
+    is_strict_mode: boolean;
     created_at: string;
 }
 
@@ -138,13 +139,11 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
 
     // ─── CALENDAR LOGIC (Feb 2026) ──────────────────────────────
     const calendarData = useMemo(() => {
-        const now = new Date(); // Using real time but targeting Feb 2026 for the request
         const year = 2026;
         const month = 1; // 0-indexed, Jan=0, Feb=1
         const daysInMonth = 28;
 
         // Feb 1st 2026 is a Sunday (index 6 if Mon=0, Sun=6)
-        // JS Date: 0=Sun, 1=Mon, ..., 6=Sat
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const startPadding = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
@@ -155,6 +154,18 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
             startPadding
         };
     }, []);
+
+    const todayNormalized = useMemo(() => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }, []);
+
+    const twoDaysAgo = useMemo(() => {
+        const d = new Date(todayNormalized);
+        d.setDate(d.getDate() - 2);
+        return d;
+    }, [todayNormalized]);
 
     // ─── RENDER ───────────────────────────────────────────────────
 
@@ -314,13 +325,20 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
 
                         {/* Start Padding */}
                         {Array.from({ length: calendarData.startPadding }).map((_, i) => (
-                            <div key={`pad-${i}`} className="aspect-square" />
+                            <div key={`pad-${i}`} className="aspect-[1.3/1]" />
                         ))}
 
                         {/* Actual Days */}
                         {Array.from({ length: calendarData.daysInMonth }, (_, i) => {
                             const day = i + 1;
                             const targetDateStr = `${calendarData.year}-02-${day.toString().padStart(2, '0')}`;
+                            const targetDate = new Date(targetDateStr);
+
+                            // Logic helpers
+                            const isFuture = targetDate > todayNormalized;
+                            const isLocked = challenge.is_strict_mode
+                                ? targetDate < todayNormalized
+                                : targetDate < twoDaysAgo;
 
                             // Get logs for this day and sort by completion time (fastest first)
                             const dayLogs = initialLogs
@@ -334,14 +352,23 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                             const allSuccess = dayLogs.length === orderedMembers.length && dayLogs.length > 0 && dayLogs.every(l => l.status === 'success');
 
                             return (
-                                <div key={i} className="relative aspect-square glass rounded-2xl flex flex-col items-center justify-center border border-white/5 group/day transition-colors hover:border-white/20">
+                                <motion.div
+                                    key={i}
+                                    whileHover={!isFuture && !isLocked ? { scale: 1.02, borderColor: 'rgba(255,255,255,0.2)' } : {}}
+                                    className={`relative aspect-[1.3/1] glass rounded-2xl flex flex-col items-center justify-center border transition-all overflow-hidden ${isFuture
+                                            ? 'border-white/2 opacity-20 pointer-events-none grayscale'
+                                            : 'border-white/5 hover:bg-white/2'
+                                        } ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                >
                                     {/* Perfect Centering - Flex Column with gap */}
                                     <div className="flex flex-col items-center justify-center gap-1.5 h-full w-full">
-                                        <span className="text-sm font-black text-white/40 group-hover/day:text-white transition-colors">{day}</span>
+                                        <span className={`text-sm font-black transition-colors ${isFuture ? 'text-white/20' : 'text-white/40 group-hover:text-white'}`}>
+                                            {day}
+                                        </span>
 
                                         {/* Completion Dots - Ordered left to right */}
                                         <div className="flex justify-center items-center gap-1 h-2">
-                                            {dayLogs.map((l, li) => {
+                                            {!isFuture && dayLogs.map((l, li) => {
                                                 const m = orderedMembers.find(mem => mem.user_id === l.user_id);
                                                 const color = m?.profiles?.color || '#ffffff';
                                                 return (
@@ -360,11 +387,23 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     </div>
 
                                     {allSuccess && (
-                                        <div className="absolute top-1 right-1 bg-brand-cyan text-brand-black rounded-full p-0.5 shadow-lg border-2 border-[#030712] z-20">
+                                        <div className="absolute top-1.5 right-1.5 bg-brand-cyan text-brand-black rounded-full p-0.5 shadow-lg border-2 border-[#030712] z-20">
                                             <Award size={10} />
                                         </div>
                                     )}
-                                </div>
+
+                                    {/* Lock Indicator */}
+                                    {isLocked && (
+                                        <div className="absolute bottom-1.5 right-1.5 text-white/20">
+                                            <Lock size={10} />
+                                        </div>
+                                    )}
+
+                                    {/* Subtle hover highlight */}
+                                    {!isFuture && !isLocked && (
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-brand-cyan/0 to-brand-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    )}
+                                </motion.div>
                             );
                         })}
                     </div>
