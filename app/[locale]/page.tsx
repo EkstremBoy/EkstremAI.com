@@ -5,7 +5,8 @@ import ProjectsSection from '@/components/sections/ProjectsSection';
 import VisionSection from '@/components/sections/VisionSection';
 import ContactSection from '@/components/sections/ContactSection';
 
-export default function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+    await params;
     return (
         <main className="relative">
             <Navbar />
