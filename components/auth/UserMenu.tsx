@@ -128,14 +128,6 @@ export default function UserMenu() {
                                 <span className="text-sm font-bold">{t('my_profile')}</span>
                             </Link>
 
-                            <Link
-                                href={`/${locale}/riseandreward/profile`}
-                                onClick={() => setIsOpen(false)}
-                                className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-brand-violet/10 text-white/60 hover:text-brand-violet-light transition-all group"
-                            >
-                                <Sparkles size={16} />
-                                <span className="text-sm font-bold">{t('my_ai_profile')}</span>
-                            </Link>
 
                             <Link
                                 href={`/${locale}/settings`}
