@@ -4,10 +4,21 @@ import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import UserMenu from '@/components/auth/UserMenu';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
     console.log("NAVBAR CHARGÉE");
     const locale = useLocale();
+    const pathname = usePathname();
+
+    // Logic to switch locale preservation current path
+    const getTargetLocalePath = () => {
+        const targetLocale = locale === 'fr' ? 'en' : 'fr';
+        // pathname is like /fr/dashboard/rise-reward or /fr
+        const segments = pathname.split('/');
+        segments[1] = targetLocale;
+        return segments.join('/');
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 py-4 glass border-b border-white/5" style={{ zIndex: 9999 }}>
@@ -29,9 +40,9 @@ export default function Navbar() {
 
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-5 border-l border-white/10 pl-8">
-                        {/* BOUTON LANGUE À DROITE */}
+                        {/* BOUTON LANGUE DYNAMIQUE */}
                         <Link
-                            href={locale === 'fr' ? '/en/dashboard' : '/fr/dashboard'}
+                            href={getTargetLocalePath()}
                             className="text-[10px] font-black px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-brand-cyan hover:border-brand-cyan/30 transition-all uppercase tracking-widest"
                         >
                             {locale === 'fr' ? 'EN' : 'FR'}
