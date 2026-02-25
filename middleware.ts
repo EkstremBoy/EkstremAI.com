@@ -12,8 +12,12 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
+    // DEBUG
+    console.log("MIDDLEWARE HIT:", pathname);
+
     // Skip middleware for sot-companion to allow direct access without locale prefix
     if (pathname.startsWith('/sot-companion')) {
+        console.log("BYPASSING MIDDLEWARE FOR SOT-COMPANION");
         return NextResponse.next();
     }
 
@@ -33,6 +37,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
     matcher: [
-        '/((?!api|_next/static|_next/image|sot-companion|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 };
