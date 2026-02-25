@@ -5,7 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 import UserMenu from '@/components/auth/UserMenu';
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 
 interface RnRNavbarProps {
     minimal?: boolean;
@@ -14,6 +16,8 @@ interface RnRNavbarProps {
 export default function RnRNavbar({ minimal = false }: RnRNavbarProps) {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const t = useTranslations('riseandreward.nav');
+    const locale = useLocale();
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 20);
@@ -22,9 +26,9 @@ export default function RnRNavbar({ minimal = false }: RnRNavbarProps) {
     }, []);
 
     const navLinks = minimal ? [] : [
-        { label: 'Comment ça marche', href: '#comment-ca-marche' },
-        { label: 'Transparence', href: '#transparence' },
-        { label: 'Aperçu', href: '#apercu' },
+        { label: t('how_it_works'), href: '#comment-ca-marche' },
+        { label: t('transparency'), href: '#transparence' },
+        { label: t('preview'), href: '#apercu' },
     ];
 
     return (
@@ -71,8 +75,14 @@ export default function RnRNavbar({ minimal = false }: RnRNavbarProps) {
                 )}
 
                 {/* Right CTA */}
-                <div className="hidden md:flex items-center gap-3">
-                    <UserMenu locale="fr" loginLabel="Se connecter" />
+                <div className="hidden md:flex items-center gap-4">
+                    <Link
+                        href="/en/dashboard"
+                        className="text-xs font-black px-3 py-1.5 rounded-lg border border-brand-cyan/30 text-brand-cyan hover:bg-brand-cyan/10 transition-all"
+                    >
+                        EN
+                    </Link>
+                    <UserMenu locale={locale} loginLabel={t('login')} />
                 </div>
 
                 {/* Mobile hamburger */}
@@ -109,8 +119,14 @@ export default function RnRNavbar({ minimal = false }: RnRNavbarProps) {
                                         {link.label}
                                     </a>
                                 ))}
-                                <div className="flex gap-3 pt-2 border-t border-white/5 items-center">
-                                    <UserMenu locale="fr" loginLabel="Se connecter" />
+                                <div className="flex justify-between pt-4 border-t border-white/5 items-center">
+                                    <Link
+                                        href="/en/dashboard"
+                                        className="text-xs font-black px-3 py-1.5 rounded-lg border border-brand-cyan/30 text-brand-cyan"
+                                    >
+                                        EN
+                                    </Link>
+                                    <UserMenu locale={locale} />
                                 </div>
                             </div>
                         </motion.div>

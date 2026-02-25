@@ -10,16 +10,17 @@ import {
     ArrowLeft, CheckCircle, Zap, Flame,
     Briefcase, Home, Heart
 } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 
 // ─── Types ───────────────────────────────────────────────────
 
 type ChallengeType = 'collective' | 'individual' | null;
 type ValidationMode = 'strict' | 'flexible' | null;
-type GroupType = 'Amis' | 'Famille' | 'Collègues' | 'Autre';
+type GroupType = string;
 
 interface FormState {
     challengeType: ChallengeType;
-    groupType: GroupType;
+    groupType: string;
     name: string;
     reward: string;
     goalAmount: string;
@@ -42,13 +43,6 @@ const generateInviteCode = () => {
 
 // ─── Stepper config ──────────────────────────────────────────
 
-const STEPS = [
-    { number: 1, label: 'Le Défi', icon: <Flame size={14} /> },
-    { number: 2, label: "L'Objectif", icon: <Target size={14} /> },
-    { number: 3, label: 'Les Règles', icon: <Shield size={14} /> },
-    { number: 4, label: 'Ma Couleur', icon: <Zap size={14} /> },
-];
-
 const COLORS = [
     { name: 'Bleu', hex: '#3b82f6', border: 'border-blue-500/30', bg: 'bg-blue-500/10', text: 'text-blue-400' },
     { name: 'Cyan', hex: '#06b6d4', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
@@ -58,13 +52,6 @@ const COLORS = [
     { name: 'Orange', hex: '#f97316', border: 'border-orange-500/30', bg: 'bg-orange-500/10', text: 'text-orange-400' },
     { name: 'Jaune', hex: '#eab308', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
     { name: 'Vert', hex: '#22c55e', border: 'border-green-500/30', bg: 'bg-green-500/10', text: 'text-green-400' },
-];
-
-const GROUP_TYPES: { label: GroupType; icon: React.ReactNode }[] = [
-    { label: 'Amis', icon: <Users size={16} /> },
-    { label: 'Famille', icon: <Home size={16} /> },
-    { label: 'Collègues', icon: <Briefcase size={16} /> },
-    { label: 'Autre', icon: <Heart size={16} /> },
 ];
 
 // ─── Animations ──────────────────────────────────────────────
@@ -80,6 +67,24 @@ const slideVariants = {
 export default function RnRCreateChallenge() {
     const router = useRouter();
     const supabase = createClient();
+    const t = useTranslations('riseandreward.create_challenge');
+    const locale = useLocale();
+
+    const STEPS = [
+        { number: 1, label: t('steps.step1'), icon: <Flame size={14} /> },
+        { number: 2, label: t('steps.step2'), icon: <Target size={14} /> },
+        { number: 3, label: t('steps.step3'), icon: <Shield size={14} /> },
+        { number: 4, label: t('steps.step4'), icon: <Zap size={14} /> },
+    ];
+
+    const GROUP_TYPES = [
+        { key: 'friends', label: t('group_types.friends'), icon: <Users size={16} /> },
+        { key: 'family', label: t('group_types.family'), icon: <Home size={16} /> },
+        { key: 'couple', label: t('group_types.couple'), icon: <Heart size={16} /> },
+        { key: 'colleagues', label: t('group_types.colleagues'), icon: <Briefcase size={16} /> },
+        { key: 'other', label: t('group_types.other'), icon: <Star size={16} /> },
+    ];
+
     const [step, setStep] = useState(1);
     const [direction, setDirection] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,7 +92,7 @@ export default function RnRCreateChallenge() {
 
     const [form, setForm] = useState<FormState>({
         challengeType: null,
-        groupType: 'Amis',
+        groupType: 'friends',
         name: '',
         reward: '',
         goalAmount: '',
@@ -114,7 +119,7 @@ export default function RnRCreateChallenge() {
         return false;
     };
 
-    const handleCreate = async () => {
+    const handleSubmit = async () => {
         if (!canProceed()) return;
         setIsSubmitting(true);
         setError(null);
@@ -122,6 +127,25 @@ export default function RnRCreateChallenge() {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Utilisateur non connecté');
+
+            // Vérifier si le profil existe (évite l'erreur FK profiles(id))
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('id, username')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError || !profile) {
+                // Créer le profil s'il manque
+                const { error: insertProfileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: user.id,
+                        username: user.email?.split('@')[0] || 'User',
+                        color: form.selectedColor || '#6366f1'
+                    });
+                if (insertProfileError) throw new Error("Impossible de créer votre profil. " + insertProfileError.message);
+            }
 
             const inviteCode = generateInviteCode();
 
@@ -142,7 +166,10 @@ export default function RnRCreateChallenge() {
                 .select()
                 .single();
 
-            if (challengeError) throw challengeError;
+            if (challengeError) {
+                console.error('Erreur Supabase Challenges:', challengeError);
+                throw new Error("Erreur lors de la création du défi : " + challengeError.message);
+            }
 
             // 2. Ajouter le créateur comme membre avec rôle 'admin' et sa couleur
             const { error: memberError } = await supabase
@@ -154,12 +181,16 @@ export default function RnRCreateChallenge() {
                     color: form.selectedColor
                 });
 
-            if (memberError) throw memberError;
+            if (memberError) {
+                console.error('Erreur Supabase Members Result:', memberError);
+                // Si l'erreur est un 400, on log les détails pour le debug
+                throw new Error(`Erreur lors de l'ajout du membre (Code ${memberError.code}) : ${memberError.message}`);
+            }
 
             // Rediriger vers la page de succès via le invite_code
             router.push(`/riseandreward/succes/${inviteCode}`);
         } catch (err: any) {
-            console.error('Erreur lors de la création:', err);
+            console.error('Erreur lors du lancement:', err);
             setError(err.message || 'Une erreur inattendue est survenue.');
             setIsSubmitting(false);
         }
@@ -185,12 +216,22 @@ export default function RnRCreateChallenge() {
                         Rise &amp; Reward
                     </div>
                     <h1 className="text-3xl md:text-4xl font-extrabold text-white">
-                        Créer un nouveau défi
+                        {t('title')}
                     </h1>
                     <p className="text-white/40 text-sm mt-2">
-                        Configurez votre groupe en 3 étapes simples.
+                        {t('subtitle', { count: 3 })}
                     </p>
                 </div>
+
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+                    >
+                        <strong>Oups !</strong> {error}
+                    </motion.div>
+                )}
 
                 {/* ── Stepper ──────────────────────────────── */}
                 <div className="flex items-center justify-center gap-0 mb-10">
@@ -237,7 +278,7 @@ export default function RnRCreateChallenge() {
                                 {/* Type cards */}
                                 <div>
                                     <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
-                                        Dynamique du groupe
+                                        {t('group_dynamic')}
                                     </p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {/* Option A — Défi Commun */}
@@ -259,10 +300,10 @@ export default function RnRCreateChallenge() {
                                             </div>
                                             <h3 className={`font-bold text-base mb-1.5 transition-colors ${form.challengeType === 'collective' ? 'text-white' : 'text-white/70'
                                                 }`}>
-                                                Défi Commun
+                                                {t('collective_title')}
                                             </h3>
                                             <p className="text-xs text-white/40 leading-relaxed">
-                                                Tout le groupe accomplit la <strong className="text-white/60">même tâche quotidienne</strong>. Simple, unifié, percutant.
+                                                {t('collective_desc')}
                                             </p>
                                         </button>
 
@@ -285,10 +326,10 @@ export default function RnRCreateChallenge() {
                                             </div>
                                             <h3 className={`font-bold text-base mb-1.5 transition-colors ${form.challengeType === 'individual' ? 'text-white' : 'text-white/70'
                                                 }`}>
-                                                Défis Personnalisés
+                                                {t('individual_title')}
                                             </h3>
                                             <p className="text-xs text-white/40 leading-relaxed">
-                                                Chaque membre a son <strong className="text-white/60">propre objectif quotidien</strong>, mais la cagnotte est partagée.
+                                                {t('individual_desc')}
                                             </p>
                                         </button>
                                     </div>
@@ -297,14 +338,14 @@ export default function RnRCreateChallenge() {
                                 {/* Group Type */}
                                 <div>
                                     <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
-                                        Type de groupe
+                                        {t('group_type')}
                                     </p>
                                     <div className="flex flex-wrap gap-3">
                                         {GROUP_TYPES.map((gt) => (
                                             <button
-                                                key={gt.label}
-                                                onClick={() => set('groupType', gt.label)}
-                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium border transition-all ${form.groupType === gt.label
+                                                key={gt.key}
+                                                onClick={() => set('groupType', gt.key)}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium border transition-all ${form.groupType === gt.key
                                                     ? 'bg-brand-cyan/15 border-brand-cyan/50 text-brand-cyan'
                                                     : 'bg-white/5 border-white/5 text-white/40 hover:border-white/20'
                                                     }`}
@@ -329,8 +370,8 @@ export default function RnRCreateChallenge() {
                                         >
                                             <label htmlFor="rr-fld-v92" className="text-xs font-semibold text-white/40 tracking-wider uppercase">
                                                 {form.challengeType === 'collective'
-                                                    ? 'Quel est le défi quotidien du groupe ?'
-                                                    : 'Donnez un nom à votre groupe'}
+                                                    ? t('labels.challenge_name_collective')
+                                                    : t('labels.challenge_name_individual')}
                                             </label>
                                             <input
                                                 id="rr-fld-v92"
@@ -343,8 +384,8 @@ export default function RnRCreateChallenge() {
                                                 onChange={e => set('name', e.target.value)}
                                                 placeholder={
                                                     form.challengeType === 'collective'
-                                                        ? 'ex. 50 push-ups, Zéro Uber Eats...'
-                                                        : 'ex. Opération Remise en forme...'
+                                                        ? t('placeholders.challenge_name_collective')
+                                                        : t('placeholders.challenge_name_individual')
                                                 }
                                                 className="input-glass text-base"
                                                 maxLength={80}
@@ -382,7 +423,7 @@ export default function RnRCreateChallenge() {
                                 <div className="flex flex-col gap-2">
                                     <label htmlFor="rr-fld-k31" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <Star size={12} className="text-brand-cyan" />
-                                        Que va-t-on se payer avec la cagnotte ?
+                                        {t('labels.reward')}
                                     </label>
                                     <input
                                         id="rr-fld-k31"
@@ -393,7 +434,7 @@ export default function RnRCreateChallenge() {
                                         data-dashlane-ignore="true"
                                         value={form.reward}
                                         onChange={e => set('reward', e.target.value)}
-                                        placeholder="ex. Soirée resto, Billets pour le match..."
+                                        placeholder={t('placeholders.reward')}
                                         className="input-glass"
                                     />
                                 </div>
@@ -402,7 +443,7 @@ export default function RnRCreateChallenge() {
                                 <div className="flex flex-col gap-2">
                                     <label htmlFor="rr-fld-m29" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <Target size={12} className="text-brand-violet-light" />
-                                        Quel est l&apos;objectif financier ?
+                                        {t('labels.goal_amount')}
                                     </label>
                                     <div className="flex items-center input-glass !py-0 !px-4 focus-within:border-brand-cyan/50 focus-within:ring-3 focus-within:ring-brand-cyan/8 transition-all overflow-hidden group">
                                         <span className="text-white/40 font-bold text-base pr-2 shrink-0 select-none">
@@ -418,14 +459,14 @@ export default function RnRCreateChallenge() {
                                             data-dashlane-ignore="true"
                                             value={form.goalAmount}
                                             onChange={e => set('goalAmount', e.target.value)}
-                                            placeholder="ex. 200"
+                                            placeholder={t('placeholders.goal_amount')}
                                             className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20 appearance-none"
                                         />
                                     </div>
                                     <div className="flex items-start gap-2 bg-brand-cyan/5 border border-brand-cyan/15 rounded-xl px-4 py-3 mt-1">
                                         <span className="text-base shrink-0 mt-0.5">💡</span>
                                         <p className="text-xs text-white/50 leading-relaxed">
-                                            N&apos;oubliez pas d&apos;inclure les <strong className="text-white/70">taxes et le pourboire</strong> dans votre cible pour éviter les surprises.
+                                            {t('tips.goal_amount')}
                                         </p>
                                     </div>
                                 </div>
@@ -434,7 +475,7 @@ export default function RnRCreateChallenge() {
                                 <div className="flex flex-col gap-2">
                                     <label htmlFor="rr-fld-p77" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <DollarSign size={12} className="text-red-400" />
-                                        Coût d&apos;un échec quotidien
+                                        {t('labels.penalty_amount')}
                                     </label>
                                     <div className="flex items-center input-glass !py-0 !px-4 focus-within:border-brand-cyan/50 focus-within:ring-3 focus-within:ring-brand-cyan/8 transition-all overflow-hidden group">
                                         <span className="text-white/40 font-bold text-base pr-2 shrink-0 select-none">
@@ -450,7 +491,7 @@ export default function RnRCreateChallenge() {
                                             data-dashlane-ignore="true"
                                             value={form.penaltyAmount}
                                             onChange={e => set('penaltyAmount', e.target.value)}
-                                            placeholder="ex. 2, 5, 10..."
+                                            placeholder={t('placeholders.penalty_amount')}
                                             className="flex-1 bg-transparent border-none outline-none py-3.5 text-white placeholder:text-white/20 appearance-none"
                                         />
                                     </div>
@@ -463,13 +504,12 @@ export default function RnRCreateChallenge() {
                                             className="glass rounded-xl px-4 py-3 border border-white/8 mt-1"
                                         >
                                             <p className="text-xs text-white/40">
-                                                Estimation — à{' '}
-                                                <strong className="text-white/60">{form.penaltyAmount}$/échec</strong>, il faut environ{' '}
-                                                <strong className="text-brand-cyan">
-                                                    {Math.ceil(Number(form.goalAmount) / Number(form.penaltyAmount))} échec{Math.ceil(Number(form.goalAmount) / Number(form.penaltyAmount)) > 1 ? 's' : ''}
-                                                </strong>{' '}
-                                                pour remplir la cagnotte de{' '}
-                                                <strong className="text-white/60">{form.goalAmount}$</strong>.
+                                                {t('estimation', {
+                                                    penalty: form.penaltyAmount,
+                                                    fails: Math.ceil(Number(form.goalAmount) / Number(form.penaltyAmount)),
+                                                    s: Math.ceil(Number(form.goalAmount) / Number(form.penaltyAmount)) > 1 ? 's' : '',
+                                                    goal: form.goalAmount
+                                                })}
                                             </p>
                                         </motion.div>
                                     )}
@@ -493,7 +533,7 @@ export default function RnRCreateChallenge() {
                                 <div className="flex flex-col gap-2">
                                     <label htmlFor="rr-fld-d14" className="text-xs font-semibold text-white/40 tracking-wider uppercase flex items-center gap-2">
                                         <CalendarDays size={12} className="text-brand-cyan" />
-                                        Date de départ
+                                        {t('labels.start_date')}
                                     </label>
                                     <input
                                         id="rr-fld-d14"
@@ -509,14 +549,14 @@ export default function RnRCreateChallenge() {
                                         style={{ colorScheme: 'dark' }}
                                     />
                                     <p className="text-xs text-white/20">
-                                        Le défi se termine automatiquement quand la cagnotte est pleine — pas de date de fin fixe.
+                                        {t('tips.start_date')}
                                     </p>
                                 </div>
 
                                 {/* Validation mode */}
                                 <div>
                                     <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
-                                        Règles de validation
+                                        {t('labels.validation_rules')}
                                     </p>
                                     <div className="flex flex-col gap-4">
                                         {/* Strict */}
@@ -538,16 +578,16 @@ export default function RnRCreateChallenge() {
                                                     <Shield size={18} className={form.validationMode === 'strict' ? 'text-red-400' : 'text-white/30'} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-sm text-white">Mode Strict</h3>
-                                                    <span className="text-xs text-red-400/70 font-medium">Coupure à minuit</span>
+                                                    <h3 className="font-bold text-sm text-white">{t('modes.strict.title')}</h3>
+                                                    <span className="text-xs text-red-400/70 font-medium">{t('modes.strict.subtitle')}</span>
                                                 </div>
                                             </div>
                                             <p className="text-xs text-white/50 leading-relaxed mb-3">
-                                                Le défi doit être validé le jour même, avant minuit.
+                                                {t('modes.strict.desc')}
                                             </p>
                                             <div className={`text-xs px-3 py-2 rounded-lg ${form.validationMode === 'strict' ? 'bg-red-400/10 text-red-300/80' : 'bg-white/3 text-white/25'
                                                 }`}>
-                                                ⚡ Idéal pour bâtir une discipline d&apos;acier. Le suivi en temps réel crée une forte dynamique d&apos;équipe.
+                                                {t('modes.strict.tip')}
                                             </div>
                                         </button>
 
@@ -570,16 +610,16 @@ export default function RnRCreateChallenge() {
                                                     <Clock size={18} className={form.validationMode === 'flexible' ? 'text-brand-cyan' : 'text-white/30'} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-sm text-white">Mode Flexible</h3>
-                                                    <span className="text-xs text-brand-cyan/70 font-medium">Période de grâce de 3 jours</span>
+                                                    <h3 className="font-bold text-sm text-white">{t('modes.flexible.title')}</h3>
+                                                    <span className="text-xs text-brand-cyan/70 font-medium">{t('modes.flexible.subtitle')}</span>
                                                 </div>
                                             </div>
                                             <p className="text-xs text-white/50 leading-relaxed mb-3">
-                                                Vous avez jusqu&apos;à 3 jours en arrière pour valider un défi complété.
+                                                {t('modes.flexible.desc')}
                                             </p>
                                             <div className={`text-xs px-3 py-2 rounded-lg ${form.validationMode === 'flexible' ? 'bg-brand-cyan/10 text-brand-cyan/80' : 'bg-white/3 text-white/25'
                                                 }`}>
-                                                🏕️ L&apos;honnêteté prime sur la connectivité ! Parfait pour les fins de semaine au chalet, la pêche dans le nord ou les simples oublis.
+                                                {t('modes.flexible.tip')}
                                             </div>
                                         </button>
                                     </div>
@@ -592,34 +632,34 @@ export default function RnRCreateChallenge() {
                                         animate={{ opacity: 1, y: 0 }}
                                         className="glass rounded-2xl p-5 border border-white/8"
                                     >
-                                        <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">Récapitulatif</p>
+                                        <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">{t('summary.title')}</p>
                                         <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                                             <div>
-                                                <p className="text-xs text-white/30">Type</p>
+                                                <p className="text-xs text-white/30">{t('summary.type')}</p>
                                                 <p className="text-white/80 font-medium">
-                                                    {form.challengeType === 'collective' ? '👥 Défi Commun' : '⭐ Défis Personnalisés'}
+                                                    {form.challengeType === 'collective' ? `👥 ${t('collective_title')}` : `⭐ ${t('individual_title')}`}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/30">Nom</p>
+                                                <p className="text-xs text-white/30">{t('summary.name')}</p>
                                                 <p className="text-white/80 font-medium truncate">{form.name}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/30">Récompense</p>
+                                                <p className="text-xs text-white/30">{t('summary.reward')}</p>
                                                 <p className="text-white/80 font-medium truncate">{form.reward}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/30">Cagnotte cible</p>
+                                                <p className="text-xs text-white/30">{t('summary.goal')}</p>
                                                 <p className="text-brand-cyan font-bold">{form.goalAmount}$</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/30">Amende/échec</p>
+                                                <p className="text-xs text-white/30">{t('summary.penalty')}</p>
                                                 <p className="text-red-400 font-bold">{form.penaltyAmount}$</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-white/30">Départ</p>
+                                                <p className="text-xs text-white/30">{t('summary.start')}</p>
                                                 <p className="text-white/80 font-medium">
-                                                    {new Date(form.startDate).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                    {new Date(form.startDate).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                 </p>
                                             </div>
                                         </div>
@@ -641,7 +681,7 @@ export default function RnRCreateChallenge() {
                             >
                                 <div>
                                     <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
-                                        Identité Visuelle
+                                        {t('identity.title')}
                                     </p>
                                     <div className="glass border border-white/8 rounded-2xl p-6">
                                         <div className="flex items-center gap-4 mb-6">
@@ -652,8 +692,8 @@ export default function RnRCreateChallenge() {
                                                 P
                                             </div>
                                             <div>
-                                                <h3 className="text-white font-bold text-base">Votre couleur dans le défi</h3>
-                                                <p className="text-white/40 text-xs">Cette couleur vous représentera sur le calendrier.</p>
+                                                <h3 className="text-white font-bold text-base">{t('identity.subtitle')}</h3>
+                                                <p className="text-white/40 text-xs">{t('identity.desc')}</p>
                                             </div>
                                         </div>
 
@@ -678,9 +718,9 @@ export default function RnRCreateChallenge() {
                                         <div className="w-10 h-10 rounded-full bg-brand-violet/20 flex items-center justify-center mx-auto mb-3">
                                             <Zap size={18} className="text-brand-violet-light" fill="currentColor" />
                                         </div>
-                                        <h4 className="text-white font-bold mb-1">Prêt à lancer le défi ?</h4>
+                                        <h4 className="text-white font-bold mb-1">{t('ready.title')}</h4>
                                         <p className="text-white/40 text-xs px-10">
-                                            Tous les paramètres sont configurés. Vos amis peuvent vous rejoindre dès l&apos;étape suivante.
+                                            {t('ready.desc')}
                                         </p>
                                     </div>
                                 </div>
@@ -698,7 +738,7 @@ export default function RnRCreateChallenge() {
                             className="flex items-center gap-2 text-sm font-medium text-white/40 hover:text-white transition-colors disabled:opacity-30"
                         >
                             <ArrowLeft size={16} />
-                            Retour
+                            {t('buttons.back')}
                         </button>
                     ) : (
                         <div />
@@ -710,12 +750,12 @@ export default function RnRCreateChallenge() {
                             disabled={!canProceed()}
                             className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all glow-cyan disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
                         >
-                            Continuer
+                            {t('buttons.continue')}
                             <ArrowRight size={16} />
                         </button>
                     ) : (
                         <button
-                            onClick={handleCreate}
+                            onClick={handleSubmit}
                             disabled={!canProceed() || isSubmitting}
                             className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-base text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed group relative overflow-hidden"
                             style={{
@@ -733,7 +773,7 @@ export default function RnRCreateChallenge() {
                             ) : (
                                 <Flame size={16} />
                             )}
-                            {isSubmitting ? 'Création en cours...' : 'Lancer le défi !'}
+                            {isSubmitting ? t('buttons.creating') : t('buttons.create')}
                             {!isSubmitting && <ArrowRight size={16} />}
                         </button>
                     )}

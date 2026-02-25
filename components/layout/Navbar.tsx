@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import UserMenu from '@/components/auth/UserMenu';
+import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 
 export default function Navbar() {
     const t = useTranslations('nav');
@@ -23,13 +24,6 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    const toggleLocale = () => {
-        const next = locale === 'fr' ? 'en' : 'fr';
-        // Replace locale prefix in pathname
-        const segments = pathname.split('/');
-        segments[1] = next;
-        router.push(segments.join('/'));
-    };
 
     const navLinks = [
         { key: 'projects', href: '#projets' },
@@ -73,15 +67,13 @@ export default function Navbar() {
                 </nav>
 
                 {/* Right actions */}
-                <div className="hidden md:flex items-center gap-3">
-                    {/* Lang toggle */}
-                    <button
-                        onClick={toggleLocale}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all duration-200 tracking-wider"
-                        aria-label="Toggle language"
+                <div className="hidden md:flex items-center gap-4">
+                    <Link
+                        href="/en/dashboard"
+                        className="text-xs font-black px-3 py-1.5 rounded-lg border border-brand-cyan/30 text-brand-cyan hover:bg-brand-cyan/10 transition-all"
                     >
-                        {locale === 'fr' ? 'EN' : 'FR'}
-                    </button>
+                        EN
+                    </Link>
                     <UserMenu locale={locale} />
                 </div>
 
@@ -116,13 +108,13 @@ export default function Navbar() {
                                     {t(link.key as 'projects' | 'vision' | 'blog' | 'contact')}
                                 </a>
                             ))}
-                            <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-                                <button
-                                    onClick={toggleLocale}
-                                    className="text-xs font-semibold px-3 py-1.5 rounded-full border border-white/10 text-white/60 hover:text-white transition-all"
+                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                <Link
+                                    href="/en/dashboard"
+                                    className="text-xs font-black px-3 py-1.5 rounded-lg border border-brand-cyan/30 text-brand-cyan"
                                 >
-                                    {locale === 'fr' ? 'EN' : 'FR'}
-                                </button>
+                                    EN
+                                </Link>
                                 <UserMenu locale={locale} />
                             </div>
                         </div>

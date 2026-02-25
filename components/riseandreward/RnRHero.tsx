@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ArrowRight, Zap, Flame } from 'lucide-react';
 
@@ -19,6 +20,8 @@ const fadeUp = {
 };
 
 export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
+    const t = useTranslations('riseandreward.hero');
+
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
             {/* Background gradient orbs */}
@@ -78,7 +81,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-violet/30 text-brand-violet-light text-sm font-semibold mb-8 tracking-wide"
                 >
                     <Zap size={14} className="text-brand-cyan" />
-                    Gamification · Discipline · Communauté
+                    {t('badge')}
                 </motion.div>
 
                 {/* Title */}
@@ -121,7 +124,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                     animate="visible"
                     className="text-lg md:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed mb-12"
                 >
-                    Où l&apos;évolution personnelle et le bon temps entre amis se <span className="text-white/80 font-medium">rejoignent.</span>
+                    {t('slogan')}
                 </motion.p>
 
                 {/* CTA buttons */}
@@ -136,16 +139,16 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                         <>
                             {/* Primary — Se connecter */}
                             <Link
-                                href="/fr/login"
+                                href="/login"
                                 className="group flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all duration-300 glow-cyan"
                             >
-                                Se connecter
+                                {t('cta_login')}
                                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
                             </Link>
 
                             {/* Secondary — Créer un compte */}
                             <Link
-                                href="/fr/signup"
+                                href="/signup"
                                 className="group relative flex items-center gap-2.5 px-8 py-4 rounded-2xl font-semibold text-base text-white border border-white/10 hover:border-brand-violet/50 hover:bg-brand-violet/10 transition-all duration-300"
                             >
                                 <span
@@ -154,7 +157,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                                         background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,58,247,0.15), transparent)',
                                     }}
                                 />
-                                <span className="relative z-10">Créer un compte</span>
+                                <span className="relative z-10">{t('cta_signup')}</span>
                             </Link>
                         </>
                     ) : (
@@ -168,7 +171,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                             }}
                         >
                             <Flame size={20} className="group-hover:scale-110 transition-transform" />
-                            Créer mon premier défi de groupe
+                            {t('cta_new_challenge')}
                             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
                         </Link>
                     )}
@@ -193,8 +196,8 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                         ))}
                     </div>
                     <div className="text-left">
-                        <p className="text-xs text-white/35 font-medium">Rejoins des groupes actifs</p>
-                        <p className="text-sm text-white/80 font-semibold">Déjà des centaines de défis lancés</p>
+                        <p className="text-xs text-white/35 font-medium">{t('social_proof')}</p>
+                        <p className="text-sm text-white/80 font-semibold">{t('social_proof_sub')}</p>
                     </div>
                 </motion.div>
             </div>
@@ -206,7 +209,7 @@ export default function RnRHero({ ctaMode = 'guest' }: RnRHeroProps) {
                 transition={{ delay: 1.1, duration: 0.5 }}
                 className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
             >
-                <span className="text-xs text-white/20 font-medium tracking-widest uppercase">Découvrir</span>
+                <span className="text-xs text-white/20 font-medium tracking-widest uppercase">{t('scroll_discover')}</span>
                 <motion.div
                     animate={{ y: [0, 7, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import {
     Trophy, Users, CalendarDays, ArrowRight,
@@ -26,6 +27,8 @@ export default function RnRDashboard() {
     const [firstName, setFirstName] = useState('');
     const [loading, setLoading] = useState(true);
     const supabase = createClient();
+    const t = useTranslations('riseandreward.dashboard');
+    const locale = useLocale();
 
     useEffect(() => {
         async function load() {
@@ -72,7 +75,7 @@ export default function RnRDashboard() {
                     className="mb-10"
                 >
                     <p className="text-sm text-brand-cyan font-semibold mb-1">
-                        Bon retour,{' '}
+                        {t('welcome')},{' '}
                         <span className="text-white">{firstName} 👋</span>
                     </p>
                     <h1 className="text-4xl font-extrabold text-white">
@@ -89,7 +92,7 @@ export default function RnRDashboard() {
                         </span>
                     </h1>
                     <p className="text-white/40 mt-1 text-sm">
-                        {challenges.length} défi{challenges.length > 1 ? 's' : ''} actif{challenges.length > 1 ? 's' : ''}
+                        {challenges.length} {challenges.length > 1 ? t('active_challenges') : t('active_challenge')}
                     </p>
                 </motion.div>
 
@@ -101,10 +104,10 @@ export default function RnRDashboard() {
                     className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
                 >
                     {[
-                        { icon: <Trophy size={18} className="text-brand-cyan" />, label: 'Défis actifs', value: challenges.length },
-                        { icon: <CheckCircle size={18} className="text-green-400" />, label: 'Complétés', value: '—' },
-                        { icon: <TrendingUp size={18} className="text-brand-violet-light" />, label: 'Streak actuel', value: '—' },
-                        { icon: <Users size={18} className="text-brand-cyan" />, label: 'Co-membres', value: '—' },
+                        { icon: <Trophy size={18} className="text-brand-cyan" />, label: t('stats.active'), value: challenges.length },
+                        { icon: <CheckCircle size={18} className="text-green-400" />, label: t('stats.completed'), value: '—' },
+                        { icon: <TrendingUp size={18} className="text-brand-violet-light" />, label: t('stats.streak'), value: '—' },
+                        { icon: <Users size={18} className="text-brand-cyan" />, label: t('stats.members'), value: '—' },
                     ].map((stat) => (
                         <div key={stat.label} className="glass rounded-2xl p-5 border border-white/8 flex flex-col gap-2">
                             {stat.icon}
@@ -121,13 +124,13 @@ export default function RnRDashboard() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                 >
                     <div className="flex items-center justify-between mb-5">
-                        <h2 className="text-lg font-bold text-white">Mes défis</h2>
+                        <h2 className="text-lg font-bold text-white">{t('my_challenges')}</h2>
                         <Link
                             href="/riseandreward/nouveau"
                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-brand-black bg-brand-cyan hover:bg-brand-cyan/90 transition-all glow-cyan"
                         >
                             <Plus size={13} />
-                            Nouveau défi
+                            {t('new_challenge')}
                         </Link>
                     </div>
 
@@ -146,27 +149,27 @@ export default function RnRDashboard() {
                                         <div>
                                             <div className="flex items-center gap-2 mb-2">
                                                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-violet/15 text-brand-violet-light border border-brand-violet/20">
-                                                    {c.challenge_type === 'collective' ? 'Collectif' : 'Individuel'}
+                                                    {c.challenge_type === 'collective' ? t('type_collective') : t('type_individual')}
                                                 </span>
                                                 <span className="flex items-center gap-1 text-xs text-green-400/80">
                                                     <Clock size={11} />
-                                                    En cours
+                                                    {t('status_ongoing')}
                                                 </span>
                                             </div>
                                             <h3 className="text-lg font-bold text-white mb-1">{c.name}</h3>
                                             <div className="flex items-center gap-4 text-xs text-white/40">
                                                 <span className="flex items-center gap-1">
                                                     <CalendarDays size={11} />
-                                                    Depuis {new Date(c.created_at).toLocaleDateString('fr-CA')}
+                                                    {t('since')} {new Date(c.created_at).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-US')}
                                                 </span>
-                                                <span>{c.penalty_amount}$/échec · Cagnotte {c.goal_amount}$</span>
+                                                <span>{c.penalty_amount}$/{t('view') === 'Voir' ? 'échec' : 'fail'} · {t('view') === 'Voir' ? 'Cagnotte' : 'Goal'} {c.goal_amount}$</span>
                                             </div>
                                         </div>
                                         <Link
                                             href={`/riseandreward/nouveau`}
                                             className="flex items-center gap-1 text-xs text-white/40 hover:text-brand-cyan transition-colors group-hover:text-white/70 mt-1"
                                         >
-                                            Voir
+                                            {t('view')}
                                             <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                                         </Link>
                                     </div>
@@ -184,7 +187,7 @@ export default function RnRDashboard() {
                     className="mt-8 glass rounded-2xl p-6 border border-dashed border-white/8 text-center"
                 >
                     <p className="text-white/20 text-sm">
-                        ✦ Calendrier de groupe, chat et classement — bientôt disponibles
+                        {t('coming_soon')}
                     </p>
                 </motion.div>
             </div>

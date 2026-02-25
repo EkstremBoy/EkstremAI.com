@@ -8,16 +8,20 @@ import RnRCalendarPreview from '@/components/riseandreward/RnRCalendarPreview';
 import RnRFooterCTA from '@/components/riseandreward/RnRFooterCTA';
 import RnRDashboard from '@/components/riseandreward/RnRDashboard';
 
-export const metadata: Metadata = {
-    title: 'Rise & Reward — EkstremAI',
-    description:
-        'Où l\'évolution personnelle et le bon temps entre amis se rejoignent. Créez des défis de groupe avec pénalités financières et récompenses collectives.',
-    openGraph: {
-        title: 'Rise & Reward — EkstremAI',
-        description: 'Lancez des défis entre amis, gérez vos amendes et célébrez ensemble.',
-        url: 'https://ekstrem.ai/riseandreward',
-    },
-};
+import { getTranslations } from 'next-intl/server';
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+    const t = await getTranslations({ locale, namespace: 'riseandreward.meta' });
+    return {
+        title: t('title'),
+        description: t('description'),
+        openGraph: {
+            title: t('title'),
+            description: t('description'),
+            url: 'https://ekstrem.ai/riseandreward',
+        },
+    };
+}
 
 export default async function RiseAndRewardPage() {
     const supabase = await createClient();

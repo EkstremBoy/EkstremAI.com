@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 // Simulated member colors for the calendar demo
 const members = [
@@ -33,188 +34,152 @@ const generateDays = (): { day: number; status: DayStatus; completions: string[]
 
 const days = generateDays();
 
-const weekdays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-
 export default function RnRCalendarPreview() {
+    const t = useTranslations('riseandreward.calendar');
+
+    const weekdays = [
+        t('days.lun'), t('days.mar'), t('days.mer'), t('days.jeu'), t('days.ven'), t('days.sam'), t('days.dim')
+    ];
+
     return (
         <section id="apercu" className="relative section-padding overflow-hidden">
             {/* Background */}
             <div
                 aria-hidden
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139,58,247,0.1), transparent)' }}
+                className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-brand-violet/5 to-transparent pointer-events-none"
             />
 
             <div className="relative z-10 max-w-6xl mx-auto px-6">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-60px' }}
-                    transition={{ duration: 0.6 }}
-                    className="text-center mb-14"
-                >
-                    <p className="text-sm font-semibold tracking-[0.2em] uppercase text-brand-violet-light/70 mb-3">
-                        Aperçu de la plateforme
-                    </p>
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                        Le calendrier{' '}
-                        <span
-                            style={{
-                                background: 'linear-gradient(135deg, #00D4FF, #8B3AF7)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                            }}
-                        >
-                            de groupe
-                        </span>
-                    </h2>
-                    <p className="mt-4 text-white/45 text-lg max-w-xl mx-auto">
-                        Chaque couleur représente un membre. D&apos;un coup d&apos;œil, vous savez qui a réussi, qui a raté, et dans quel ordre chacun a complété son défi.
-                    </p>
-                </motion.div>
-
-                {/* Calendar card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 32, scale: 0.98 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="relative rounded-3xl overflow-hidden"
-                    style={{
-                        background: 'rgba(255,255,255,0.025)',
-                        border: '1px solid rgba(255,255,255,0.07)',
-                        backdropFilter: 'blur(24px)',
-                    }}
-                >
-                    {/* Calendar header */}
-                    <div
-                        className="flex items-center justify-between px-8 py-5 border-b border-white/5"
-                        style={{ background: 'rgba(255,255,255,0.02)' }}
+                <div className="flex flex-col lg:flex-row items-center gap-16">
+                    {/* Visual Demo */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8 }}
+                        className="flex-1 w-full max-w-2xl"
                     >
-                        <div>
-                            <h3 className="text-white font-bold text-lg">🏆 Défi Cardio Février</h3>
-                            <p className="text-white/40 text-xs mt-0.5">30 min d&apos;exercice • 5 membres • Pénalité : 5$</p>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.2)' }}>
-                            <div className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
-                            <span className="text-brand-cyan text-xs font-semibold">En cours</span>
-                        </div>
-                    </div>
-
-                    {/* Member legend */}
-                    <div className="flex flex-wrap items-center gap-3 px-8 py-4 border-b border-white/5">
-                        {members.map((m) => (
-                            <div key={m.name} className="flex items-center gap-1.5">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: m.color }} />
-                                <span className="text-white/55 text-xs font-medium">{m.name}</span>
+                        <div className="relative glass rounded-[2.5rem] border border-white/5 p-4 md:p-8 shadow-2xl">
+                            {/* Calendar Header */}
+                            <div className="flex items-center justify-between mb-8 px-2">
+                                <div>
+                                    <h4 className="text-xl font-bold text-white mb-1">{t('month_year')}</h4>
+                                    <div className="flex items-center gap-2">
+                                        <span className="flex h-2 w-2 rounded-full bg-brand-cyan animate-pulse" />
+                                        <span className="text-xs text-white/40 font-medium uppercase tracking-wider">{t('ongoing')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 bg-white/5 rounded-2xl px-4 py-2 border border-white/5">
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-white/30 uppercase font-bold">{t('members')}</p>
+                                        <p className="text-sm font-bold text-white">05</p>
+                                    </div>
+                                    <div className="w-px h-6 bg-white/10" />
+                                    <div>
+                                        <p className="text-[10px] text-white/30 uppercase font-bold">{t('penalty')}</p>
+                                        <p className="text-sm font-bold text-brand-cyan">5$</p>
+                                    </div>
+                                </div>
                             </div>
-                        ))}
-                        <div className="ml-auto flex items-center gap-4 text-xs text-white/30">
-                            <span className="flex items-center gap-1"><CheckCircle2 size={12} className="text-emerald-400" /> Tous réussi</span>
-                            <span className="flex items-center gap-1"><XCircle size={12} className="text-rose-400" /> Échec(s)</span>
-                            <span className="flex items-center gap-1"><Clock size={12} className="text-white/30" /> À venir</span>
-                        </div>
-                    </div>
 
-                    {/* Weekday headers */}
-                    <div className="grid grid-cols-7 gap-px px-8 pt-4 pb-2">
-                        {weekdays.map((d) => (
-                            <div key={d} className="text-center text-xs font-semibold text-white/25 tracking-wider uppercase">
-                                {d}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-2 px-8 pb-8 pt-1">
-                        {/* Offset for first day (Tuesday = index 1) */}
-                        <div />
-
-                        {days.map(({ day, status, completions }, idx) => {
-                            const isFuture = status === 'future';
-                            const isToday = day === 18;
-
-                            return (
-                                <motion.div
-                                    key={day}
-                                    initial={{ opacity: 0, scale: 0.85 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: idx * 0.015, duration: 0.35 }}
-                                    className="relative aspect-square rounded-xl flex flex-col items-center justify-center gap-1 cursor-default group overflow-hidden"
-                                    style={{
-                                        background: isFuture
-                                            ? 'rgba(255,255,255,0.02)'
-                                            : isToday
-                                                ? 'rgba(0,212,255,0.06)'
-                                                : 'rgba(255,255,255,0.04)',
-                                        border: isToday
-                                            ? '1px solid rgba(0,212,255,0.3)'
-                                            : '1px solid rgba(255,255,255,0.04)',
-                                    }}
-                                >
-                                    {/* Day number */}
-                                    <span className={`text-xs font-bold leading-none ${isFuture ? 'text-white/15' : isToday ? 'text-brand-cyan' : 'text-white/60'}`}>
-                                        {day}
-                                    </span>
-
-                                    {/* Color dots (member completions) */}
-                                    {!isFuture && completions.length > 0 && (
-                                        <div className="flex flex-wrap gap-[2px] justify-center max-w-[90%]">
+                            {/* Calendar Days */}
+                            <div className="grid grid-cols-7 gap-2 md:gap-3 mb-8">
+                                {weekdays.map((d) => (
+                                    <div key={d} className="text-center text-[10px] md:text-xs font-bold text-white/20 uppercase pb-2">
+                                        {d}
+                                    </div>
+                                ))}
+                                {days.map(({ day, status, completions }, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0 }}
+                                        whileInView={{ opacity: 1 }}
+                                        transition={{ delay: idx * 0.01 }}
+                                        className={`relative aspect-square rounded-xl md:rounded-2xl flex items-center justify-center text-xs font-bold transition-all duration-300 ${status === 'future'
+                                            ? 'bg-white/2 border border-white/5 text-white/10'
+                                            : 'bg-white/5 border border-white/10 text-white/80'
+                                            }`}
+                                    >
+                                        <span className="relative z-10">{day}</span>
+                                        {/* Colored dots for completions */}
+                                        <div className="absolute inset-x-0 bottom-1.5 md:bottom-2.5 flex justify-center gap-0.5 px-1 truncate">
                                             {completions.map((color, ci) => (
                                                 <div
                                                     key={ci}
-                                                    className="w-2 h-2 rounded-full"
-                                                    style={{
-                                                        backgroundColor: color,
-                                                        boxShadow: `0 0 4px ${color}80`,
-                                                    }}
+                                                    className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                                    style={{ backgroundColor: color }}
                                                 />
                                             ))}
                                         </div>
-                                    )}
+                                        {/* Status indicator */}
+                                        {status === 'success' && (
+                                            <div className="absolute -top-1 -right-1 bg-brand-cyan text-brand-black rounded-full p-0.5 shadow-lg">
+                                                <CheckCircle2 size={10} />
+                                            </div>
+                                        )}
+                                        {status === 'failed' && (
+                                            <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 shadow-lg">
+                                                <XCircle size={10} />
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
 
-                                    {/* Status indicator */}
-                                    {!isFuture && (
-                                        <div
-                                            className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full"
-                                            style={{
-                                                backgroundColor:
-                                                    status === 'success'
-                                                        ? '#34d399'
-                                                        : status === 'partial'
-                                                            ? '#f59e0b'
-                                                            : '#f87171',
-                                                boxShadow:
-                                                    status === 'success'
-                                                        ? '0 0 6px rgba(52,211,153,0.6)'
-                                                        : status === 'partial'
-                                                            ? '0 0 6px rgba(245,158,11,0.6)'
-                                                            : '0 0 6px rgba(248,113,113,0.6)',
-                                            }}
-                                        />
-                                    )}
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Fake "blur" badge overlay to tease the app */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-max">
-                        <div
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white/80"
-                            style={{
-                                background: 'rgba(139,58,247,0.15)',
-                                border: '1px solid rgba(139,58,247,0.3)',
-                                backdropFilter: 'blur(8px)',
-                            }}
-                        >
-                            ✨ Aperçu interactif disponible après inscription
+                            {/* Legend */}
+                            <div className="flex flex-wrap items-center gap-4 px-2 pt-6 border-t border-white/5">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1 rounded-md bg-brand-cyan/20 text-brand-cyan">
+                                        <CheckCircle2 size={12} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">{t('success_all')}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1 rounded-md bg-red-500/20 text-red-500">
+                                        <XCircle size={12} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">{t('failed')}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1 rounded-md bg-white/10 text-white/30">
+                                        <Clock size={12} />
+                                    </div>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">{t('future')}</span>
+                                </div>
+                            </div>
                         </div>
+                    </motion.div>
+
+                    {/* Content */}
+                    <div className="flex-1 space-y-8 text-center lg:text-left">
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <span className="inline-flex px-3 py-1 rounded-full bg-brand-violet/10 text-brand-violet-light text-[11px] font-bold uppercase tracking-widest mb-6">
+                                {t('badge')}
+                            </span>
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-[1.1] mb-6">
+                                {t('title')}
+                            </h2>
+                            <p className="text-lg text-white/50 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                                {t('description')}
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="inline-flex items-center gap-3 glass px-5 py-3 rounded-2xl border border-white/5"
+                        >
+                            <span className="flex h-2 w-2 rounded-full bg-brand-cyan" />
+                            <span className="text-sm text-white/60 font-medium">
+                                {t('tease')}
+                            </span>
+                        </motion.div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

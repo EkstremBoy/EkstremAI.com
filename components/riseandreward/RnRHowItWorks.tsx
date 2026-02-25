@@ -1,44 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Target, AlertTriangle, PartyPopper } from 'lucide-react';
-
-const steps: { number: string; icon: React.ElementType; title: string; description: ReactNode; color: string; glow: string; border: string }[] = [
-    {
-        number: '01',
-        icon: Target,
-        title: 'Fixez un but quotidien',
-        description: (
-            <>
-                <strong className="text-white/75">Défi collectif</strong> — tout le monde relève le même challenge.<br />
-                <strong className="text-white/75">Défi individuel</strong> — chaque membre inscrit son propre objectif personnel.<br />
-                Dans les deux cas, l&apos;engagement est quotidien et la récompense est du plaisir en bonne compagnie.
-            </>
-        ),
-        color: '#00D4FF',
-        glow: 'rgba(0,212,255,0.2)',
-        border: 'rgba(0,212,255,0.15)',
-    },
-    {
-        number: '02',
-        icon: AlertTriangle,
-        title: 'Payez l\'amende en cas d\'échec',
-        description: 'Vous n\'avez pas validé votre défi du jour ? Une pénalité fixée à l\'avance par le groupe s\'applique et alimente la cagnotte commune.',
-        color: '#C026D3',
-        glow: 'rgba(192,38,211,0.2)',
-        border: 'rgba(192,38,211,0.15)',
-    },
-    {
-        number: '03',
-        icon: PartyPopper,
-        title: 'Célébrez ensemble',
-        description: 'Quand la cagnotte atteint le montant préétabli pour votre récompense — souper, activité, voyage — il ne vous reste qu\'à choisir la date avec notre calendrier interactif, puis à célébrer votre progression.',
-        color: '#8B3AF7',
-        glow: 'rgba(139,58,247,0.2)',
-        border: 'rgba(139,58,247,0.15)',
-    },
-];
 
 const fadeUp = {
     hidden: { opacity: 0, y: 28 },
@@ -50,6 +14,38 @@ const fadeUp = {
 };
 
 export default function RnRHowItWorks() {
+    const t = useTranslations('riseandreward.how_it_works');
+
+    const steps = [
+        {
+            number: '01',
+            icon: Target,
+            title: t('step1.title'),
+            description: t('step1.desc'),
+            color: '#00D4FF',
+            glow: 'rgba(0,212,255,0.2)',
+            border: 'rgba(0,212,255,0.15)',
+        },
+        {
+            number: '02',
+            icon: AlertTriangle,
+            title: t('step2.title'),
+            description: t('step2.desc'),
+            color: '#C026D3',
+            glow: 'rgba(192,38,211,0.2)',
+            border: 'rgba(192,38,211,0.15)',
+        },
+        {
+            number: '03',
+            icon: PartyPopper,
+            title: t('step3.title'),
+            description: t('step3.desc'),
+            color: '#8B3AF7',
+            glow: 'rgba(139,58,247,0.2)',
+            border: 'rgba(139,58,247,0.15)',
+        },
+    ];
+
     return (
         <section id="comment-ca-marche" className="relative section-padding overflow-hidden">
             {/* Background glow */}
@@ -69,24 +65,13 @@ export default function RnRHowItWorks() {
                     className="text-center mb-16"
                 >
                     <p className="text-sm font-semibold tracking-[0.2em] uppercase text-brand-cyan/70 mb-3">
-                        Comment ça marche
+                        {t('badge')}
                     </p>
                     <h2 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
-                        Simple,{' '}
-                        <span
-                            style={{
-                                background: 'linear-gradient(135deg, #C026D3, #8B3AF7)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                            }}
-                        >
-                            motivant,
-                        </span>{' '}
-                        efficace.
+                        {t('title')}
                     </h2>
                     <p className="mt-4 text-white/45 text-lg max-w-xl mx-auto">
-                        Trois étapes pour transformer vos habitudes en victoires collectives.
+                        {t('subtitle')}
                     </p>
                 </motion.div>
 

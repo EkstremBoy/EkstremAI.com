@@ -2,14 +2,16 @@
 
 import { motion } from 'framer-motion';
 import { ShieldCheck, HandCoins, Users } from 'lucide-react';
-
-const highlights = [
-    { icon: ShieldCheck, label: 'Zéro frais cachés', color: '#00D4FF' },
-    { icon: HandCoins, label: 'Zéro transaction sur le site', color: '#8B3AF7' },
-    { icon: Users, label: 'Votre groupe, vos règles', color: '#C026D3' },
-];
+import { useTranslations } from 'next-intl';
 
 export default function RnRReassurance() {
+    const t = useTranslations('riseandreward.reassurance');
+
+    const highlights = [
+        { icon: ShieldCheck, label: t('item1'), color: '#00D4FF' },
+        { icon: HandCoins, label: t('item2'), color: '#8B3AF7' },
+        { icon: Users, label: t('item3'), color: '#C026D3' },
+    ];
     return (
         <section id="transparence" className="relative section-padding overflow-hidden">
             {/* Background */}
@@ -57,30 +59,17 @@ export default function RnRReassurance() {
                     <div className="relative z-10 flex justify-center mb-8">
                         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-[0.18em] uppercase border border-brand-cyan/25 text-brand-cyan/80">
                             <ShieldCheck size={13} />
-                            Transparence totale
+                            {t('badge')}
                         </span>
                     </div>
 
                     {/* Main message */}
                     <div className="relative z-10 text-center mb-10">
                         <h2 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-6">
-                            Votre argent reste{' '}
-                            <span
-                                style={{
-                                    background: 'linear-gradient(135deg, #00D4FF, #8B3AF7)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text',
-                                }}
-                            >
-                                entre vos mains.
-                            </span>
+                            {t('title')}
                         </h2>
                         <p className="text-white/60 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-                            Vous gérez votre cagnotte entre amis via{' '}
-                            <strong className="text-white/85 font-semibold">virement Interac</strong> ou{' '}
-                            <strong className="text-white/85 font-semibold">argent comptant</strong>.
-                            Nous fournissons uniquement la plateforme de suivi — le reste vous appartient.
+                            {t('description')}
                         </p>
                     </div>
 

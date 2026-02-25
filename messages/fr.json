@@ -40,7 +40,7 @@
             },
             "aesthetics": {
                 "title": "L'Esthétique",
-                "desc": "Quand la beauté rencontre la simplicité, la technologie offre ce qu'elle a de mieux. Pour nous, le design n'est pas un luxe, c'est la preuve que chaque détail a été pensé pour honorer l'expérience de celui qui l'utilise."
+                "desc": "Quand la beauté rencontre la simplicité, la technologie offre ce qu'elle a de mieux. Pour nous, le design n'est pas un luxe, c'est la preuve que chaque detail a été pensé pour honorer l'expérience de celui qui l'utilise."
             }
         }
     },
@@ -87,10 +87,293 @@
         "errorMatch": "Les mots de passe ne correspondent pas.",
         "errorShort": "Le mot de passe doit contenir au moins 8 caractères."
     },
-    "dashboard": {
-        "welcome": "Bienvenue",
-        "title": "Rise & Reward",
-        "subtitle": "Votre espace de gamification de la discipline collective.",
-        "comingSoon": "Bientôt disponible — en cours de construction."
+    "riseandreward": {
+        "meta": {
+            "title": "Rise & Reward — EkstremAI",
+            "description": "Où l'évolution personnelle et le bon temps entre amis se rejoignent. Créez des défis de groupe avec pénalités financières et récompenses collectives."
+        },
+        "hero": {
+            "badge": "Gamification · Discipline · Communauté",
+            "slogan": "Où l'évolution personnelle et le bon temps entre amis se rejoignent.",
+            "cta_login": "Se connecter",
+            "cta_signup": "Créer un compte",
+            "cta_new_challenge": "Créer mon premier défi de groupe",
+            "social_proof": "Rejoins des groupes actifs",
+            "social_proof_sub": "Déjà des centaines de défis lancés",
+            "scroll_discover": "Découvrir"
+        },
+        "nav": {
+            "how_it_works": "Comment ça marche",
+            "transparency": "Transparence",
+            "preview": "Aperçu",
+            "login": "Se connecter"
+        },
+        "create_challenge": {
+            "title": "Créer un nouveau défi",
+            "subtitle": "Configurez votre groupe en {count} étapes simples.",
+            "steps": {
+                "step1": "Le Défi",
+                "step2": "L'Objectif",
+                "step3": "Les Règles",
+                "step4": "Ma Couleur"
+            },
+            "group_dynamic": "Dynamique du groupe",
+            "collective_title": "Défi Commun",
+            "collective_desc": "Tout le groupe accomplit la même tâche quotidienne. Simple, unifié, percutant.",
+            "individual_title": "Défis Personnalisés",
+            "individual_desc": "Chaque membre a son propre objectif quotidien, mais la cagnotte est partagée.",
+            "group_type": "Type de groupe",
+            "group_types": {
+                "friends": "Amis",
+                "family": "Famille",
+                "couple": "Couple",
+                "colleagues": "Collègues",
+                "other": "Autre"
+            },
+            "labels": {
+                "challenge_name_collective": "Quel est le défi quotidien du groupe ?",
+                "challenge_name_individual": "Donnez un nom à votre groupe",
+                "reward": "Que va-t-on se payer avec la cagnotte ?",
+                "goal_amount": "Quel est l'objectif financier ?",
+                "penalty_amount": "Coût d'un échec quotidien",
+                "start_date": "Date de départ",
+                "validation_rules": "Règles de validation"
+            },
+            "placeholders": {
+                "challenge_name_collective": "ex. 50 push-ups, Zéro Uber Eats...",
+                "challenge_name_individual": "ex. Opération Remise en forme...",
+                "reward": "ex. Soirée resto, Billets pour le match...",
+                "goal_amount": "ex. 200",
+                "penalty_amount": "ex. 5"
+            },
+            "tips": {
+                "goal_amount": "N'oubliez pas d'inclure les taxes et le pourboire dans votre cible pour éviter les surprises.",
+                "start_date": "Le défi se termine automatiquement quand la cagnotte est pleine — pas de date de fin fixe."
+            },
+            "estimation": "Estimation — à {penalty}$/échec, il faut environ {fails} échec{s} pour remplir la cagnotte de {goal}$.",
+            "modes": {
+                "strict": {
+                    "title": "Mode Strict",
+                    "subtitle": "Coupure à minuit",
+                    "desc": "Le défi doit être validé le jour même, avant minuit.",
+                    "tip": "⚡ Idéal pour bâtir une discipline d'acier. Le suivi en temps réel crée une forte dynamique d'équipe."
+                },
+                "flexible": {
+                    "title": "Mode Flexible",
+                    "subtitle": "Période de grâce de 3 jours",
+                    "desc": "Vous avez jusqu'à 3 jours en arrière pour valider un défi complété.",
+                    "tip": "🏕️ L'honnêteté prime sur la connectivité ! Parfait pour les fins de semaine au chalet, la pêche dans le nord ou les simples oublis."
+                }
+            },
+            "summary": {
+                "title": "Récapitulatif",
+                "type": "Type",
+                "name": "Nom",
+                "reward": "Récompense",
+                "goal": "Cagnotte cible",
+                "penalty": "Amende/échec",
+                "start": "Départ"
+            },
+            "identity": {
+                "title": "Identité Visuelle",
+                "subtitle": "Votre couleur dans le défi",
+                "desc": "Cette couleur vous représentera sur le calendrier."
+            },
+            "ready": {
+                "title": "Prêt à lancer le défi ?",
+                "desc": "Tous les paramètres sont configurés. Vos amis peuvent vous rejoindre dès l'étape suivante."
+            },
+            "buttons": {
+                "back": "Retour",
+                "continue": "Continuer",
+                "create": "Lancer le défi !",
+                "creating": "Lancement..."
+            }
+        },
+        "how_it_works": {
+            "badge": "Comment ça marche",
+            "title": "Simple, motivant, efficace.",
+            "subtitle": "Trois étapes pour transformer vos habitudes en victoires collectives.",
+            "step1": {
+                "title": "Fixez un but quotidien",
+                "desc": "Défi collectif ou individuel — l'engagement est quotidien et la récompense est du plaisir en bonne compagnie."
+            },
+            "step2": {
+                "title": "Payez l'amende en cas d'échec",
+                "desc": "Vous n'avez pas validé votre défi du jour ? Une pénalité fixée à l'avance alimente la cagnotte commune."
+            },
+            "step3": {
+                "title": "Célébrez ensemble",
+                "desc": "Quand la cagnotte atteint le montant fixé, il ne reste qu'à choisir la date et à célébrer votre progression."
+            }
+        },
+        "reassurance": {
+            "badge": "Transparence totale",
+            "title": "Votre argent reste entre vos mains.",
+            "description": "Vous gérez votre cagnotte entre amis via virement Interac ou argent comptant. Nous fournissons uniquement la plateforme de suivi.",
+            "item1": "Zéro frais cachés",
+            "item2": "Zéro transaction sur le site",
+            "item3": "Votre groupe, vos règles"
+        },
+        "calendar": {
+            "badge": "Aperçu de la plateforme",
+            "title": "Le calendrier de groupe",
+            "description": "Chaque couleur représente un membre. D'un coup d'œil, vous savez qui a réussi et qui a raté.",
+            "ongoing": "En cours",
+            "members": "membres",
+            "penalty": "Pénalité",
+            "success_all": "Tous réussi",
+            "failed": "Échec(s)",
+            "future": "À venir",
+            "tease": "Aperçu interactif disponible après inscription",
+            "days": {
+                "lun": "Lun",
+                "mar": "Mar",
+                "mer": "Mer",
+                "jeu": "Jeu",
+                "ven": "Ven",
+                "sam": "Sam",
+                "dim": "Dim"
+            },
+            "month_year": "Mars 2024"
+        },
+        "footer_cta": {
+            "title": "Prêt à relever le défi ?",
+            "subtitle": "Créez votre premier groupe en moins de 2 minutes. Gratuit. Sans frais cachés. Juste vous et votre gang.",
+            "cta_free": "Créer un compte gratuit",
+            "cta_login": "Se connecter",
+            "back_to_site": "Retour au site principal"
+        },
+        "dashboard": {
+            "welcome": "Bon retour",
+            "active_challenges": "défis actifs",
+            "active_challenge": "défi actif",
+            "stats": {
+                "active": "Défis actifs",
+                "completed": "Complétés",
+                "streak": "Streak actuel",
+                "members": "Co-membres"
+            },
+            "my_challenges": "Mes défis",
+            "new_challenge": "Nouveau défi",
+            "type_collective": "Collectif",
+            "type_individual": "Individuel",
+            "status_ongoing": "En cours",
+            "since": "Depuis",
+            "view": "Voir",
+            "coming_soon": "✦ Calendrier de groupe, chat et classement — bientôt disponibles",
+            "loading": "Chargement..."
+        },
+        "profile": {
+            "title": "Générateur d'Avatar AI",
+            "tokens": "Tokens AI",
+            "tokens_desc": "Chaque génération consomme 1 token.",
+            "welcome": "Bienvenue {username}! 🎁",
+            "welcome_desc": "Pour fêter votre arrivée, nous vous offrons <strong>3 tokens AI</strong> pour créer vos premiers avatars personnalisés.",
+            "steps": {
+                "step1": "Personnage",
+                "step2": "Environnement",
+                "step3": "Vibe",
+                "step4": "Génération"
+            },
+            "characters": {
+                "cyberpunk": {
+                    "name": "Cyberpunk",
+                    "desc": "Style néon futuriste"
+                },
+                "viking": {
+                    "name": "Guerrier Viking",
+                    "desc": "Force et bravoure"
+                },
+                "astronaut": {
+                    "name": "Astronaute",
+                    "desc": "Explorateur spatial"
+                },
+                "samurai": {
+                    "name": "Samuraï",
+                    "desc": "Honneur et précision"
+                }
+            },
+            "environments": {
+                "tokyo": {
+                    "name": "Néo-Tokyo",
+                    "desc": "Rues pluvieuses et néons"
+                },
+                "forest": {
+                    "name": "Forêt Mystique",
+                    "desc": "Nature et magie"
+                },
+                "mars": {
+                    "name": "Colonie sur Mars",
+                    "desc": "Dômes et poussière rouge"
+                },
+                "castle": {
+                    "name": "Château Médiéval",
+                    "desc": "Épique et ancien"
+                }
+            },
+            "vibes": {
+                "cool": "Cool / Relax",
+                "epic": "Épique / Intense",
+                "dark": "Sombre / Mystérieux",
+                "bright": "Lumineux / Héroïque"
+            },
+            "generator": {
+                "title": "Configuration",
+                "select_character": "Choisissez votre personnage",
+                "select_env": "Choisissez l'environnement",
+                "select_vibe": "Choisissez l'ambiance",
+                "ready": "Prêt à générer ?",
+                "ready_desc": "Votre avatar sera unique et généré par notre IA.",
+                "generate": "Générer mon avatar",
+                "generating": "Génération en cours...",
+                "no_tokens": "Tokens insuffisants",
+                "success": "Avatar généré avec succès !",
+                "preview": "Aperçu"
+            }
+        },
+        "success": {
+            "title": "Votre défi est lancé ! 🎉",
+            "subtitle": "Il ne reste plus qu'à inviter vos amis pour commencer l'aventure.",
+            "invite_title": "Code d'invitation",
+            "invite_desc": "Partagez ce code avec vos amis pour qu'ils rejoignent le groupe.",
+            "copy": "Copier",
+            "copied": "Copié !",
+            "share_title": "Partager directement",
+            "admin_title": "Administration du groupe",
+            "admin_desc": "En tant que créateur, vous pouvez gérer les membres et le statut du défi.",
+            "members": "Membres du groupe",
+            "member_count": "{count} membre(s)",
+            "next_steps": {
+                "title": "Prochaines étapes",
+                "step1": "Invitez au moins 2 amis pour dynamiser le groupe.",
+                "step2": "Validez votre premier défi dès demain matin.",
+                "step3": "Le premier qui échoue paie l'amende dans la cagnotte !"
+            },
+            "buttons": {
+                "dashboard": "Aller au tableau de bord",
+                "home": "Retour à l'accueil"
+            },
+            "share_text": "Rejoins mon défi sur EkstremAI ! Code : {code}"
+        }
+    },
+    "auth": {
+        "menu": {
+            "my_profile": "Mon Profil",
+            "my_ai_profile": "Mon Profil AI",
+            "settings": "Paramètres",
+            "logout": "Déconnexion",
+            "default_account": "Mon compte"
+        }
+    },
+    "profile_page": {
+        "title": "Mon Profil",
+        "description": "Gérez vos informations personnelles et votre photo de profil.",
+        "upload_photo": "Changer la photo",
+        "uploading": "Téléchargement...",
+        "success": "Photo mise à jour !",
+        "error": "Erreur lors du téléchargement.",
+        "username": "Nom d'utilisateur",
+        "email": "Adresse courriel"
     }
 }

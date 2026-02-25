@@ -12,18 +12,14 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
-    // Routes standalone — pas de préfixe de locale (Rise & Reward landing page)
-    const isStandalone = pathname.startsWith('/riseandreward');
-    if (isStandalone) {
-        return NextResponse.next();
-    }
-
-    // Protect dashboard routes — requires Supabase session
-    const isDashboard = locales.some((locale) =>
-        pathname.startsWith(`/${locale}/dashboard`)
+    // Protect dashboard and profile routes — requires Supabase session
+    const isProtected = locales.some((locale) =>
+        pathname.startsWith(`/${locale}/dashboard`) ||
+        pathname.startsWith(`/${locale}/profile`) ||
+        pathname.startsWith(`/${locale}/settings`)
     );
 
-    if (isDashboard) {
+    if (isProtected) {
         return updateSession(request);
     }
 

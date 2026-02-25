@@ -7,52 +7,52 @@
         "cta": "Access Rise & Reward"
     },
     "hero": {
-        "tagline": "Free your time • Create your way",
-        "title": "AI in service of your freedom.",
-        "subtitle": "We forge intelligent tools to automate the necessary and let you live the essential.",
-        "cta": "See our projects",
+        "tagline": "Unlock your time • Create your way",
+        "title": "AI for your freedom.",
+        "subtitle": "We forge intelligent tools to automate the useful and allow you to live the essential.",
+        "cta": "View our projects",
         "visionCta": "Our vision",
         "forgedWith": "Tools forged with"
     },
     "projects": {
         "title": "Our Projects",
-        "subtitle": "Tools designed to transform your everyday life.",
+        "subtitle": "Tools designed to transform your daily life.",
         "rr": {
             "badge": "SaaS • Gamification • Supabase",
             "title": "Rise & Reward",
-            "description": "A collective discipline gamification app. Turn your habits into shared challenges, grow together, and reward the effort.",
+            "description": "A gamification app for collective discipline. Transform your habits into shared challenges, progress together, and reward the effort.",
             "cta": "Discover"
         }
     },
     "vision": {
-        "quote": "Artificial intelligence should not replace us, but set us free.",
+        "quote": "Artificial intelligence should not replace us, but free us.",
         "quoteAuthor": "EkstremAI",
         "title": "Our Vision",
-        "subtitle": "Three pillars guide every creation we build.",
+        "subtitle": "Three pillars guide each of our creations.",
         "pillars": {
             "intuitivite": {
-                "title": "Intuitiveness",
-                "desc": "The ideal tool needs no manual. We believe a single glance should be enough to understand how to reach your goal. Our priority is finding the perfect balance between clarity and power so that technology becomes second nature."
+                "title": "Intuitivity",
+                "desc": "The ideal tool doesn't need a manual. We believe one glance should be enough to understand how to reach your goal. Our priority is finding the perfect balance between clarity and power so technology becomes second nature."
             },
             "efficacite": {
                 "title": "Efficiency",
-                "desc": "The art of eliminating every unnecessary step between your intention and the result. We don't just build tools — we design shortcuts to excellence by removing friction and keeping only pure performance."
+                "desc": "The art of eliminating every unnecessary step between your intention and the result. We don't just develop tools; we design shortcuts to excellence by removing friction to keep only pure performance."
             },
             "aesthetics": {
                 "title": "Aesthetics",
-                "desc": "When beauty meets simplicity, technology offers its very best. For us, design is not a luxury — it is proof that every detail was thoughtfully crafted to honor the experience of the person using it."
+                "desc": "When beauty meets simplicity, technology offers its best. For us, design is not a luxury; it's proof that every detail has been thought through to honor the experience of the user."
             }
         }
     },
     "contact": {
-        "title": "Let's Connect",
+        "title": "Get in Touch",
         "subtitle": "A project, a collaboration, an idea? We're listening.",
         "name": "Your name",
         "email": "Your email",
         "message": "Your message",
         "send": "Send message",
         "sending": "Sending...",
-        "success": "Message sent! We'll get back to you shortly.",
+        "success": "Message sent! We'll get back to you soon.",
         "namePlaceholder": "John Doe",
         "emailPlaceholder": "john@example.com",
         "messagePlaceholder": "Tell us about your project..."
@@ -63,34 +63,317 @@
     },
     "login": {
         "title": "Access Rise & Reward",
-        "subtitle": "Sign in to your EkstremAI space",
+        "subtitle": "Log in to your EkstremAI space",
         "email": "Email",
         "password": "Password",
-        "submit": "Sign in",
-        "noAccount": "No account yet?",
-        "signUp": "Create an account"
+        "submit": "Log In",
+        "noAccount": "Don't have an account?",
+        "signUp": "Sign Up"
     },
     "signup": {
         "title": "Create your account",
         "subtitle": "Join the EkstremAI community",
-        "firstName": "First name",
+        "firstName": "First Name",
         "firstNamePlaceholder": "Alex",
         "email": "Email",
         "password": "Password",
-        "confirm": "Confirm password",
+        "confirm": "Confirm Password",
         "submit": "Create my account",
         "hasAccount": "Already have an account?",
-        "login": "Sign in",
+        "login": "Log In",
         "successTitle": "Check your email!",
         "successBody": "A confirmation link has been sent to you. Click it to activate your account and start using Rise & Reward.",
         "goLogin": "Go to login",
         "errorMatch": "Passwords do not match.",
-        "errorShort": "Password must be at least 8 characters."
+        "errorShort": "Password must be at least 8 characters long."
     },
-    "dashboard": {
-        "welcome": "Welcome",
-        "title": "Rise & Reward",
-        "subtitle": "Your collective discipline gamification space.",
-        "comingSoon": "Coming soon — currently in development."
+    "riseandreward": {
+        "meta": {
+            "title": "Rise & Reward — EkstremAI",
+            "description": "Where personal growth and good times with friends meet. Create group challenges with financial penalties and collective rewards."
+        },
+        "hero": {
+            "badge": "Gamification · Discipline · Community",
+            "slogan": "Where personal growth and good times with friends meet.",
+            "cta_login": "Sign In",
+            "cta_signup": "Sign Up",
+            "cta_new_challenge": "Create my first group challenge",
+            "social_proof": "Join active groups",
+            "social_proof_sub": "Hundreds of challenges already launched",
+            "scroll_discover": "Discover"
+        },
+        "nav": {
+            "how_it_works": "How it works",
+            "transparency": "Transparency",
+            "preview": "Preview",
+            "login": "Sign In"
+        },
+        "create_challenge": {
+            "title": "Create a new challenge",
+            "subtitle": "Set up your group in {count} simple steps.",
+            "steps": {
+                "step1": "The Challenge",
+                "step2": "The Goal",
+                "step3": "The Rules",
+                "step4": "My Color"
+            },
+            "group_dynamic": "Group Dynamic",
+            "collective_title": "Common Challenge",
+            "collective_desc": "The whole group performs the same daily task. Simple, unified, impactful.",
+            "individual_title": "Custom Challenges",
+            "individual_desc": "Each member has their own daily goal, but the success pool is shared.",
+            "group_type": "Group Type",
+            "group_types": {
+                "friends": "Friends",
+                "family": "Family",
+                "couple": "Couple",
+                "colleagues": "Colleagues",
+                "other": "Other"
+            },
+            "labels": {
+                "challenge_name_collective": "What is the group's daily challenge?",
+                "challenge_name_individual": "Give your group a name",
+                "reward": "What will the success pool pay for?",
+                "goal_amount": "What is the financial goal?",
+                "penalty_amount": "Daily failure cost",
+                "start_date": "Start date",
+                "validation_rules": "Validation rules"
+            },
+            "placeholders": {
+                "challenge_name_collective": "ex. 50 push-ups, No Uber Eats...",
+                "challenge_name_individual": "ex. Operation Fitness...",
+                "reward": "ex. Dinner outing, Game tickets...",
+                "goal_amount": "ex. 200",
+                "penalty_amount": "ex. 5"
+            },
+            "tips": {
+                "goal_amount": "Don't forget to include taxes and tips in your target to avoid surprises.",
+                "start_date": "The challenge automatically ends when the pool is full — no fixed end date."
+            },
+            "estimation": "Estimation — at {penalty}$/failure, it takes about {fails} failure{s} to fill the {goal}$ pool.",
+            "modes": {
+                "strict": {
+                    "title": "Strict Mode",
+                    "subtitle": "Midnight cutoff",
+                    "desc": "The challenge must be validated on the same day, before midnight.",
+                    "tip": "⚡ Ideal for building iron discipline. Real-time tracking creates a strong team dynamic."
+                },
+                "flexible": {
+                    "title": "Flexible Mode",
+                    "subtitle": "3-day grace period",
+                    "desc": "You have up to 3 days back to validate a completed challenge.",
+                    "tip": "🏕️ Honesty comes before connectivity! Perfect for weekends at the cottage, fishing trips, or simple forgetfulness."
+                }
+            },
+            "summary": {
+                "title": "Summary",
+                "type": "Type",
+                "name": "Name",
+                "reward": "Reward",
+                "goal": "Target pool",
+                "penalty": "Penalty/failure",
+                "start": "Start"
+            },
+            "identity": {
+                "title": "Visual Identity",
+                "subtitle": "Your color in the challenge",
+                "desc": "This color will represent you on the calendar."
+            },
+            "ready": {
+                "title": "Ready to launch?",
+                "desc": "All settings are configured. Your friends can join you in the next step."
+            },
+            "buttons": {
+                "back": "Back",
+                "continue": "Continue",
+                "create": "Launch Challenge!",
+                "creating": "Launching..."
+            }
+        },
+        "how_it_works": {
+            "badge": "How it works",
+            "title": "Simple, motivating, effective.",
+            "subtitle": "Three steps to transform your habits into collective victories.",
+            "step1": {
+                "title": "Set a daily goal",
+                "desc": "Common or individual challenge — the commitment is daily and the reward is fun in good company."
+            },
+            "step2": {
+                "title": "Pay the penalty on failure",
+                "desc": "Didn't validate your daily challenge? A pre-set penalty feeds the shared pool."
+            },
+            "step3": {
+                "title": "Celebrate together",
+                "desc": "When the pool reaches the target amount, all that's left is to pick a date and celebrate your progress."
+            }
+        },
+        "reassurance": {
+            "badge": "Total Transparency",
+            "title": "Your money stays in your hands.",
+            "description": "You manage your pool between friends via Interac transfer or cash. We only provide the tracking platform.",
+            "item1": "Zero hidden fees",
+            "item2": "Zero transactions on site",
+            "item3": "Your group, your rules"
+        },
+        "calendar": {
+            "badge": "Platform Preview",
+            "title": "The Group Calendar",
+            "description": "Each color represents a member. At a glance, you know who succeeded and who failed.",
+            "ongoing": "Ongoing",
+            "members": "members",
+            "penalty": "Penalty",
+            "success_all": "All succeeded",
+            "failed": "Failure(s)",
+            "future": "Upcoming",
+            "tease": "Interactive preview available after sign up",
+            "days": {
+                "lun": "Mon",
+                "mar": "Tue",
+                "mer": "Wed",
+                "jeu": "Thu",
+                "ven": "Fri",
+                "sam": "Sat",
+                "dim": "Sun"
+            },
+            "month_year": "March 2024"
+        },
+        "footer_cta": {
+            "title": "Ready for the challenge?",
+            "subtitle": "Create your first group in under 2 minutes. Free. No hidden fees. Just you and your gang.",
+            "cta_free": "Create free account",
+            "cta_login": "Sign In",
+            "back_to_site": "Back to main site"
+        },
+        "dashboard": {
+            "welcome": "Welcome back",
+            "active_challenges": "active challenges",
+            "active_challenge": "active challenge",
+            "stats": {
+                "active": "Active challenges",
+                "completed": "Completed",
+                "streak": "Current streak",
+                "members": "Members"
+            },
+            "my_challenges": "My challenges",
+            "new_challenge": "New challenge",
+            "type_collective": "Collective",
+            "type_individual": "Individual",
+            "status_ongoing": "Ongoing",
+            "since": "Since",
+            "view": "View",
+            "coming_soon": "✦ Group calendar, chat and rankings — coming soon",
+            "loading": "Loading..."
+        },
+        "profile": {
+            "title": "AI Avatar Creator",
+            "tokens": "AI Tokens",
+            "tokens_desc": "Each generation consumes 1 token.",
+            "welcome": "Welcome {username}! 🎁",
+            "welcome_desc": "To celebrate your arrival, we're giving you <strong>3 AI tokens</strong> to create your first custom avatars.",
+            "steps": {
+                "step1": "Character",
+                "step2": "Environment",
+                "step3": "Vibe",
+                "step4": "Generation"
+            },
+            "characters": {
+                "cyberpunk": {
+                    "name": "Cyberpunk",
+                    "desc": "Futuristic neon style"
+                },
+                "viking": {
+                    "name": "Viking Warrior",
+                    "desc": "Strength and bravery"
+                },
+                "astronaut": {
+                    "name": "Astronaut",
+                    "desc": "Space explorer"
+                },
+                "samurai": {
+                    "name": "Samurai",
+                    "desc": "Honor and precision"
+                }
+            },
+            "environments": {
+                "tokyo": {
+                    "name": "Neo-Tokyo",
+                    "desc": "Rainy streets and neons"
+                },
+                "forest": {
+                    "name": "Mystic Forest",
+                    "desc": "Nature and magic"
+                },
+                "mars": {
+                    "name": "Mars Colony",
+                    "desc": "Domes and red dust"
+                },
+                "castle": {
+                    "name": "Medieval Castle",
+                    "desc": "Epic and ancient"
+                }
+            },
+            "vibes": {
+                "cool": "Cool / Relax",
+                "epic": "Epic / Intense",
+                "dark": "Dark / Mysterious",
+                "bright": "Bright / Heroic"
+            },
+            "generator": {
+                "title": "Configuration",
+                "select_character": "Choose your character",
+                "select_env": "Choose environment",
+                "select_vibe": "Choose vibe",
+                "ready": "Ready to generate?",
+                "ready_desc": "Your avatar will be unique and generated by our AI.",
+                "generate": "Generate my avatar",
+                "generating": "Generating...",
+                "no_tokens": "Insufficient tokens",
+                "success": "Avatar generated successfully!",
+                "preview": "Preview"
+            }
+        },
+        "success": {
+            "title": "Your challenge is live! 🎉",
+            "subtitle": "Now just invite your friends to start the adventure.",
+            "invite_title": "Invitation Code",
+            "invite_desc": "Share this code with your friends so they can join the group.",
+            "copy": "Copy",
+            "copied": "Copied!",
+            "share_title": "Share directly",
+            "admin_title": "Group Administration",
+            "admin_desc": "As the creator, you can manage members and challenge status.",
+            "members": "Group Members",
+            "member_count": "{count} member(s)",
+            "next_steps": {
+                "title": "Next Steps",
+                "step1": "Invite at least 2 friends to boost the group.",
+                "step2": "Validate your first challenge tomorrow morning.",
+                "step3": "The first one to fail pays the penalty into the pool!"
+            },
+            "buttons": {
+                "dashboard": "Go to Dashboard",
+                "home": "Back to Home"
+            },
+            "share_text": "Join my challenge on EkstremAI! Code: {code}"
+        }
+    },
+    "auth": {
+        "menu": {
+            "my_profile": "My Profile",
+            "my_ai_profile": "My AI Profile",
+            "settings": "Settings",
+            "logout": "Log out",
+            "default_account": "My account"
+        }
+    },
+    "profile_page": {
+        "title": "My Profile",
+        "description": "Manage your personal information and profile photo.",
+        "upload_photo": "Change photo",
+        "uploading": "Uploading...",
+        "success": "Photo updated!",
+        "error": "Upload error.",
+        "username": "Username",
+        "email": "Email address"
     }
 }
