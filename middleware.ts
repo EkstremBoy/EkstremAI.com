@@ -12,6 +12,11 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
+    // Skip middleware for sot-companion to allow direct access without locale prefix
+    if (pathname.startsWith('/sot-companion')) {
+        return NextResponse.next();
+    }
+
     // Protect dashboard and profile routes — requires Supabase session
     const isProtected = locales.some((locale) =>
         pathname.startsWith(`/${locale}/dashboard`) ||
