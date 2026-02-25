@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-    Trophy, Users, CalendarDays, Coins,
+    Trophy, Users, CalendarDays, Banknote,
     Flame, Award, ShieldCheck, Timer,
     ChevronLeft, Plus, MessageSquare, Lock
 } from 'lucide-react';
@@ -192,7 +192,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                             </span>
                             <span>•</span>
                             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 text-[10px] uppercase font-bold tracking-wider">
-                                <Coins size={10} className="fill-brand-cyan" />
+                                <Banknote size={10} className="fill-brand-cyan" />
                                 {totalPool}$ TOTAL
                             </span>
                             <span>•</span>
@@ -273,7 +273,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
 
                                     <div className="flex items-center justify-between p-3 rounded-xl bg-white/2 border border-white/5">
                                         <div className="flex items-center gap-2 text-white/40">
-                                            <Coins size={14} className="text-brand-cyan" />
+                                            <Banknote size={14} className="text-brand-cyan" />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">{t('details.stats.contribution') || 'Contribution'}</span>
                                         </div>
                                         <span className="font-black text-brand-cyan italic">
