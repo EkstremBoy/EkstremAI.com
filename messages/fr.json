@@ -374,6 +374,8 @@
         "success": "Photo mise à jour !",
         "error": "Erreur lors du téléchargement.",
         "username": "Nom d'utilisateur",
-        "email": "Adresse courriel"
+        "email": "Adresse courriel",
+        "save": "Enregistrer les modifications",
+        "update_success": "Profil mis à jour avec succès !"
     }
 }

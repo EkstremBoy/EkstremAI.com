@@ -374,6 +374,8 @@
         "success": "Photo updated!",
         "error": "Upload error.",
         "username": "Username",
-        "email": "Email address"
+        "email": "Email address",
+        "save": "Save changes",
+        "update_success": "Profile updated successfully!"
     }
 }

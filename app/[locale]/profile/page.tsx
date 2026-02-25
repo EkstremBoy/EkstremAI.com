@@ -12,7 +12,10 @@ import { User, Mail } from 'lucide-react';
 export default function GeneralProfilePage() {
     const t = useTranslations('profile_page');
     const [userProfile, setUserProfile] = useState<any>(null);
+    const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const supabase = createClient();
 
     useEffect(() => {
@@ -26,6 +29,7 @@ export default function GeneralProfilePage() {
                     .single();
 
                 setUserProfile({ ...user, ...profile });
+                setUsername(profile?.username || user.email?.split('@')[0] || '');
             }
             setLoading(false);
         }
@@ -34,6 +38,26 @@ export default function GeneralProfilePage() {
 
     const handlePhotoUpdate = (url: string) => {
         setUserProfile((prev: any) => ({ ...prev, avatar_url: url }));
+    };
+
+    const handleUpdateProfile = async () => {
+        setUpdating(true);
+        setMessage(null);
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({ username })
+            .eq('id', userProfile.id);
+
+        if (error) {
+            setMessage({ type: 'error', text: error.message });
+        } else {
+            setMessage({ type: 'success', text: t('update_success') });
+            setUserProfile((prev: any) => ({ ...prev, username }));
+            // Refresh page/UserMenu if needed
+            setTimeout(() => setMessage(null), 3000);
+        }
+        setUpdating(false);
     };
 
     if (loading) {
@@ -45,7 +69,7 @@ export default function GeneralProfilePage() {
     }
 
     if (!userProfile) {
-        return null; // Should be handled by middleware/redirect
+        return null;
     }
 
     return (
@@ -102,8 +126,36 @@ export default function GeneralProfilePage() {
                                     <User size={14} />
                                     {t('username')}
                                 </label>
-                                <div className="px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium">
-                                    {userProfile.username || userProfile.email?.split('@')[0]}
+                                <div className="space-y-4">
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium focus:border-brand-cyan/50 focus:bg-white/10 transition-all outline-none"
+                                        placeholder={t('username')}
+                                    />
+
+                                    <button
+                                        onClick={handleUpdateProfile}
+                                        disabled={updating || username === userProfile.username}
+                                        className="w-full py-4 rounded-2xl bg-brand-cyan text-brand-black font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 transition-all shadow-[0_0_20px_rgba(0,212,255,0.2)]"
+                                    >
+                                        {updating ? (
+                                            <div className="w-5 h-5 border-2 border-brand-black border-t-transparent rounded-full animate-spin mx-auto" />
+                                        ) : (
+                                            t('save')
+                                        )}
+                                    </button>
+
+                                    {message && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className={`text-center text-xs font-bold ${message.type === 'success' ? 'text-green-400' : 'text-red-400'}`}
+                                        >
+                                            {message.text}
+                                        </motion.p>
+                                    )}
                                 </div>
                             </div>
 
