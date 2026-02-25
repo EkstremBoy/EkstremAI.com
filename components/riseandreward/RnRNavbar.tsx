@@ -27,18 +27,7 @@ export default function RnRNavbar({ minimal = false }: { minimal?: boolean }) {
                     </Link>
                 </div>
 
-                <div className="flex items-center gap-8">
-                    {!minimal && (
-                        <nav className="hidden md:flex items-center gap-8">
-                            <Link
-                                href={`/${locale}/dashboard`}
-                                className="text-[10px] font-black text-white/40 hover:text-brand-cyan transition-colors tracking-[0.2em] uppercase"
-                            >
-                                Dashboard
-                            </Link>
-                        </nav>
-                    )}
-
+                <div className="flex items-center gap-4">
                     <div className="flex items-center gap-5 border-l border-white/10 pl-8">
                         {/* BOUTON LANGUE À DROITE */}
                         <Link

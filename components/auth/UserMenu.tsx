@@ -111,7 +111,7 @@ export default function UserMenu() {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 mt-3 w-64 glass rounded-3xl border border-white/10 shadow-2xl p-2 z-[10000] overflow-hidden"
+                        className="absolute right-0 mt-3 w-64 bg-[#0F172A]/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-2 z-[10000] overflow-hidden"
                     >
                         <div className="px-4 py-3 border-b border-white/5 mb-2">
                             <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mb-1">Session Active</p>
