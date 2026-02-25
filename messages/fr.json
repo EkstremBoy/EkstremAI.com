@@ -46,7 +46,7 @@
     },
     "contact": {
         "title": "Entrons en Contact",
-        "subtitle": "Un projet, une collaboration, une idée ? Nous sommes à l'écoute.",
+        "subtitle": "Un projet, une collaboration, un idea ? Nous sommes à l'écoute.",
         "name": "Votre nom",
         "email": "Votre email",
         "message": "Votre message",
@@ -383,5 +383,14 @@
         "lang_en": "English",
         "create_ai_avatar": "Créer AI Avatar",
         "upload_personal_photo": "Uploader photo perso"
+    },
+    "settings_page": {
+        "title": "Paramètres",
+        "subtitle": "Gérez vos préférences et la configuration de votre compte.",
+        "notifications": "Notifications",
+        "security": "Sécurité",
+        "danger_zone": "Zone de danger",
+        "danger_zone_desc": "Une fois supprimé, votre compte et toutes ses données ne pourront plus être récupérés.",
+        "delete_account": "Supprimer mon compte"
     }
 }

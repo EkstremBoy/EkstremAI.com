@@ -383,5 +383,14 @@
         "lang_en": "English",
         "create_ai_avatar": "Create AI Avatar",
         "upload_personal_photo": "Upload personal photo"
+    },
+    "settings_page": {
+        "title": "Settings",
+        "subtitle": "Manage your preferences and account configuration.",
+        "notifications": "Notifications",
+        "security": "Security",
+        "danger_zone": "Danger Zone",
+        "danger_zone_desc": "Once deleted, your account and all its data cannot be recovered.",
+        "delete_account": "Delete my account"
     }
 }
