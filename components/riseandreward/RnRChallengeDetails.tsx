@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import {
     Trophy, Users, CalendarDays, Banknote,
     Flame, Award, ShieldCheck, Timer,
-    ChevronLeft, Plus, MessageSquare, Lock
+    ChevronLeft, Plus, MessageSquare, Lock,
+    Check, X, Send
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -42,6 +43,18 @@ interface Challenge {
     max_members: number;
     is_strict_mode: boolean;
     created_at: string;
+    reward: string;
+}
+
+interface ChatMessage {
+    id: string;
+    content: string;
+    user_id: string;
+    created_at: string;
+    profiles: {
+        first_name: string | null;
+        username: string;
+    };
 }
 
 interface Props {
@@ -54,6 +67,10 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
     const t = useTranslations('riseandreward');
     const locale = useLocale();
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [isSubmittingLog, setIsSubmittingLog] = useState(false);
+    const [localLogs, setLocalLogs] = useState<Log[]>(initialLogs);
     const supabase = createClient();
 
     useEffect(() => {
@@ -62,7 +79,93 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
             if (user) setCurrentUserId(user.id);
         };
         getUserId();
+
+        // Initial messages fetch
+        const fetchMessages = async () => {
+            const { data } = await supabase
+                .from('chat_messages')
+                .select('*, profiles(first_name, username)')
+                .eq('challenge_id', challenge.id)
+                .order('created_at', { ascending: true });
+            if (data) setMessages(data);
+        };
+        fetchMessages();
+
+        // Subscribe to chat channel
+        const channel = supabase
+            .channel(`challenge-chat-${challenge.id}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'chat_messages',
+                filter: `challenge_id=eq.${challenge.id}`
+            }, async (payload) => {
+                // Fetch the profile for the new message
+                const { data } = await supabase
+                    .from('chat_messages')
+                    .select('*, profiles(first_name, username)')
+                    .eq('id', payload.new.id)
+                    .single();
+                if (data) setMessages(prev => [...prev, data]);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
+
+    const sendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !currentUserId) return;
+
+        const { error } = await supabase
+            .from('chat_messages')
+            .insert({
+                challenge_id: challenge.id,
+                user_id: currentUserId,
+                content: newMessage.trim()
+            });
+
+        if (!error) setNewMessage('');
+    };
+
+    const logDay = async (status: 'success' | 'failed') => {
+        if (!currentUserId || isSubmittingLog) return;
+        setIsSubmittingLog(true);
+
+        const targetDate = todayNormalized.toISOString().split('T')[0];
+
+        const { error } = await supabase
+            .from('daily_logs')
+            .upsert({
+                challenge_id: challenge.id,
+                user_id: currentUserId,
+                target_date: targetDate,
+                status,
+                completed_at: status === 'success' ? new Date().toISOString() : null
+            });
+
+        if (!error) {
+            // Update local state for immediate feedback
+            const newLog: Log = {
+                user_id: currentUserId,
+                target_date: targetDate,
+                status,
+                completed_at: status === 'success' ? new Date().toISOString() : null
+            };
+            setLocalLogs(prev => {
+                const filtered = prev.filter(l => !(l.user_id === currentUserId && l.target_date === targetDate));
+                return [...filtered, newLog];
+            });
+        }
+        setIsSubmittingLog(false);
+    };
+
+    const todayLog = useMemo(() => {
+        const targetDate = todayNormalized.toISOString().split('T')[0];
+        return localLogs.find(l => l.user_id === currentUserId && l.target_date === targetDate);
+    }, [localLogs, currentUserId, todayNormalized]);
 
     // ─── REORDER MEMBERS (Current user first) ───────────────────
     const orderedMembers = useMemo(() => {
@@ -76,9 +179,8 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
     // ─── BADGES & STATS LOGIC ──────────────────────────────────────
 
     const { stats, totalPool } = useMemo(() => {
-        const now = new Date();
         const memberStats = orderedMembers.map(member => {
-            const userLogs = initialLogs
+            const userLogs = localLogs
                 .filter(l => l.user_id === member.user_id)
                 .sort((a, b) => new Date(b.target_date).getTime() - new Date(a.target_date).getTime());
 
@@ -174,7 +276,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
     return (
         <div className="pt-24 pb-20 px-6 max-w-6xl mx-auto">
             {/* Header / Nav */}
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
                 <div className="flex items-center gap-4">
                     <Link
                         href={`/${locale}/riseandreward`}
@@ -186,29 +288,65 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                         <h1 className="text-3xl md:text-4xl font-black text-white italic tracking-tighter">
                             {challenge.name}
                         </h1>
-                        <div className="flex items-center gap-3 mt-1 text-white/40 text-sm font-medium">
+                        <div className="flex items-center gap-2 mt-1">
                             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-violet/10 text-brand-violet-light border border-brand-violet/20 text-[10px] uppercase font-bold tracking-wider">
                                 {challenge.challenge_type}
                             </span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 text-[10px] uppercase font-bold tracking-wider">
-                                <Banknote size={10} className="fill-brand-cyan" />
-                                {totalPool}$ TOTAL
-                            </span>
-                            <span>•</span>
-                            <span>{challenge.penalty_amount}$ / {t('dashboard.view') === 'Voir' ? 'échec' : 'fail'}</span>
+                            <span className="text-white/20">•</span>
+                            <div className="flex items-center gap-2 text-brand-cyan">
+                                <Banknote size={16} />
+                                <span className="text-lg font-black tracking-tighter">{totalPool}$</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-white/40">{challenge.reward || 'Cagnotte'}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/5 border border-white/5 text-white/60 font-bold hover:bg-white/10 transition-all">
-                        <MessageSquare size={18} />
-                        <span className="hidden md:inline">Chat</span>
-                    </button>
-                    <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-brand-cyan text-brand-black font-black uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,242,255,0.3)]">
-                        <Plus size={18} />
-                        <span className="hidden md:inline">Log Journée</span>
-                    </button>
+
+                <div className="flex items-center gap-6">
+                    <div className="relative group">
+                        <MessageSquare size={24} className="text-white/20 group-hover:text-white/40 transition-colors" />
+                        {messages.length > 0 && (
+                            <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-brand-cyan text-brand-black text-[10px] font-black flex items-center justify-center border-2 border-[#030712] shadow-lg">
+                                {messages.length > 99 ? '99+' : messages.length}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Action Card: Défi Quotidien */}
+                    <div className="glass rounded-3xl p-5 border border-white/10 flex items-center gap-6 shadow-2xl">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-brand-cyan uppercase tracking-[0.3em] mb-1">Défi Quotidien</span>
+                            <span className="text-sm font-bold text-white/60">
+                                {todayLog ? (
+                                    todayLog.status === 'success' ? 'Défi réussi ! 🦾' : 'Échec aujourd\'hui 💀'
+                                ) : (
+                                    'À valider'
+                                )}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => logDay('failed')}
+                                disabled={isSubmittingLog}
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${todayLog?.status === 'failed'
+                                    ? 'bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]'
+                                    : 'bg-white/5 text-white/20 hover:bg-red-500/20 hover:text-red-400'
+                                    }`}
+                            >
+                                <X size={20} />
+                            </button>
+                            <button
+                                onClick={() => logDay('success')}
+                                disabled={isSubmittingLog}
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${todayLog?.status === 'success'
+                                    ? 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]'
+                                    : 'bg-white/5 text-white/20 hover:bg-green-500/20 hover:text-green-400'
+                                    }`}
+                            >
+                                <Check size={20} />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -229,14 +367,14 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {orderedMembers.map((member) => {
                         const mStats = stats.find(s => s.userId === member.user_id);
-                        const isPierre = member.user_id === currentUserId;
+                        const isMe = member.user_id === currentUserId;
                         const profile = member.profiles || { first_name: 'Utilisateur', username: 'user', color: '#6366f1' };
 
                         return (
                             <motion.div
                                 key={member.user_id}
                                 whileHover={{ y: -5 }}
-                                className={`glass rounded-[2rem] p-6 border ${isPierre ? 'border-brand-cyan/40 bg-brand-cyan/5' : 'border-white/8'} relative overflow-hidden group`}
+                                className={`glass rounded-[2rem] p-6 border ${isMe ? 'border-brand-cyan/40 bg-brand-cyan/5' : 'border-white/8'} relative overflow-hidden group`}
                             >
                                 <div className="flex items-center gap-4 mb-6">
                                     <div
@@ -254,7 +392,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     <div>
                                         <h3 className="font-black text-white text-lg">
                                             {profile.first_name || profile.username}
-                                            {isPierre && <span className="ml-2 text-[10px] text-brand-cyan font-bold uppercase tracking-widest">(Moi)</span>}
+                                            {isMe && <span className="ml-2 text-[10px] text-brand-cyan font-bold uppercase tracking-widest">(Moi)</span>}
                                         </h3>
                                         <p className="text-xs font-bold text-white/30 uppercase tracking-widest">
                                             {t('details.member_role') || 'Membre'}
@@ -352,22 +490,21 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                         {/* Actual Days */}
                         {Array.from({ length: calendarData.daysInMonth }, (_, i) => {
                             const day = i + 1;
-                            const targetDate = new Date(calendarData.year, 1, day);
                             const targetDateStr = `${calendarData.year}-02-${day.toString().padStart(2, '0')}`;
+                            const targetDateObj = new Date(calendarData.year, 1, day);
 
                             // Logic helpers
-                            // Use time-only comparison to avoid midnight mismatch
-                            const isFuture = targetDate.getTime() > todayNormalized.getTime();
+                            const isFuture = targetDateObj.getTime() > todayNormalized.getTime();
                             const isLocked = challenge.is_strict_mode
-                                ? targetDate.getTime() < todayNormalized.getTime()
-                                : targetDate.getTime() < twoDaysAgo.getTime();
+                                ? targetDateObj.getTime() < todayNormalized.getTime()
+                                : targetDateObj.getTime() < twoDaysAgo.getTime();
 
-                            // Get logs for this day and sort by completion time (fastest first)
-                            const dayLogs = initialLogs
+                            // Get logs for this day
+                            const dayLogs = localLogs
                                 .filter(l => l.target_date === targetDateStr)
                                 .sort((a, b) => {
-                                    if (!a.completed_at) return 1; // Incomplete logs last
-                                    if (!b.completed_at) return -1; // Incomplete logs last
+                                    if (!a.completed_at) return 1;
+                                    if (!b.completed_at) return -1;
                                     return new Date(a.completed_at).getTime() - new Date(b.completed_at).getTime();
                                 });
 
@@ -388,7 +525,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                             {day}
                                         </span>
 
-                                        {/* Completion Dots - Ordered left to right */}
+                                        {/* Completion Dots */}
                                         <div className="flex justify-center items-center gap-1 h-2">
                                             {!isFuture && dayLogs.map((l, li) => {
                                                 const m = orderedMembers.find(mem => mem.user_id === l.user_id);
@@ -414,16 +551,10 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                         </div>
                                     )}
 
-                                    {/* Lock Indicator */}
                                     {isLocked && (
                                         <div className="absolute bottom-1.5 right-1.5 text-white/20">
                                             <Lock size={10} />
                                         </div>
-                                    )}
-
-                                    {/* Subtle hover highlight */}
-                                    {!isFuture && !isLocked && (
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-brand-cyan/0 to-brand-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     )}
                                 </motion.div>
                             );
@@ -431,7 +562,67 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                     </div>
                 </div>
             </div>
+
+            {/* Chat Box Section */}
+            <div className="max-w-4xl mx-auto md:mx-0">
+                <div className="flex items-center gap-3 mb-8">
+                    <MessageSquare className="text-brand-cyan" size={20} />
+                    <h2 className="text-xl font-black text-white uppercase tracking-widest italic">Discussion d'équipe</h2>
+                </div>
+
+                <div className="glass rounded-[2rem] border border-white/5 flex flex-col h-[500px] overflow-hidden">
+                    {/* Messages Area */}
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                        {messages.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-white/10 italic">
+                                <MessageSquare size={48} className="mb-4 opacity-5" />
+                                <p>Aucun message encore...</p>
+                                <p className="text-xs mt-1">Lancer le premier encouragement !</p>
+                            </div>
+                        ) : (
+                            messages.map((msg) => {
+                                const isMe = msg.user_id === currentUserId;
+                                const senderName = msg.profiles?.first_name || msg.profiles?.username || 'Utilisateur';
+
+                                return (
+                                    <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                                        <div className="flex items-center gap-2 mb-1 px-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{senderName}</span>
+                                            <span className="text-[8px] text-white/10">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        </div>
+                                        <div className={`px-4 py-2.5 rounded-2xl max-w-[80%] text-sm ${isMe
+                                            ? 'bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan rounded-tr-none'
+                                            : 'bg-white/5 border border-white/5 text-white/80 rounded-tl-none'
+                                            }`}>
+                                            {msg.content}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+
+                    {/* Input Area */}
+                    <form onSubmit={sendMessage} className="p-4 bg-white/2 border-t border-white/5">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder="Écrire un message..."
+                                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-brand-cyan/50 transition-all"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!newMessage.trim()}
+                                className="w-10 h-10 rounded-xl bg-brand-cyan text-brand-black flex items-center justify-center hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 transition-all shadow-[0_0_15px_rgba(0,242,255,0.3)]"
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }
-
