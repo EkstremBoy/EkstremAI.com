@@ -9,13 +9,14 @@ import Link from 'next/link';
 import { useLocale } from 'next-intl';
 
 export default function SettingsPage() {
-    const t = useTranslations('auth.menu');
+    const t = useTranslations('settings_page');
+    const tMenu = useTranslations('auth.menu');
     const locale = useLocale();
 
     const sections = [
-        { id: 'profile', icon: User, label: t('my_profile'), href: `/${locale}/profile` },
-        { id: 'notifications', icon: Bell, label: 'Notifications', href: '#' },
-        { id: 'security', icon: Lock, label: 'Sécurité', href: '#' },
+        { id: 'profile', icon: User, label: tMenu('my_profile'), href: `/${locale}/profile` },
+        { id: 'notifications', icon: Bell, label: t('notifications'), href: '#' },
+        { id: 'security', icon: Lock, label: t('security'), href: '#' },
     ];
 
     return (
@@ -33,11 +34,11 @@ export default function SettingsPage() {
                             <SettingsIcon className="text-brand-cyan" size={28} />
                         </div>
                         <h1 className="text-4xl font-extrabold text-white">
-                            {t('settings')}
+                            {t('title')}
                         </h1>
                     </div>
                     <p className="text-white/40 text-lg">
-                        Gérez vos préférences et la configuration de votre compte.
+                        {t('subtitle')}
                     </p>
                 </motion.div>
 
@@ -70,12 +71,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="mt-12 p-8 glass rounded-3xl border border-white/5 bg-red-500/5">
-                    <h3 className="text-red-400 font-bold mb-2">Zone de danger</h3>
+                    <h3 className="text-red-400 font-bold mb-2">{t('danger_zone')}</h3>
                     <p className="text-white/40 text-sm mb-6">
-                        Une fois supprimé, votre compte et toutes ses données ne pourront plus être récupérés.
+                        {t('danger_zone_desc')}
                     </p>
                     <button className="px-6 py-3 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all font-semibold text-sm">
-                        Supprimer mon compte
+                        {t('delete_account')}
                     </button>
                 </div>
             </div>
