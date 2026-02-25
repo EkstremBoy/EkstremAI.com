@@ -15,10 +15,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     // DEBUG
     console.log("MIDDLEWARE HIT:", pathname);
 
-    // Skip middleware for sot-companion to allow direct access without locale prefix
-    if (pathname.startsWith('/sot-companion')) {
-        console.log("BYPASSING MIDDLEWARE FOR SOT-COMPANION");
-        return NextResponse.next();
+    // Transparent rewrite for sot-companion to keep URL absolute at root
+    if (pathname === '/sot-companion' || pathname === '/sot-companion/') {
+        console.log("REWRITING SOT-COMPANION TO DEFAULT LOCALE");
+        return NextResponse.rewrite(new URL(`/${defaultLocale}/sot-companion`, request.url));
     }
 
     // Protect dashboard and profile routes — requires Supabase session
