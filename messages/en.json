@@ -356,6 +356,22 @@
                 "home": "Back to Home"
             },
             "share_text": "Join my challenge on EkstremAI! Code: {code}"
+        },
+        "details": {
+            "title": "Challenge Details",
+            "members_title": "Discipline Members",
+            "calendar_title": "Discipline Calendar",
+            "member_role": "Member",
+            "stats": {
+                "streak": "Streak",
+                "pool": "Contribution",
+                "generous": "Generous"
+            },
+            "badges": {
+                "unstoppable": "Unstoppable",
+                "max_streak": "Max Streak",
+                "early_bird": "Early Bird"
+            }
         }
     },
     "auth": {

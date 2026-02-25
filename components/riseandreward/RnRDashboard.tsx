@@ -138,42 +138,50 @@ export default function RnRDashboard() {
                         {challenges.map((cm, i) => {
                             const c = cm.challenges;
                             return (
-                                <motion.div
+                                <Link
                                     key={cm.challenge_id}
-                                    initial={{ opacity: 0, x: -12 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 * i, duration: 0.4 }}
-                                    className="glass rounded-2xl p-6 border border-white/8 hover:border-brand-violet/30 transition-all group"
+                                    href={`/riseandreward/${cm.challenge_id}`}
+                                    className="block"
                                 >
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-violet/15 text-brand-violet-light border border-brand-violet/20">
-                                                    {c.challenge_type === 'collective' ? t('type_collective') : t('type_individual')}
-                                                </span>
-                                                <span className="flex items-center gap-1 text-xs text-green-400/80">
-                                                    <Clock size={11} />
-                                                    {t('status_ongoing')}
-                                                </span>
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -12 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.1 * i, duration: 0.4 }}
+                                        className="glass rounded-3xl p-8 border border-white/8 hover:border-brand-cyan/40 hover:bg-brand-cyan/5 transition-all group relative overflow-hidden"
+                                    >
+                                        <div className="flex items-start justify-between relative z-10">
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-violet/15 text-brand-violet-light border border-brand-violet/20 uppercase tracking-wider">
+                                                        {c.challenge_type === 'collective' ? t('type_collective') : t('type_individual')}
+                                                    </span>
+                                                    <span className="flex items-center gap-1 text-[10px] font-bold text-green-400/80 uppercase tracking-wider">
+                                                        <Clock size={10} />
+                                                        {t('status_ongoing')}
+                                                    </span>
+                                                </div>
+                                                <h3 className="text-2xl font-black text-white mb-2 group-hover:text-brand-cyan transition-colors">{c.name}</h3>
+                                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/40">
+                                                    <span className="flex items-center gap-1.5 font-medium">
+                                                        <CalendarDays size={14} />
+                                                        {t('since')} {new Date(c.created_at).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-US')}
+                                                    </span>
+                                                    <span className="font-semibold text-white/60">
+                                                        {c.penalty_amount}$ <span className="text-white/20 font-medium">/ {t('view') === 'Voir' ? 'échec' : 'fail'}</span>
+                                                        <span className="mx-2 text-white/10">•</span>
+                                                        {t('view') === 'Voir' ? 'Objectif' : 'Goal'} {c.goal_amount}$
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <h3 className="text-lg font-bold text-white mb-1">{c.name}</h3>
-                                            <div className="flex items-center gap-4 text-xs text-white/40">
-                                                <span className="flex items-center gap-1">
-                                                    <CalendarDays size={11} />
-                                                    {t('since')} {new Date(c.created_at).toLocaleDateString(locale === 'fr' ? 'fr-CA' : 'en-US')}
-                                                </span>
-                                                <span>{c.penalty_amount}$/{t('view') === 'Voir' ? 'échec' : 'fail'} · {t('view') === 'Voir' ? 'Cagnotte' : 'Goal'} {c.goal_amount}$</span>
+                                            <div className="p-3 rounded-2xl bg-white/5 group-hover:bg-brand-cyan/20 group-hover:text-brand-cyan text-white/20 transition-all self-center">
+                                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                             </div>
                                         </div>
-                                        <Link
-                                            href={`/riseandreward/nouveau`}
-                                            className="flex items-center gap-1 text-xs text-white/40 hover:text-brand-cyan transition-colors group-hover:text-white/70 mt-1"
-                                        >
-                                            {t('view')}
-                                            <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                                        </Link>
-                                    </div>
-                                </motion.div>
+
+                                        {/* Hover decoration */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-cyan/10 blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                    </motion.div>
+                                </Link>
                             );
                         })}
                     </div>

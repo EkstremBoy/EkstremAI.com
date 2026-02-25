@@ -356,6 +356,22 @@
                 "home": "Retour à l'accueil"
             },
             "share_text": "Rejoins mon défi sur EkstremAI ! Code : {code}"
+        },
+        "details": {
+            "title": "Détails du défi",
+            "members_title": "Membres de la discipline",
+            "calendar_title": "Calendrier de discipline",
+            "member_role": "Membre",
+            "stats": {
+                "streak": "Streak",
+                "pool": "Cagnotte",
+                "generous": "Généreux"
+            },
+            "badges": {
+                "unstoppable": "Inarrêtable",
+                "max_streak": "Max Streak",
+                "early_bird": "Lève-tôt"
+            }
         }
     },
     "auth": {
