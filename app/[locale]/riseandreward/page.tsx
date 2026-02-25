@@ -33,7 +33,6 @@ export default async function RiseAndRewardPage() {
     if (!user) {
         return (
             <main className="relative bg-[#030712] text-[#f0f9ff] font-jakarta overflow-x-hidden">
-                <RnRNavbar />
                 <RnRHero ctaMode="guest" />
                 <RnRHowItWorks />
                 <RnRReassurance />
@@ -55,7 +54,6 @@ export default async function RiseAndRewardPage() {
     if (challengeCount === 0) {
         return (
             <main className="relative bg-[#030712] text-[#f0f9ff] font-jakarta overflow-x-hidden">
-                <RnRNavbar />
                 <RnRHero ctaMode="new-user" />
                 <RnRHowItWorks />
                 <RnRReassurance />
@@ -68,7 +66,6 @@ export default async function RiseAndRewardPage() {
     // ─── Cas C : Connecté, >= 1 défi → Dashboard ─────────────
     return (
         <main className="relative bg-[#030712] text-[#f0f9ff] font-jakarta overflow-x-hidden">
-            <RnRNavbar />
             <RnRDashboard />
         </main>
     );
