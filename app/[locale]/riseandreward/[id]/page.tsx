@@ -26,7 +26,7 @@ export default async function ChallengeDetailsPage({
         .from('challenge_members')
         .select(`
             *,
-            profiles (
+            profiles:user_id (
                 id,
                 username,
                 first_name,
@@ -37,7 +37,7 @@ export default async function ChallengeDetailsPage({
         .order('joined_at', { ascending: true });
 
     if (mError) {
-        console.error('Error fetching members:', mError);
+        console.error('Error fetching members for challenge:', id, mError);
     }
 
     // 3. Fetch all daily logs to calculate streaks and badges
