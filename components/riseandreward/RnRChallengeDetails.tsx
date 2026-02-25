@@ -75,7 +75,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
 
     // ─── BADGES & STATS LOGIC ──────────────────────────────────────
 
-    const stats = useMemo(() => {
+    const { stats, totalPool } = useMemo(() => {
         const now = new Date();
         const memberStats = orderedMembers.map(member => {
             const userLogs = initialLogs
@@ -88,14 +88,12 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                 .filter(l => l.status === 'success')
                 .map(l => l.target_date);
 
-            // Basic streak: consecutive days from today/yesterday
-            // (Simplified for this UI demo, can be improved with date diff logic)
             for (let i = 0; i < sortedSuccessDates.length; i++) {
                 currentStreak++;
             }
 
-            // 2. Total Penalties (Contribution)
-            const totalPenalties = userLogs.filter(l => l.status === 'failed').length * Number(challenge.penalty_amount);
+            // 2. Individual Contribution (Penalties + Generous)
+            const individualContribution = userLogs.filter(l => l.status === 'failed').length * Number(challenge.penalty_amount) + Number(member.generous_amount || 0);
 
             // 3. Unstoppable Badge (Never failed)
             const hasFailed = userLogs.some(l => l.status === 'failed');
@@ -104,7 +102,7 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
             return {
                 userId: member.user_id,
                 currentStreak,
-                totalPenalties,
+                individualContribution,
                 isInarretable
             };
         });
@@ -130,11 +128,15 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
         const maxEarlyBirdCount = Math.max(0, ...Object.values(earlyBirdTally));
         const maxStreakValue = Math.max(0, ...memberStats.map(s => s.currentStreak));
 
-        return memberStats.map(s => ({
+        const statsWithBadges = memberStats.map(s => ({
             ...s,
             isLongestStreak: s.currentStreak > 0 && s.currentStreak === maxStreakValue,
             isEarlyBird: earlyBirdTally[s.userId] > 0 && earlyBirdTally[s.userId] === maxEarlyBirdCount
         }));
+
+        const totalPool = memberStats.reduce((sum, s) => sum + s.individualContribution, 0);
+
+        return { stats: statsWithBadges, totalPool };
     }, [orderedMembers, initialLogs, challenge]);
 
     // ─── CALENDAR LOGIC (Feb 2026) ──────────────────────────────
@@ -187,6 +189,11 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                         <div className="flex items-center gap-3 mt-1 text-white/40 text-sm font-medium">
                             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-violet/10 text-brand-violet-light border border-brand-violet/20 text-[10px] uppercase font-bold tracking-wider">
                                 {challenge.challenge_type}
+                            </span>
+                            <span>•</span>
+                            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 text-[10px] uppercase font-bold tracking-wider">
+                                <Zap size={10} className="fill-brand-cyan" />
+                                {totalPool}$ TOTAL
                             </span>
                             <span>•</span>
                             <span>{challenge.penalty_amount}$ / {t('dashboard.view') === 'Voir' ? 'échec' : 'fail'}</span>
@@ -267,38 +274,52 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     <div className="flex items-center justify-between p-3 rounded-xl bg-white/2 border border-white/5">
                                         <div className="flex items-center gap-2 text-white/40">
                                             <Zap size={14} className="text-brand-cyan" />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">{t('details.stats.pool') || 'Cagnotte'}</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">{t('details.stats.contribution') || 'Contribution'}</span>
                                         </div>
                                         <span className="font-black text-brand-cyan italic">
-                                            {(mStats?.totalPenalties || 0) + Number(member.generous_amount || 0)}$
+                                            {mStats?.individualContribution || 0}$
                                         </span>
                                     </div>
 
                                     <div className="flex items-center gap-2 pt-2 min-h-[38px]">
-                                        {mStats?.isInarretable && (
-                                            <div className="group/badge relative">
-                                                <div className="p-2 rounded-lg bg-green-500/20 text-green-400 border border-green-500/30">
-                                                    <ShieldCheck size={16} />
-                                                </div>
-                                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">{t('details.badges.unstoppable') || 'Inarrêtable'}</span>
+                                        {/* Inarrêtable Badge */}
+                                        <div className="group/badge relative">
+                                            <div className={`p-2 rounded-lg border transition-all ${mStats?.isInarretable
+                                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                }`}>
+                                                <ShieldCheck size={16} />
                                             </div>
-                                        )}
-                                        {mStats?.isLongestStreak && (
-                                            <div className="group/badge relative">
-                                                <div className="p-2 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                                                    <Flame size={16} />
-                                                </div>
-                                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">{t('details.badges.max_streak') || 'Max Streak'}</span>
+                                            <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">
+                                                {t('details.badges.unstoppable') || 'Inarrêtable'}
+                                            </span>
+                                        </div>
+
+                                        {/* Max Streak Badge */}
+                                        <div className="group/badge relative">
+                                            <div className={`p-2 rounded-lg border transition-all ${mStats?.isLongestStreak
+                                                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                }`}>
+                                                <Flame size={16} />
                                             </div>
-                                        )}
-                                        {mStats?.isEarlyBird && (
-                                            <div className="group/badge relative">
-                                                <div className="p-2 rounded-lg bg-brand-cyan/20 text-brand-cyan border border-brand-cyan/30">
-                                                    <Timer size={16} />
-                                                </div>
-                                                <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">{t('details.badges.early_bird') || 'Lève-tôt'}</span>
+                                            <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">
+                                                {t('details.badges.max_streak') || 'Max Streak'}
+                                            </span>
+                                        </div>
+
+                                        {/* Early Bird Badge */}
+                                        <div className="group/badge relative">
+                                            <div className={`p-2 rounded-lg border transition-all ${mStats?.isEarlyBird
+                                                    ? 'bg-brand-cyan/20 text-brand-cyan border-brand-cyan/30 shadow-[0_0_15px_rgba(0,242,255,0.2)]'
+                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                }`}>
+                                                <Timer size={16} />
                                             </div>
-                                        )}
+                                            <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black text-[10px] text-white whitespace-nowrap opacity-0 group-hover/badge:opacity-100 transition-opacity">
+                                                {t('details.badges.early_bird') || 'Lève-tôt'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -331,14 +352,15 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                         {/* Actual Days */}
                         {Array.from({ length: calendarData.daysInMonth }, (_, i) => {
                             const day = i + 1;
+                            const targetDate = new Date(calendarData.year, 1, day);
                             const targetDateStr = `${calendarData.year}-02-${day.toString().padStart(2, '0')}`;
-                            const targetDate = new Date(targetDateStr);
 
                             // Logic helpers
-                            const isFuture = targetDate > todayNormalized;
+                            // Use time-only comparison to avoid midnight mismatch
+                            const isFuture = targetDate.getTime() > todayNormalized.getTime();
                             const isLocked = challenge.is_strict_mode
-                                ? targetDate < todayNormalized
-                                : targetDate < twoDaysAgo;
+                                ? targetDate.getTime() < todayNormalized.getTime()
+                                : targetDate.getTime() < twoDaysAgo.getTime();
 
                             // Get logs for this day and sort by completion time (fastest first)
                             const dayLogs = initialLogs
@@ -356,13 +378,13 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     key={i}
                                     whileHover={!isFuture && !isLocked ? { scale: 1.02, borderColor: 'rgba(255,255,255,0.2)' } : {}}
                                     className={`relative aspect-[1.3/1] glass rounded-2xl flex flex-col items-center justify-center border transition-all overflow-hidden ${isFuture
-                                            ? 'border-white/2 opacity-20 pointer-events-none grayscale'
+                                            ? 'border-white/5 opacity-40 pointer-events-none'
                                             : 'border-white/5 hover:bg-white/2'
                                         } ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                 >
                                     {/* Perfect Centering - Flex Column with gap */}
                                     <div className="flex flex-col items-center justify-center gap-1.5 h-full w-full">
-                                        <span className={`text-sm font-black transition-colors ${isFuture ? 'text-white/20' : 'text-white/40 group-hover:text-white'}`}>
+                                        <span className={`text-sm font-black transition-colors ${isFuture ? 'text-white/40' : 'text-white/40 group-hover:text-white'}`}>
                                             {day}
                                         </span>
 
