@@ -12,16 +12,15 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
-    // DEBUG
-    console.log("MIDDLEWARE HIT:", pathname);
-
-    // Transparent rewrite for sot-companion to keep URL absolute at root
+    // 1. Transparent rewrite for sot-companion
     if (pathname === '/sot-companion' || pathname === '/sot-companion/') {
-        console.log("REWRITING SOT-COMPANION TO DEFAULT LOCALE");
         return NextResponse.rewrite(new URL(`/${defaultLocale}/sot-companion`, request.url));
     }
 
-    // Protect dashboard and profile routes — requires Supabase session
+    // 2. Call intlMiddleware first to handle locale
+    const response = intlMiddleware(request) as NextResponse;
+
+    // 3. Protect routes — requires Supabase session
     const isProtected = locales.some((locale) =>
         pathname.startsWith(`/${locale}/dashboard`) ||
         pathname.startsWith(`/${locale}/profile`) ||
@@ -29,10 +28,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     );
 
     if (isProtected) {
-        return updateSession(request);
+        return await updateSession(request, response);
     }
 
-    return intlMiddleware(request) as NextResponse;
+    return response;
 }
 
 export const config = {
