@@ -377,6 +377,9 @@
         "username": "Username",
         "email": "Email address",
         "save": "Save changes",
-        "update_success": "Profile updated successfully!"
+        "update_success": "Profile updated successfully!",
+        "language": "Display Language",
+        "lang_fr": "French",
+        "lang_en": "English"
     }
 }

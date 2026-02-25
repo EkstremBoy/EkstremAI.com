@@ -377,6 +377,9 @@
         "username": "Nom d'utilisateur",
         "email": "Adresse courriel",
         "save": "Enregistrer les modifications",
-        "update_success": "Profil mis à jour avec succès !"
+        "update_success": "Profil mis à jour avec succès !",
+        "language": "Langue d'affichage",
+        "lang_fr": "Français",
+        "lang_en": "English"
     }
 }

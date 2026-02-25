@@ -16,7 +16,6 @@ export default function SettingsPage() {
         { id: 'profile', icon: User, label: t('my_profile'), href: `/${locale}/profile` },
         { id: 'notifications', icon: Bell, label: 'Notifications', href: '#' },
         { id: 'security', icon: Lock, label: 'Sécurité', href: '#' },
-        { id: 'language', icon: Globe, label: 'Langue & Région', href: '#' },
     ];
 
     return (
