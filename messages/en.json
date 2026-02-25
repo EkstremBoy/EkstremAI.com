@@ -360,7 +360,6 @@
     "auth": {
         "menu": {
             "my_profile": "My Profile",
-            "my_ai_profile": "My AI Profile",
             "settings": "Settings",
             "logout": "Log out",
             "default_account": "My account"
@@ -369,6 +368,8 @@
     "profile_page": {
         "title": "My Profile",
         "description": "Manage your personal information and profile photo.",
+        "tokens": "My AI Tokens",
+        "tokens_desc": "Use your tokens to generate avatars and more.",
         "upload_photo": "Change photo",
         "uploading": "Uploading...",
         "success": "Photo updated!",

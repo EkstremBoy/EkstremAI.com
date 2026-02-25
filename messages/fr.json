@@ -360,7 +360,6 @@
     "auth": {
         "menu": {
             "my_profile": "Mon Profil",
-            "my_ai_profile": "Mon Profil AI",
             "settings": "Paramètres",
             "logout": "Déconnexion",
             "default_account": "Mon compte"
@@ -369,6 +368,8 @@
     "profile_page": {
         "title": "Mon Profil",
         "description": "Gérez vos informations personnelles et votre photo de profil.",
+        "tokens": "Mes Jetons IA",
+        "tokens_desc": "Utilisez vos jetons pour générer des avatars et plus encore.",
         "upload_photo": "Changer la photo",
         "uploading": "Téléchargement...",
         "success": "Photo mise à jour !",
