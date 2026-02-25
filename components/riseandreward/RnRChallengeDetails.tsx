@@ -162,6 +162,18 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
         setIsSubmittingLog(false);
     };
 
+    const todayNormalized = useMemo(() => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }, []);
+
+    const twoDaysAgo = useMemo(() => {
+        const d = new Date(todayNormalized);
+        d.setDate(d.getDate() - 2);
+        return d;
+    }, [todayNormalized]);
+
     const todayLog = useMemo(() => {
         const targetDate = todayNormalized.toISOString().split('T')[0];
         return localLogs.find(l => l.user_id === currentUserId && l.target_date === targetDate);
@@ -259,17 +271,6 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
         };
     }, []);
 
-    const todayNormalized = useMemo(() => {
-        const d = new Date();
-        d.setHours(0, 0, 0, 0);
-        return d;
-    }, []);
-
-    const twoDaysAgo = useMemo(() => {
-        const d = new Date(todayNormalized);
-        d.setDate(d.getDate() - 2);
-        return d;
-    }, [todayNormalized]);
 
     // ─── RENDER ───────────────────────────────────────────────────
 
