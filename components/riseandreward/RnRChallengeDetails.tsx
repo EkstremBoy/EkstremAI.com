@@ -285,8 +285,8 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                         {/* Inarrêtable Badge */}
                                         <div className="group/badge relative">
                                             <div className={`p-2 rounded-lg border transition-all ${mStats?.isInarretable
-                                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                                : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
                                                 }`}>
                                                 <ShieldCheck size={16} />
                                             </div>
@@ -298,8 +298,8 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                         {/* Max Streak Badge */}
                                         <div className="group/badge relative">
                                             <div className={`p-2 rounded-lg border transition-all ${mStats?.isLongestStreak
-                                                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
-                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                ? 'bg-orange-500/20 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                                                : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
                                                 }`}>
                                                 <Flame size={16} />
                                             </div>
@@ -311,8 +311,8 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                         {/* Early Bird Badge */}
                                         <div className="group/badge relative">
                                             <div className={`p-2 rounded-lg border transition-all ${mStats?.isEarlyBird
-                                                    ? 'bg-brand-cyan/20 text-brand-cyan border-brand-cyan/30 shadow-[0_0_15px_rgba(0,242,255,0.2)]'
-                                                    : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
+                                                ? 'bg-brand-cyan/20 text-brand-cyan border-brand-cyan/30 shadow-[0_0_15px_rgba(0,242,255,0.2)]'
+                                                : 'bg-white/2 text-white/10 border-white/5 grayscale opacity-20'
                                                 }`}>
                                                 <Timer size={16} />
                                             </div>
@@ -378,13 +378,13 @@ export default function RnRChallengeDetails({ challenge, members: initialMembers
                                     key={i}
                                     whileHover={!isFuture && !isLocked ? { scale: 1.02, borderColor: 'rgba(255,255,255,0.2)' } : {}}
                                     className={`relative aspect-[1.3/1] glass rounded-2xl flex flex-col items-center justify-center border transition-all overflow-hidden ${isFuture
-                                            ? 'border-white/5 opacity-40 pointer-events-none'
+                                            ? 'border-white/10 opacity-60 pointer-events-none'
                                             : 'border-white/5 hover:bg-white/2'
                                         } ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                                 >
                                     {/* Perfect Centering - Flex Column with gap */}
                                     <div className="flex flex-col items-center justify-center gap-1.5 h-full w-full">
-                                        <span className={`text-sm font-black transition-colors ${isFuture ? 'text-white/40' : 'text-white/40 group-hover:text-white'}`}>
+                                        <span className={`text-sm font-black transition-colors ${isFuture ? 'text-white/60' : 'text-white/40 group-hover:text-white'}`}>
                                             {day}
                                         </span>
 
