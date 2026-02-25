@@ -3,19 +3,21 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
-import { Upload, CheckCircle, AlertCircle, Loader2, Camera } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Loader2, Camera, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ProfilePhotoUploadProps {
     userId: string;
     currentAvatarUrl?: string;
     onUploadComplete: (url: string) => void;
+    onAiAvatarClick?: () => void;
 }
 
 export default function ProfilePhotoUpload({
     userId,
     currentAvatarUrl,
     onUploadComplete,
+    onAiAvatarClick,
 }: ProfilePhotoUploadProps) {
     const t = useTranslations('profile_page');
     const [uploading, setUploading] = useState(false);
@@ -30,23 +32,19 @@ export default function ProfilePhotoUpload({
             const file = event.target.files?.[0];
             if (!file) return;
 
-            // 1. Upload file to Supabase Storage
-            // Path: userId/filename (scoped by user ID for RLS)
             const fileExt = file.name.split('.').pop();
             const fileName = `${userId}/avatar_${Date.now()}.${fileExt}`;
 
-            const { error: uploadError, data } = await supabase.storage
+            const { error: uploadError } = await supabase.storage
                 .from('avatars')
                 .upload(fileName, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
-            // 2. Get Public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('avatars')
                 .getPublicUrl(fileName);
 
-            // 3. Update profiles table
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({ avatar_url: publicUrl })
@@ -56,8 +54,6 @@ export default function ProfilePhotoUpload({
 
             onUploadComplete(publicUrl);
             setStatus('success');
-
-            // Reset status after a few seconds
             setTimeout(() => setStatus('idle'), 3000);
 
         } catch (error) {
@@ -69,7 +65,7 @@ export default function ProfilePhotoUpload({
     };
 
     return (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-4">
             {/* Avatar Preview */}
             <div className="relative group">
                 <div className="w-32 h-32 rounded-3xl overflow-hidden glass border-2 border-white/10 group-hover:border-brand-cyan/50 transition-all duration-300 shadow-2xl">
@@ -86,73 +82,78 @@ export default function ProfilePhotoUpload({
                     )}
                 </div>
 
-                {/* Upload Overlay Button */}
-                <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-3xl">
-                    <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleUpload}
-                        disabled={uploading}
-                    />
-                    <Upload size={24} className="text-white" />
-                </label>
-            </div>
-
-            {/* Status Feedback */}
-            <div className="h-6 flex items-center justify-center">
-                <AnimatePresence mode="wait">
-                    {uploading && (
-                        <motion.div
-                            key="uploading"
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -5 }}
-                            className="flex items-center gap-2 text-brand-cyan text-sm font-medium"
-                        >
-                            <Loader2 size={16} className="animate-spin" />
-                            {t('uploading')}
-                        </motion.div>
-                    )}
-
-                    {status === 'success' && (
-                        <motion.div
-                            key="success"
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -5 }}
-                            className="flex items-center gap-2 text-green-400 text-sm font-medium"
-                        >
-                            <CheckCircle size={16} />
-                            {t('success')}
-                        </motion.div>
-                    )}
-
-                    {status === 'error' && (
-                        <motion.div
-                            key="error"
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -5 }}
-                            className="flex items-center gap-2 text-red-400 text-sm font-medium"
-                        >
-                            <AlertCircle size={16} />
-                            {t('error')}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            <label className="cursor-pointer px-6 py-2.5 rounded-xl text-sm font-bold text-white glass border border-white/10 hover:border-brand-cyan transition-all active:scale-95">
+                {/* Hidden File Input */}
                 <input
+                    id="avatar-upload"
                     type="file"
                     className="hidden"
                     accept="image/*"
                     onChange={handleUpload}
                     disabled={uploading}
                 />
-                {t('upload_photo')}
-            </label>
+            </div>
+
+            {/* Status Feedback */}
+            <div className="h-4 flex items-center justify-center">
+                <AnimatePresence mode="wait">
+                    {uploading && (
+                        <motion.div
+                            key="uploading"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="flex items-center gap-2 text-brand-cyan text-xs font-medium"
+                        >
+                            <Loader2 size={12} className="animate-spin" />
+                            {t('uploading')}
+                        </motion.div>
+                    )}
+                    {status === 'success' && (
+                        <motion.div
+                            key="success"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="flex items-center gap-2 text-green-400 text-xs font-medium"
+                        >
+                            <CheckCircle size={12} />
+                            {t('success')}
+                        </motion.div>
+                    )}
+                    {status === 'error' && (
+                        <motion.div
+                            key="error"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="flex items-center gap-2 text-red-400 text-xs font-medium"
+                        >
+                            <AlertCircle size={12} />
+                            {t('error')}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+
+            <div className="flex flex-col gap-3 w-full max-w-[200px]">
+                {/* Personal Photo Button */}
+                <label
+                    htmlFor="avatar-upload"
+                    className="cursor-pointer px-4 py-3 rounded-2xl text-[11px] font-black text-white/60 glass border border-white/10 hover:border-brand-cyan hover:text-brand-cyan text-center transition-all active:scale-95 uppercase tracking-widest"
+                >
+                    {t('upload_personal_photo')}
+                </label>
+
+                {/* AI Avatar Button */}
+                <button
+                    onClick={onAiAvatarClick}
+                    className="px-4 py-3 rounded-2xl text-[11px] font-black text-brand-cyan bg-brand-cyan/10 border border-brand-cyan/30 hover:bg-brand-cyan/20 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest group"
+                >
+                    <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
+                    <span>{t('create_ai_avatar')}</span>
+                    <span className="ml-1 opacity-40">— 1 Token</span>
+                </button>
+            </div>
         </div>
     );
 }

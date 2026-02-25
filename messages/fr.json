@@ -380,6 +380,8 @@
         "update_success": "Profil mis à jour avec succès !",
         "language": "Langue d'affichage",
         "lang_fr": "Français",
-        "lang_en": "English"
+        "lang_en": "English",
+        "create_ai_avatar": "Créer AI Avatar",
+        "upload_personal_photo": "Uploader photo perso"
     }
 }

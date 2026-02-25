@@ -24,37 +24,68 @@ export default function GeneralProfilePage() {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const supabase = createClient();
 
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     useEffect(() => {
         async function loadProfile() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                const [{ data: profile }, { data: tokenData }] = await Promise.all([
-                    supabase.from('profiles').select('id, username, avatar_url, language').eq('id', user.id).single(),
-                    supabase.from('user_tokens').select('balance').eq('user_id', user.id).single()
-                ]);
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    // Fetch profile and tokens in parallel
+                    const [profileResult, tokenResult] = await Promise.all([
+                        supabase.from('profiles').select('id, username, avatar_url, language').eq('id', user.id).single(),
+                        supabase.from('user_tokens').select('balance').eq('user_id', user.id).single()
+                    ]);
 
-                setUserProfile({ ...user, ...profile });
-                setUsername(profile?.username || user.email?.split('@')[0] || '');
-                setLanguage(profile?.language || locale);
+                    if (profileResult.error) {
+                        console.error('Error fetching profile:', profileResult.error);
+                        // If language column is missing, this fetch will fail. 
+                        // We still want to show the basic info if possible.
+                        const { data: basicProfile } = await supabase.from('profiles').select('id, username, avatar_url').eq('id', user.id).single();
 
-                if (!tokenData) {
-                    const { data: newToken } = await supabase
-                        .from('user_tokens')
-                        .insert({ user_id: user.id, balance: 1 })
-                        .select('balance')
-                        .single();
-                    setTokens(newToken?.balance ?? 1);
-                } else {
-                    setTokens(tokenData.balance);
+                        setUserProfile({ ...user, ...(basicProfile || {}) });
+                        setUsername(basicProfile?.username || user.user_metadata?.username || user.email?.split('@')[0] || '');
+
+                        if (profileResult.error.code === '42703') { // Column does not exist
+                            setErrorMsg("Database migration required: Please run the SQL script for language preference.");
+                        }
+                    } else {
+                        setUserProfile({ ...user, ...profileResult.data });
+                        setUsername(profileResult.data?.username || user.email?.split('@')[0] || '');
+                        setLanguage(profileResult.data?.language || locale);
+                    }
+
+                    if (tokenResult.error && tokenResult.error.code !== 'PGRST116') {
+                        console.error('Error fetching tokens:', tokenResult.error);
+                    } else if (!tokenResult.data) {
+                        // First visit logic for tokens
+                        const { data: newToken } = await supabase
+                            .from('user_tokens')
+                            .insert({ user_id: user.id, balance: 1 })
+                            .select('balance')
+                            .single();
+                        setTokens(newToken?.balance ?? 1);
+                    } else {
+                        setTokens(tokenResult.data.balance);
+                    }
                 }
+            } catch (err) {
+                console.error('Load profile error:', err);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
         loadProfile();
     }, [supabase, locale]);
 
     const handlePhotoUpdate = (url: string) => {
         setUserProfile((prev: any) => ({ ...prev, avatar_url: url }));
+    };
+
+    const handleAiAvatar = () => {
+        // Placeholder for future AI Avatar generation logic
+        setMessage({ type: 'error', text: "AI Avatar generation service coming soon!" });
+        setTimeout(() => setMessage(null), 3000);
     };
 
     const handleLanguageChange = async (newLang: string) => {
@@ -135,6 +166,11 @@ export default function GeneralProfilePage() {
                     <p className="text-white/40 text-lg max-w-xl mx-auto">
                         {t('description')}
                     </p>
+                    {errorMsg && (
+                        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold inline-block">
+                            {errorMsg}
+                        </div>
+                    )}
                 </motion.div>
 
                 <div className="grid md:grid-cols-3 gap-8">
@@ -150,6 +186,7 @@ export default function GeneralProfilePage() {
                                 userId={userProfile.id}
                                 currentAvatarUrl={userProfile.avatar_url}
                                 onUploadComplete={handlePhotoUpdate}
+                                onAiAvatarClick={handleAiAvatar}
                             />
                         </motion.div>
 
