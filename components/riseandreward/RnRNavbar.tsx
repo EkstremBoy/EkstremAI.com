@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { User } from 'lucide-react';
 
-export default function RnRNavbar() {
+export default function RnRNavbar({ minimal = false }: { minimal?: boolean }) {
     console.log("RnR NAVBAR CHARGÉE");
     const locale = useLocale();
 
