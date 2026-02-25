@@ -4,6 +4,7 @@
         "vision": "Vision",
         "blog": "Blog",
         "contact": "Contact",
+        "games": "Games",
         "cta": "Access Rise & Reward"
     },
     "hero": {
@@ -392,5 +393,39 @@
         "danger_zone": "Danger Zone",
         "danger_zone_desc": "Once deleted, your account and all its data cannot be recovered.",
         "delete_account": "Delete my account"
+    },
+    "game": {
+        "title": "EkstremAI Gaming Hub",
+        "subtitle": "Discover our decentralized entertainment experiences.",
+        "snake": {
+            "title": "Snake Game",
+            "description": "Multi-mode arcade classic. Challenge EkstremAI Guy's record.",
+            "cta": "Play Now"
+        },
+        "coming_soon": {
+            "title": "Coming Soon",
+            "description": "New intelligent experiences are being forged..."
+        }
+    },
+    "snake": {
+        "title": "Snake - EkstremAI Edition",
+        "retro_mode": "Retro Mode",
+        "ekstrem_mode": "EkstremAI Mode",
+        "score": "Score",
+        "high_score": "High Score",
+        "start": "Press Start",
+        "game_over": "Game Over",
+        "story": {
+            "guy_title": "EkstremAI Guy",
+            "msg_20": "Wow... bravo. I thought no one would ever beat me... but one thing is certain: you will NEVER reach 25.",
+            "msg_25": "Impressive! You've surpassed the limits. Here is your reward.",
+            "continue": "Continue"
+        },
+        "leaderboard": {
+            "title": "Top Players",
+            "rank": "Rank",
+            "player": "Player",
+            "mode": "Mode"
+        }
     }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import UserMenu from '@/components/auth/UserMenu';
@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 export default function Navbar() {
     console.log("NAVBAR CHARGÉE");
     const locale = useLocale();
+    const t = useTranslations('nav');
     const pathname = usePathname();
 
     // Logic to switch locale preservation current path
@@ -24,7 +25,7 @@ export default function Navbar() {
         <header className="fixed top-0 left-0 right-0 py-4 glass border-b border-white/5" style={{ zIndex: 9999 }}>
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-8">
                     {/* Logo */}
                     <Link href={`/${locale}`} className="flex items-center group transition-transform hover:scale-[1.02]">
                         <Image
@@ -36,6 +37,16 @@ export default function Navbar() {
                             priority
                         />
                     </Link>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center gap-6">
+                        <Link
+                            href={`/${locale}/game`}
+                            className="text-sm font-medium text-white/50 hover:text-brand-cyan transition-all"
+                        >
+                            {t('games')}
+                        </Link>
+                    </nav>
                 </div>
 
                 <div className="flex items-center gap-4">
