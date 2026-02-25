@@ -2,17 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ProfilePhotoUpload from '@/components/auth/ProfilePhotoUpload';
-import { User, Mail, Sparkles } from 'lucide-react';
+import { User, Mail, Sparkles, Globe, ChevronDown } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function GeneralProfilePage() {
     const t = useTranslations('profile_page');
+    const locale = useLocale();
+    const router = useRouter();
+    const pathname = usePathname();
     const [userProfile, setUserProfile] = useState<any>(null);
     const [username, setUsername] = useState('');
+    const [language, setLanguage] = useState(locale);
     const [tokens, setTokens] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -24,12 +29,13 @@ export default function GeneralProfilePage() {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 const [{ data: profile }, { data: tokenData }] = await Promise.all([
-                    supabase.from('profiles').select('id, username, avatar_url').eq('id', user.id).single(),
+                    supabase.from('profiles').select('id, username, avatar_url, language').eq('id', user.id).single(),
                     supabase.from('user_tokens').select('balance').eq('user_id', user.id).single()
                 ]);
 
                 setUserProfile({ ...user, ...profile });
                 setUsername(profile?.username || user.email?.split('@')[0] || '');
+                setLanguage(profile?.language || locale);
 
                 if (!tokenData) {
                     const { data: newToken } = await supabase
@@ -45,10 +51,33 @@ export default function GeneralProfilePage() {
             setLoading(false);
         }
         loadProfile();
-    }, [supabase]);
+    }, [supabase, locale]);
 
     const handlePhotoUpdate = (url: string) => {
         setUserProfile((prev: any) => ({ ...prev, avatar_url: url }));
+    };
+
+    const handleLanguageChange = async (newLang: string) => {
+        setLanguage(newLang);
+        setUpdating(true);
+
+        const { error } = await supabase
+            .from('profiles')
+            .update({ language: newLang })
+            .eq('id', userProfile.id);
+
+        if (!error) {
+            // Redirect to the new locale
+            const segments = pathname.split('/');
+            segments[1] = newLang; // segments[0] is empty because of leading /
+            const newPath = segments.join('/');
+            router.push(newPath);
+            router.refresh();
+        } else {
+            console.error('Error updating language:', error);
+            setMessage({ type: 'error', text: error.message });
+        }
+        setUpdating(false);
     };
 
     const handleUpdateProfile = async () => {
@@ -196,12 +225,33 @@ export default function GeneralProfilePage() {
                                     <Mail size={14} />
                                     {t('email')}
                                 </label>
-                                <div className="px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/50 font-medium italic">
+                                <div className="px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white/50 font-medium italic mb-2">
                                     {userProfile.email}
                                 </div>
-                                <p className="mt-2 text-[10px] text-white/20 italic">
+                                <p className="text-[10px] text-white/20 italic">
                                     L'adresse courriel ne peut pas être modifiée directement.
                                 </p>
+                            </div>
+
+                            {/* Language Selection */}
+                            <div>
+                                <label className="flex items-center gap-2 text-xs font-bold text-brand-cyan uppercase tracking-widest mb-3">
+                                    <Globe size={14} />
+                                    {t('language')}
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        value={language}
+                                        onChange={(e) => handleLanguageChange(e.target.value)}
+                                        className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium focus:border-brand-cyan/50 focus:bg-white/10 transition-all outline-none appearance-none cursor-pointer"
+                                    >
+                                        <option value="fr" className="bg-[#1e293b]">{t('lang_fr')}</option>
+                                        <option value="en" className="bg-[#1e293b]">{t('lang_en')}</option>
+                                    </select>
+                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                                        <ChevronDown size={14} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
