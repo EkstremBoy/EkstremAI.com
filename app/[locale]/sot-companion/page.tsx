@@ -104,16 +104,6 @@ const iles = [
     { nom: "Plunder Outpost", slug: "Plunder_Outpost", coord: "K18", type: "Outpost", ilots: 1 },
     { nom: "Morrow's Peak Outpost", slug: "Morrow's_Peak_Outpost", coord: "V17", type: "Outpost", ilots: 1 },
 
-    // Seaposts (Contrebandiers)
-    { nom: "The North Star Seapost", slug: "The_North_Star_Seapost", coord: "H10", type: "Seapost", ilots: 1 },
-    { nom: "The Spoils of Plenty Store", slug: "The_Spoils_of_Plenty_Store", coord: "B7", type: "Seapost", ilots: 1 },
-    { nom: "Stephen's Spoils", slug: "Stephen's_Spoils", coord: "L15", type: "Seapost", ilots: 1 },
-    { nom: "The Finest Trading Post", slug: "The_Finest_Trading_Post", coord: "F17", type: "Seapost", ilots: 1 },
-    { nom: "Three Paces East Seapost", slug: "Three_Paces_East_Seapost", coord: "S10", type: "Seapost", ilots: 1 },
-    { nom: "The Wild Treasures Store", slug: "The_Wild_Treasures_Store", coord: "O4", type: "Seapost", ilots: 1 },
-    { nom: "Brian's Bazaar", slug: "Brian's_Bazaar", coord: "Y12", type: "Seapost", ilots: 1 },
-    { nom: "Roaring Traders", slug: "Roaring_Traders", coord: "U20", type: "Seapost", ilots: 1 },
-
     // Petites Iles
     { nom: "Barnacle Cay", slug: "Barnacle_Cay", coord: "O15", type: "Small", ilots: 1 },
     { nom: "Blind Man's Lagoon", slug: "Blind_Man's_Lagoon", coord: "N6", type: "Small", ilots: 1 },
@@ -185,6 +175,17 @@ const iles = [
     { nom: "Sailor's Bounty", slug: "Sailor's_Bounty", coord: "C4", type: "Large", ilots: 11 },
 ];
 
+const smugglers = [
+    { mapId: "F3", island: "Smugglers' Bay", npc: "Sea-Cloak Solomon", details: "Dans la grande grotte centrale, au fond de la baie." },
+    { mapId: "B9", island: "Crescent Isle", npc: "Low-Tide Lottie", details: "Dans la grotte qui traverse l'île (salle de stockage cachée au sud)." },
+    { mapId: "M4", island: "Old Faithful Isle", npc: "Bloodwake Kidir", details: "Grande grotte au sud, derrière l'épave plantée dans la falaise." },
+    { mapId: "O11", island: "The Crooked Masts", npc: "Little Lord Leander", details: "Dans la grotte sud, accessible par les entrées est ou ouest." },
+    { mapId: "M16", island: "Crook's Hollow", npc: "Starbright Ix", details: "Grotte nord, chambre avec la peinture du lézard." },
+    { mapId: "G16", island: "Plunder Valley", npc: "Wily Wei-Lin", details: "Grotte sud (accès par Canyon Pass ou par la colline sud)." },
+    { mapId: "Y16", island: "Ruby's Fall", npc: "Laughing Fox Lucia", details: "Dans la grande caverne nord." },
+    { mapId: "V12", island: "Fetcher's Rest", npc: "Saltbones Elias", details: "Grande grotte centrale, accessible par le nord ou le sud." }
+];
+
 const butin = [
     { nom: "Gemmes de Sirène (Saphir, Émeraude, Rubis)", prix: "1000-2000", vendeur: "TOUS (Sauf Athena)", note: "Se vend à n'importe quelle faction." },
     { nom: "Souffles de la mer (Breaths of the Sea)", prix: "4000-8000", vendeur: "TOUS (Sauf Athena)", note: "Trésor sous-marin haute valeur." },
@@ -226,16 +227,22 @@ export default function SotCompanionPage() {
         const x = lettreEnChiffre(posX);
         const y = parseInt(posY);
 
+        // Closest Outpost
         let plusProcheO = null; let minDO = Infinity;
-        let plusProcheS = null; let minDS = Infinity;
-
-        iles.forEach(ile => {
+        iles.filter(i => i.type === "Outpost").forEach(ile => {
             const ileX = lettreEnChiffre(ile.coord.charAt(0));
             const ileY = parseInt(ile.coord.substring(1));
             const d2 = Math.pow(ileX - x, 2) + Math.pow(ileY - y, 2);
+            if (d2 < minDO) { minDO = d2; plusProcheO = ile; }
+        });
 
-            if (ile.type === "Outpost" && d2 < minDO) { minDO = d2; plusProcheO = ile; }
-            if (ile.type === "Seapost" && d2 < minDS) { minDS = d2; plusProcheS = ile; }
+        // Closest Smuggler
+        let plusProcheS = null; let minDS = Infinity;
+        smugglers.forEach(s => {
+            const sX = lettreEnChiffre(s.mapId.charAt(0));
+            const sY = parseInt(s.mapId.substring(1));
+            const d2 = Math.pow(sX - x, 2) + Math.pow(sY - y, 2);
+            if (d2 < minDS) { minDS = d2; plusProcheS = s; }
         });
 
         setNavResult({ o: plusProcheO, s: plusProcheS });
@@ -369,7 +376,8 @@ export default function SotCompanionPage() {
                 .danger-border { border-left: 5px solid var(--danger); background: rgba(255, 77, 77, 0.1); padding-left: 10px; border-radius: 4px; }
                 .exception-border { border-left: 5px solid var(--gold); background: rgba(255, 204, 0, 0.05); padding-left: 10px; border-radius: 4px; }
 
-                .placeholder-img { display: flex; align-items: center; justify-content: center; background: #0b141a; color: #444; font-size: 0.8rem; }
+                /* Smuggler Details */
+                .smuggler-info { margin-top: 8px; font-size: 0.85rem; background: rgba(255, 204, 0, 0.05); padding: 8px; border-radius: 4px; border: 1px dashed var(--gold); }
             `}</style>
 
             <div className="container">
@@ -397,8 +405,11 @@ export default function SotCompanionPage() {
                     </div>
                     {navResult && (
                         <div id="navResult" className="result-box">
-                            🏠 Outpost: <strong>{navResult.o.nom}</strong> ({navResult.o.coord})<br />
-                            ⛵ Contrebandier: <strong>{navResult.s.nom}</strong> ({navResult.s.coord})
+                            🏠 Outpost: <strong>{navResult.o?.nom}</strong> ({navResult.o?.coord})<br />
+                            🏴‍☠️ Contrebandier: <strong>{navResult.s?.npc}</strong> ({navResult.s?.island} - {navResult.s?.mapId})
+                            <div className="smuggler-info">
+                                🕵️ <strong>Localisation :</strong> {navResult.s?.details}
+                            </div>
                         </div>
                     )}
                 </section>
