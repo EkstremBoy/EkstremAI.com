@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 const events = [
     {
         nom: "Skeleton Fort",
-        indice: "Gros nuage en forme de crâne gris, yeux verts",
+        indice: "Crâne gris aux yeux verts",
         safer: true, high: true,
         objectif: "Nettoyer ~12 vagues de squelettes + boss pour la clé de la vault.",
         astuce: "Gare ton navire à l'abri des canons. Utilise les barils de poudre (kegs) sur les gros groupes.",
@@ -14,7 +14,7 @@ const events = [
     },
     {
         nom: "Reaper Fortress",
-        indice: "Nuage crâne gris foncé, avec chapeau et yeux rouges",
+        indice: "Crâne gris foncé avec chapeau et yeux rouges",
         safer: true, high: true,
         objectif: "15 vagues: squelettes élites, fantômes terrestres + navires fantômes (Ghost ships).",
         astuce: "Gère le combat naval en priorité. Utilise les pièges de feu du fort au sol.",
@@ -22,7 +22,7 @@ const events = [
     },
     {
         nom: "Ghost Fleet",
-        indice: "Tornade verte fine au-dessus d'une grande île",
+        indice: "Tornade verte fine (au-dessus d'une île)",
         safer: true, high: true,
         objectif: "Détruire 4 vagues de navires fantômes et le Burning Blade amiral.",
         astuce: "Longe la ronde de navires par l'extérieur. Un navire fantôme meurt en 3 boulets normaux.",
@@ -30,7 +30,7 @@ const events = [
     },
     {
         nom: "Ashen Winds (Ashen Lord)",
-        indice: "Grosse tornade rouge au-dessus d'une île",
+        indice: "Grosse tornade rouge",
         safer: true, high: true,
         objectif: "Vaincre un Ashen Lord (boss de feu) en 3 phases.",
         astuce: "Garde un seau rempli d'eau. Reste très mobile et tire au pistolet/sniper pendant qu'il crache du feu.",
@@ -38,7 +38,7 @@ const events = [
     },
     {
         nom: "Skeleton Fleet",
-        indice: "Nuage de tonnerre en forme de navire / galion",
+        indice: "Nuage en forme de navire / galion",
         safer: true, high: true,
         objectif: "Couler 3 vagues de navires squelettes en pleine mer.",
         astuce: "Viens ultra-chargé en boulets et planches. Récupère les caisses des damnés entre les vagues.",
@@ -46,7 +46,7 @@ const events = [
     },
     {
         nom: "Kraken",
-        indice: "L'eau devient noire, vitesse chute, musique épique changeante",
+        indice: "L'eau devient noire / Vitesse chute",
         safer: true, high: true,
         objectif: "Couper assez de tentacules pour fuir ou le faire disparaître.",
         astuce: "Priorité : focus le tentacule qui s'enroule sur ton bateau. Répare l'eau avant de tirer.",
@@ -54,7 +54,7 @@ const events = [
     },
     {
         nom: "Fort of Fortune",
-        indice: "Crâne géant, yeux rouges brillants et très agressifs",
+        indice: "Crâne géant aux yeux rouges brillants (fissuré)",
         safer: false, high: true,
         objectif: "Fort très long avec Ashen Lord à la fin. Loot énorme (Athéna).",
         astuce: "Point chaud PvP. Idéal pour voler ou se faire voler.",
@@ -70,7 +70,7 @@ const events = [
     },
     {
         nom: "Burning Blade",
-        indice: "Immense colonne de flammes rouges tourbillonnantes + icône sur carte",
+        indice: "Colonne de flammes rouges tourbillonnantes (Ciel)",
         safer: false, high: true,
         objectif: "Combattre le navire amiral. Option de le couler (épée) ou de le piloter.",
         astuce: "C'est l'événement majeur des Reapers. Combat naval très intense.",
@@ -78,7 +78,7 @@ const events = [
     },
     {
         nom: "Fort of the Damned",
-        indice: "Crâne rouge vif dans le ciel, brouillard permanent en L-14",
+        indice: "Crâne rouge vif (fixe en L-14)",
         safer: false, high: true,
         objectif: "Raid manuel activé par les joueurs. Très gros butin.",
         astuce: "Nécessite les 6 flammes du sort et un crâne rituel.",
@@ -86,7 +86,7 @@ const events = [
     },
     {
         nom: "Skull of Siren Song",
-        indice: "Note fantomatique bleue de Briggsy accrochée à ton mât",
+        indice: "Note fantomatique bleue (au mât)",
         safer: false, high: true,
         objectif: "Voyage compétitif (course) partagé sur tout le serveur.",
         astuce: "Le navire qui porte le crâne est ralenti par une malédiction.",
@@ -95,6 +95,25 @@ const events = [
 ];
 
 const iles = [
+    // Outposts
+    { nom: "Port Merrick", slug: "Port_Merrick", coord: "D10", type: "Outpost", ilots: 1 },
+    { nom: "Sanctuary Outpost", slug: "Sanctuary_Outpost", coord: "F7", type: "Outpost", ilots: 1 },
+    { nom: "Dagger Tooth Outpost", slug: "Dagger_Tooth_Outpost", coord: "M8", type: "Outpost", ilots: 1 },
+    { nom: "Galleon's Grave Outpost", slug: "Galleon's_Grave_Outpost", coord: "R8", type: "Outpost", ilots: 1 },
+    { nom: "Ancient Spire Outpost", slug: "Ancient_Spire_Outpost", coord: "Q17", type: "Outpost", ilots: 1 },
+    { nom: "Plunder Outpost", slug: "Plunder_Outpost", coord: "K18", type: "Outpost", ilots: 1 },
+    { nom: "Morrow's Peak Outpost", slug: "Morrow's_Peak_Outpost", coord: "V17", type: "Outpost", ilots: 1 },
+
+    // Seaposts (Contrebandiers)
+    { nom: "The North Star Seapost", slug: "The_North_Star_Seapost", coord: "H10", type: "Seapost", ilots: 1 },
+    { nom: "The Spoils of Plenty Store", slug: "The_Spoils_of_Plenty_Store", coord: "B7", type: "Seapost", ilots: 1 },
+    { nom: "Stephen's Spoils", slug: "Stephen's_Spoils", coord: "L15", type: "Seapost", ilots: 1 },
+    { nom: "The Finest Trading Post", slug: "The_Finest_Trading_Post", coord: "F17", type: "Seapost", ilots: 1 },
+    { nom: "Three Paces East Seapost", slug: "Three_Paces_East_Seapost", coord: "S10", type: "Seapost", ilots: 1 },
+    { nom: "The Wild Treasures Store", slug: "The_Wild_Treasures_Store", coord: "O4", type: "Seapost", ilots: 1 },
+    { nom: "Brian's Bazaar", slug: "Brian's_Bazaar", coord: "Y12", type: "Seapost", ilots: 1 },
+    { nom: "Roaring Traders", slug: "Roaring_Traders", coord: "U20", type: "Seapost", ilots: 1 },
+
     // Petites Iles
     { nom: "Barnacle Cay", slug: "Barnacle_Cay", coord: "O15", type: "Small", ilots: 1 },
     { nom: "Blind Man's Lagoon", slug: "Blind_Man's_Lagoon", coord: "N6", type: "Small", ilots: 1 },
@@ -164,32 +183,30 @@ const iles = [
     { nom: "Ashen Reaches", slug: "Ashen_Reaches", coord: "V23", type: "Large", ilots: 8 },
     { nom: "Shipwreck Bay", slug: "Shipwreck_Bay", coord: "M10", type: "Large", ilots: 10 },
     { nom: "Sailor's Bounty", slug: "Sailor's_Bounty", coord: "C4", type: "Large", ilots: 11 },
-
-    // Outposts & Seaposts (Exemples pour navigation)
-    { nom: "Port Merrick", slug: "Port_Merrick", coord: "D10", type: "Outpost", ilots: 3 },
-    { nom: "Sanctuary Outpost", slug: "Sanctuary_Outpost", coord: "F7", type: "Outpost", ilots: 1 },
-    { nom: "The North Star Seapost", slug: "The_North_Star_Seapost", coord: "H10", type: "Seapost", ilots: 1 },
-    { nom: "Stephen's Spoils", slug: "Stephen's_Spoils", coord: "L15", type: "Seapost", ilots: 1 }
 ];
 
 const butin = [
-    { nom: "Gemmes de Sirène", prix: "1000-2000", vendeur: "TOUS (Sauf Athena)", note: "Exception : Se vend à n'importe qui." },
-    { nom: "Coffre de Rage", prix: "3000-3500", vendeur: "Gold Hoarders", note: "DANGER FEU : Arroser souvent." },
-    { nom: "Coffre Pleureur (Sorrow)", prix: "3000-3500", vendeur: "Gold Hoarders", note: "DANGER EAU : Remplit la cale." },
-    { nom: "Caisse de Tissu", prix: "100-700", vendeur: "Marchands", note: "SEC : S'abîme à l'eau." },
-    { nom: "Caisse de Rhum", prix: "100-700", vendeur: "Marchands", note: "FRAGILE : Ne pas sauter." },
-    { nom: "Crâne rituel (Ritual Skull)", prix: "10 Doublons", vendeur: "Larinna", note: "Exception : Se vend à Larinna." }
+    { nom: "Gemmes de Sirène (Saphir, Émeraude, Rubis)", prix: "1000-2000", vendeur: "TOUS (Sauf Athena)", note: "Se vend à n'importe quelle faction." },
+    { nom: "Souffles de la mer (Breaths of the Sea)", prix: "4000-8000", vendeur: "TOUS (Sauf Athena)", note: "Trésor sous-marin haute valeur." },
+    { nom: "Orbe des secrets", prix: "~20000", vendeur: "TOUS (Sauf Athena)", note: "Très payant, accepté par tous." },
+    { nom: "Coffre de Rage", prix: "3000-3500", vendeur: "Gold Hoarders", note: "DANGER FEU : Arroser souvent ou mettre sur la proue." },
+    { nom: "Coffre Pleureur (Sorrow)", prix: "3000-3500", vendeur: "Gold Hoarders", note: "DANGER EAU : Remplit la cale. Écoper ou mettre sur chaloupe." },
+    { nom: "Coffre des mille grogs", prix: "2200-2600", vendeur: "Gold Hoarders", note: "DANGER : Rend le porteur ivre." },
+    { nom: "Caisse de Tissu élégant", prix: "100-700", vendeur: "Marchands", note: "SEC : S'abîme à l'eau ou la pluie." },
+    { nom: "Caisse de Rhum", prix: "100-700", vendeur: "Marchands", note: "FRAGILE : Ne pas sauter ni tomber." },
+    { nom: "Caisse de Plantes", prix: "100-700", vendeur: "Marchands", note: "EAU : Doit tremper dans un fond d'eau." },
+    { nom: "Crâne rituel (Ritual Skull)", prix: "10 Doublons", vendeur: "Larinna", note: "Se vend à Larinna ou active le FotD." },
+    { nom: "Tomes Cendrés", prix: "10 Doublons", vendeur: "Larinna", note: "Se vend pour des doublons." },
+    { nom: "Poissons Trophées (Cuits)", prix: "750-11000", vendeur: "Hunter's Call", note: "Doubler le prix si cuit parfaitement." }
 ];
 
 // --- HELPERS ---
 function lettreEnChiffre(l: string) { return l.toUpperCase().charCodeAt(0) - 64; }
 
 export default function SotCompanionPage() {
-    const [searchEvent, setSearchEvent] = useState('');
-    const [filterMode, setFilterMode] = useState('safer');
-
     const [posX, setPosX] = useState('');
     const [posY, setPosY] = useState('');
+    const [navResult, setNavResult] = useState<{ o: any, s: any } | null>(null);
 
     const [searchIsland, setSearchIsland] = useState('');
     const [filterTaille, setFilterTaille] = useState('');
@@ -197,19 +214,37 @@ export default function SotCompanionPage() {
 
     const [searchLoot, setSearchLoot] = useState('');
 
-    // --- LOGIC ---
-    const resetEvents = () => { setSearchEvent(''); setFilterMode('safer'); };
+    const [selectedEvent, setSelectedEvent] = useState('');
+    const [filterMode, setFilterMode] = useState('safer');
+
+    // Navigation logic
+    useEffect(() => {
+        if (!posX || !posY) {
+            setNavResult(null);
+            return;
+        }
+        const x = lettreEnChiffre(posX);
+        const y = parseInt(posY);
+
+        let plusProcheO = null; let minDO = Infinity;
+        let plusProcheS = null; let minDS = Infinity;
+
+        iles.forEach(ile => {
+            const ileX = lettreEnChiffre(ile.coord.charAt(0));
+            const ileY = parseInt(ile.coord.substring(1));
+            const d2 = Math.pow(ileX - x, 2) + Math.pow(ileY - y, 2);
+
+            if (ile.type === "Outpost" && d2 < minDO) { minDO = d2; plusProcheO = ile; }
+            if (ile.type === "Seapost" && d2 < minDS) { minDS = d2; plusProcheS = ile; }
+        });
+
+        setNavResult({ o: plusProcheO, s: plusProcheS });
+    }, [posX, posY]);
+
     const resetNav = () => { setPosX(''); setPosY(''); };
     const resetIles = () => { setSearchIsland(''); setFilterTaille(''); setFilterIlots(''); };
     const resetLoot = () => { setSearchLoot(''); };
-
-    const filteredEvents = events.filter(e => {
-        const matchSearch = e.indice.toLowerCase().includes(searchEvent.toLowerCase()) || e.nom.toLowerCase().includes(searchEvent.toLowerCase());
-        let matchMode = true;
-        if (filterMode === 'safer') matchMode = e.safer === true;
-        if (filterMode === 'high') matchMode = e.high === true;
-        return matchSearch && matchMode;
-    });
+    const resetEvents = () => { setSelectedEvent(''); setFilterMode('safer'); };
 
     const filteredIlesList = iles.filter(i => {
         if (searchIsland.length < 2 && filterTaille === "" && filterIlots === "") return false;
@@ -223,9 +258,13 @@ export default function SotCompanionPage() {
     });
 
     const filteredLootList = butin.filter(b => {
+        if (searchLoot === '*') return true;
         if (searchLoot.length < 2) return false;
         return b.nom.toLowerCase().includes(searchLoot.toLowerCase()) || b.note.toLowerCase().includes(searchLoot.toLowerCase());
     });
+
+    const currentEvent = events.find(e => e.nom === selectedEvent);
+    const displayEvent = currentEvent && (filterMode === 'all' || (filterMode === 'safer' && currentEvent.safer) || (filterMode === 'high' && currentEvent.high));
 
     return (
         <div className="sot-companion-page">
@@ -325,49 +364,18 @@ export default function SotCompanionPage() {
                 .event-detail strong { color: var(--accent); }
                 
                 /* Styles Loot */
-                .loot-item { padding: 10px 0; font-size: 0.9rem; margin-top: 5px; }
+                .loot-item { padding: 10px 0; font-size: 0.9rem; margin-top: 5px; border-bottom: 1px solid #2d414d; }
+                .loot-item:last-child { border-bottom: none; }
                 .danger-border { border-left: 5px solid var(--danger); background: rgba(255, 77, 77, 0.1); padding-left: 10px; border-radius: 4px; }
                 .exception-border { border-left: 5px solid var(--gold); background: rgba(255, 204, 0, 0.05); padding-left: 10px; border-radius: 4px; }
 
-                .hidden { display: none; }
+                .placeholder-img { display: flex; align-items: center; justify-content: center; background: #0b141a; color: #444; font-size: 0.8rem; }
             `}</style>
 
             <div className="container">
                 <header>
                     <h1>SOT Companion Pro</h1>
                 </header>
-
-                <section id="events">
-                    <h2>🌪️ World Events & Menaces</h2>
-                    <div className="input-group">
-                        <input
-                            type="text"
-                            placeholder="Indice dans le ciel (ex: crâne rouge, tornade...)"
-                            value={searchEvent}
-                            onChange={(e) => setSearchEvent(e.target.value)}
-                        />
-                        <select value={filterMode} onChange={(e) => setFilterMode(e.target.value)}>
-                            <option value="safer">Mode: Safer Seas</option>
-                            <option value="high">Mode: High Seas</option>
-                            <option value="all">Tous les modes</option>
-                        </select>
-                        <button className="reset-btn" onClick={resetEvents}>✕</button>
-                    </div>
-                    <div id="eventList">
-                        {filteredEvents.map((e, idx) => (
-                            <div key={idx} className="event-card">
-                                <h3>
-                                    {e.nom}
-                                    {e.safer ? <span className="badge-safer">Safer Seas OK</span> : <span className="badge-high">High Seas Only</span>}
-                                </h3>
-                                <div className="event-detail">👀 <strong>Indice :</strong> {e.indice}</div>
-                                <div className="event-detail">🎯 <strong>Objectif :</strong> {e.objectif}</div>
-                                <div className="event-detail" style={{ color: '#4cd137' }}>💡 <strong>Astuce :</strong> {e.astuce}</div>
-                                <div className="event-detail" style={{ color: 'var(--danger)' }}>⚠️ <strong>À éviter :</strong> {e.danger}</div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
 
                 <section id="navigation">
                     <h2>📍 Navigation de Vente</h2>
@@ -387,9 +395,10 @@ export default function SotCompanionPage() {
                         />
                         <button className="reset-btn" onClick={resetNav}>✕</button>
                     </div>
-                    {(posX && posY) && (
+                    {navResult && (
                         <div id="navResult" className="result-box">
-                            Calcul activé pour {posX.toUpperCase()}{posY}...
+                            🏠 Outpost: <strong>{navResult.o.nom}</strong> ({navResult.o.coord})<br />
+                            ⛵ Contrebandier: <strong>{navResult.s.nom}</strong> ({navResult.s.coord})
                         </div>
                     )}
                 </section>
@@ -422,11 +431,15 @@ export default function SotCompanionPage() {
                         {filteredIlesList.map((i, idx) => (
                             <div key={idx} className="island-card">
                                 <img
-                                    src={`https://seaofthieves.fandom.com/wiki/Special:FilePath/${i.slug}_Map_Island.png`}
+                                    src={`https://seaofthieves.wiki.gg/wiki/Special:FilePath/${i.slug}_Map-Blank.jpg`}
                                     className="island-img"
                                     loading="lazy"
                                     alt={i.nom}
-                                    onError={(e: any) => e.target.style.display = 'none'}
+                                    onError={(e: any) => {
+                                        const fallback = `https://seaofthieves.wiki.gg/wiki/Special:FilePath/${i.slug}_Map.png`;
+                                        if (e.target.src !== fallback) e.target.src = fallback;
+                                        else e.target.style.display = 'none';
+                                    }}
                                 />
                                 <div>
                                     <strong>{i.nom}</strong> <span className="type-tag">{i.type}</span><br />
@@ -442,7 +455,7 @@ export default function SotCompanionPage() {
                     <div className="input-group">
                         <input
                             type="text"
-                            placeholder="Recherche (ex: tissu, rage, gemme...)"
+                            placeholder="Recherche (ex: tissu, rage) ou * pour tout"
                             value={searchLoot}
                             onChange={(e) => setSearchLoot(e.target.value)}
                         />
@@ -459,6 +472,41 @@ export default function SotCompanionPage() {
                                 </div>
                             );
                         })}
+                    </div>
+                </section>
+
+                <section id="events">
+                    <h2>🌪️ World Events & Menaces</h2>
+                    <div className="input-group">
+                        <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
+                            <option value="">-- Choisir un indice ciel --</option>
+                            {events.map((e, idx) => <option key={idx} value={e.nom}>{e.indice}</option>)}
+                        </select>
+                        <select value={filterMode} onChange={(e) => setFilterMode(e.target.value)}>
+                            <option value="safer">Mode: Safer Seas</option>
+                            <option value="high">Mode: High Seas</option>
+                            <option value="all">Tous les modes</option>
+                        </select>
+                        <button className="reset-btn" onClick={resetEvents}>✕</button>
+                    </div>
+                    <div id="eventList">
+                        {displayEvent && (
+                            <div className="event-card">
+                                <h3>
+                                    {currentEvent.nom}
+                                    {currentEvent.safer ? <span className="badge-safer">Safer Seas OK</span> : <span className="badge-high">High Seas Only</span>}
+                                </h3>
+                                <div className="event-detail">👀 <strong>Indice :</strong> {currentEvent.indice}</div>
+                                <div className="event-detail">🎯 <strong>Objectif :</strong> {currentEvent.objectif}</div>
+                                <div className="event-detail" style={{ color: '#4cd137' }}>💡 <strong>Astuce :</strong> {currentEvent.astuce}</div>
+                                <div className="event-detail" style={{ color: 'var(--danger)' }}>⚠️ <strong>À éviter :</strong> {currentEvent.danger}</div>
+                            </div>
+                        )}
+                        {selectedEvent && !displayEvent && (
+                            <div className="result-box" style={{ borderLeftColor: 'var(--danger)' }}>
+                                Cet événement ({selectedEvent}) n'est pas disponible dans le mode sélectionné.
+                            </div>
+                        )}
                     </div>
                 </section>
             </div>
