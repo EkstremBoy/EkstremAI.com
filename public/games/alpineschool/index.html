@@ -1792,11 +1792,10 @@ html[lang="en"] .lang-fr { opacity: 0.55; }
            n'apparaît donc jamais pour le Freestyle ni le Crazy Mode, qui n'ont
            pas de pancartes à écarter. -->
       <div class="descent-pick" id="descentPick" hidden>
-        <p class="eyebrow eyebrow--tight" id="diffLabel" data-i18n="menu.difficulty">Difficulté de la descente</p>
+        <p class="eyebrow eyebrow--tight" id="diffLabel" data-i18n="menu.answers">Combien de réponses</p>
         <div class="difficulty" role="group" aria-labelledby="diffLabel">
-          <button class="diff" type="button" data-diff="easy" aria-pressed="false" data-i18n="diff.easy">Facile</button>
-          <button class="diff" type="button" data-diff="medium" aria-pressed="false" data-i18n="diff.medium">Moyen</button>
-          <button class="diff" type="button" data-diff="expert" aria-pressed="false" data-i18n="diff.expert">Expert</button>
+          <button class="diff" type="button" data-diff="2" aria-pressed="false" data-i18n="answers.2">2 réponses</button>
+          <button class="diff" type="button" data-diff="3" aria-pressed="false" data-i18n="answers.3">3 réponses</button>
         </div>
         <p class="hint" id="diffHint"></p>
         <button class="btn btn--primary" type="button" id="quizStart" data-i18n="menu.go">Descendre</button>
@@ -2069,27 +2068,18 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   /* --- Difficulté de la descente ----------------------------------------
      Ne joue que sur la géométrie des pancartes : leur nombre et leur largeur,
      donc l'espace qui reste entre elles. Indépendant du niveau de contenu. */
-  var DIFFICULTY = {
-    easy: {
-      panels: 2,
-      /* Jointifs pour de bon : la pancarte occupe TOUTE sa case, il ne reste
-         donc pas le moindre interstice. À 0,86 il subsistait un trou de vingt
-         centimètres — trop étroit pour y passer vraiment, assez large pour
-         qu'on croie pouvoir essayer. */
-      width: 1,
-      maxOfSlot: 1,
-      hint: 'Panneaux larges et jointifs — impossible de passer entre.'
-    },
-    medium: {
-      panels: 3,
-      width: 0.58,
-      hint: 'Panneaux espacés — il faut viser.'
-    },
-    expert: {
-      panels: 3,
-      width: 0.34,
-      hint: 'Panneaux étroits, gros trous — vise juste ou tu passes à côté.'
-    }
+  /* Le nombre de réponses proposées, et rien d'autre. Il n'y a plus de
+     largeurs à régler : les pancartes sont TOUJOURS jointives et occupent
+     toute la piste, donc deux réponses font 50 % chacune et trois en font 33 %.
+
+     Le réglage précédent mélangeait deux difficultés — celle de la question et
+     celle du geste — en rétrécissant les pancartes jusqu'à laisser des trous.
+     Réviser du vocabulaire est un exercice d'apprentissage, pas d'adresse :
+     rater une bonne réponse parce qu'on a mal visé n'apprend rien. Qui veut
+     tester ses réflexes a le Freestyle et la Course pour ça. */
+  var ANSWERS = {
+    2: { panels: 2 },
+    3: { panels: 3 }
   };
 
   /* Une pancarte s'élargit avec les mots longs, mais jamais au point de
@@ -2219,7 +2209,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   AS.PALETTE = PALETTE;
   AS.DERIVED = DERIVED;
   AS.PHYSICS = PHYSICS;
-  AS.DIFFICULTY = DIFFICULTY;
+  AS.ANSWERS = ANSWERS;
   AS.PANEL = PANEL;
   AS.WORLD = WORLD;
   AS.CAMERA = CAMERA;
@@ -2356,13 +2346,17 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'race.name.save': 'Enregistrer',
       'race.name.default': 'Anonyme',
       'race.name.saved': 'Inscrit au tableau : {n}',
-      'menu.difficulty': 'Difficulté de la descente',
+      'menu.answers': 'Combien de réponses',
+      'answers.2': '2 réponses',
+      'answers.3': '3 réponses',
+      'answers.2.hint': "Deux pancartes côte à côte, chacune sur la moitié de la piste. On lit, on choisit son côté.",
+      'answers.3.hint': "Trois pancartes jointives, un tiers de piste chacune. Un choix de plus, et moins de temps pour hésiter.",
+      'menu.need.diff': 'Choisis le nombre de réponses.',
+      'menu.need.both': 'Choisis un niveau et le nombre de réponses.',
       'menu.level': 'Niveau des mots',
       'menu.level.math': 'Table à réviser',
       'menu.go': 'Descendre',
       'menu.need.level': 'Choisis un niveau.',
-      'menu.need.diff': 'Choisis la difficulté de la descente.',
-      'menu.need.both': 'Choisis un niveau et la difficulté de la descente.',
 
       'mode.freestyle': 'Freestyle',
       'mode.freestyle.desc': "Aucune question. Un arbre et c'est fini.",
@@ -2381,13 +2375,6 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'math.2': 'Niveau 2', 'math.2.sample': "jusqu'à 12",
       'math.3': 'Niveau 3', 'math.3.sample': "jusqu'à 20",
 
-      'diff.easy': 'Facile',
-      'diff.medium': 'Moyen',
-      'diff.expert': 'Expert',
-      'diff.easy.hint': 'Panneaux larges et jointifs — impossible de passer entre.',
-      'diff.medium.hint': 'Panneaux espacés — il faut viser.',
-      'diff.expert.hint': 'Panneaux étroits, gros trous — vise juste ou tu passes à côté.',
-      'diff.note': 'Ne concerne que le Vocabulaire et les Multiplications.',
 
       'keys.line1': 'Tiens {left} ou {right} pour carver. Plus tu tiens, plus tu glisses loin.',
       'keys.line2': 'Appuie sur {jump} pour sauter.',
@@ -2452,6 +2439,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
       /* --- Menu pause ------------------------------------------------------ */
       'pause.title': 'Pause',
+      'pause.hint.rotate': "Remets ton téléphone à l'horizontale pour repartir — un décompte te laissera le temps de reprendre les commandes.",
       'pause.hint': 'Flèches pour naviguer, Entrée pour valider, Échap pour reprendre.',
       'pause.resume': 'Reprendre',
       'pause.restart': 'Recommencer',
@@ -2529,13 +2517,17 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'race.name.save': 'Save',
       'race.name.default': 'Anonymous',
       'race.name.saved': 'Added to the board: {n}',
-      'menu.difficulty': 'How hard the run is',
+      'menu.answers': 'How many answers',
+      'answers.2': '2 answers',
+      'answers.3': '3 answers',
+      'answers.2.hint': 'Two signs side by side, half the slope each. Read, then pick your side.',
+      'answers.3.hint': 'Three signs, a third of the slope each. One more choice, less time to hesitate.',
+      'menu.need.diff': 'Pick how many answers.',
+      'menu.need.both': 'Pick a level and how many answers.',
       'menu.level': 'Word level',
       'menu.level.math': 'Table to practise',
       'menu.go': 'Set off',
       'menu.need.level': 'Pick a level.',
-      'menu.need.diff': 'Pick how hard the run is.',
-      'menu.need.both': 'Pick a level and how hard the run is.',
 
       'mode.freestyle': 'Freestyle',
       'mode.freestyle.desc': 'No questions. One tree and it is over.',
@@ -2554,13 +2546,6 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'math.2': 'Level 2', 'math.2.sample': 'up to 12',
       'math.3': 'Level 3', 'math.3.sample': 'up to 20',
 
-      'diff.easy': 'Easy',
-      'diff.medium': 'Medium',
-      'diff.expert': 'Expert',
-      'diff.easy.hint': 'Wide signs, edge to edge — there is no way between them.',
-      'diff.medium.hint': 'Spaced out — you have to aim.',
-      'diff.expert.hint': 'Narrow signs, wide gaps — aim well or you sail straight past.',
-      'diff.note': 'Only affects Vocabulary and Times tables.',
 
       'keys.line1': 'Hold {left} or {right} to carve. The longer you hold, the further you slide.',
       'keys.line2': 'Press {jump} to jump.',
@@ -2616,6 +2601,8 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'hint.rotate': 'Turn your phone sideways — the slope is far easier to read.',
 
       'pause.title': 'Paused',
+      'pause.hint.rotate': "Remets ton téléphone à l'horizontale pour repartir — un décompte te laissera le temps de reprendre les commandes.",
+      'pause.hint.rotate': 'Turn your phone back to landscape to carry on — a countdown will give you time to get your thumbs ready.',
       'pause.hint': 'Arrows to move, Enter to choose, Esc to carry on.',
       'pause.resume': 'Carry on',
       'pause.restart': 'Start over',
@@ -3799,6 +3786,17 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (frozen) return;
     frozen = true;
     hooks.setFrozen(true);
+
+    /* En pleine descente, tourner le téléphone ouvre le VRAI menu pause. Sur
+       mobile il n'y a pas de touche Échap : la rotation était donc le seul
+       geste disponible, et elle ne menait qu'à un écran sans issue. Musique,
+       langue, recommencer, quitter — tout devient enfin atteignable au doigt.
+       Hors partie, il n'y a rien à mettre en pause : on garde le simple
+       conseil de tourner l'appareil. */
+    if (hooks.isPlaying() && hooks.openPause()) {
+      el.portrait.classList.add('is-off');
+      return;
+    }
     paintPortrait();
     el.portrait.classList.remove('is-off');
   }
@@ -3807,6 +3805,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (!frozen) return;
     frozen = false;
     el.portrait.classList.add('is-off');
+    hooks.closePause();
     /* Hors partie, rien à décompter : on rend la main tout de suite. */
     if (!hooks.isPlaying()) {
       hooks.setFrozen(false);
@@ -3916,6 +3915,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       showInvite();
     });
 
+    /* Le menu pause affiche un rappel « remets à l'horizontale », mais
+       seulement sur mobile et seulement quand c'est la rotation qui l'a
+       ouvert. */
     window.addEventListener('resize', refresh);
     window.addEventListener('orientationchange', function () {
       /* La taille de fenêtre n'est pas encore à jour au moment où l'événement
@@ -3933,6 +3935,10 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
   AS.mobile = {
     init: init,
+    /* Le menu pause interroge ceci pour savoir s'il doit afficher le rappel de
+       rotation à la place de la ligne « Reprendre » — sur un téléphone en
+       portrait, reprendre ne se fait pas en cliquant. */
+    isPortraitPause: function () { return frozen && isPhone(); },
     refresh: refresh,
     isPhone: isPhone,
     isTouch: isTouch,
@@ -7415,9 +7421,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     this.group.visible = true;
   };
 
-  Gate.prototype.build = function (question, diff, z) {
+  Gate.prototype.build = function (question, answers, z) {
     this.isChoice = false;
-    var cfg = AS.DIFFICULTY[diff];
+    var cfg = AS.ANSWERS[answers] || AS.ANSWERS[3];
     var n = cfg.panels;
     var slotW = (P.HALF * 2) / n;
 
@@ -7428,13 +7434,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     for (var i = 0; i < MAX_PANELS; i++) {
       if (i < n) {
         var text = options[i];
-        /* Un mot long élargit sa pancarte, mais jamais jusqu'à toucher sa
-           voisine : le plafond à 94 % de la case garantit qu'il reste un trou
-           visible, sinon le mode expert n'aurait plus de sens. */
-        var grow = 1 + Math.max(0, text.length - PANEL.GROW_FROM) * PANEL.GROW_PER_LETTER;
-        var ceiling = cfg.maxOfSlot === undefined ? PANEL.MAX_OF_SLOT : cfg.maxOfSlot;
-        var width = Math.min(slotW * cfg.width * grow, slotW * ceiling);
-        this.panels[i].set(text, -P.HALF + slotW * (i + 0.5), width, text === question.answer);
+        /* La pancarte occupe TOUTE sa case, quelle que soit la longueur du
+           mot : plus d'interstice, donc plus moyen de passer entre deux
+           réponses. On traverse forcément l'une d'elles, et c'est ce qu'on
+           veut — la question est de savoir laquelle, pas de savoir viser. */
+        this.panels[i].set(text, -P.HALF + slotW * (i + 0.5), slotW,
+          text === question.answer);
       } else {
         this.panels[i].group.visible = false;
       }
@@ -8857,14 +8862,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     this.state = null;
   }
 
-  Game.prototype.start = function (mode, level, diff) {
+  Game.prototype.start = function (mode, level, answers) {
     var crazy = mode === 'crazy';
     var race = mode === 'race';
     var quiz = mode !== 'freestyle' && !crazy && !race;
     this.state = {
       mode: mode,
       contentLevel: level || 1,
-      diff: diff,
+      answers: answers || 3,
 
       x: 0,
       vx: 0,
@@ -9098,7 +9103,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   Game.prototype.spawnGate = function (z) {
     var s = this.state;
     var question = s.provider.next();
-    this.world.gates.spawn(question, s.diff, z);
+    this.world.gates.spawn(question, s.answers, z);
     /* La porte naît peut-être au milieu d'obstacles déjà posés : on dégage
        son approche et sa sortie. */
     this.world.props.clearZone(z - W.GATE_SAFE_BEFORE, z + W.GATE_SAFE_AFTER);
@@ -9644,6 +9649,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     this.hooks = hooks;
     this.layer = document.getElementById('pause');
     this.list = document.getElementById('pauseRows');
+    this.hint = document.querySelector('#pause [data-i18n="pause.hint"]');
     this.rows = [];
     this.index = 0;
     this.open = false;
@@ -9661,7 +9667,17 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     var self = this;
     var rows = [];
 
-    rows.push({
+    /* Téléphone tenu à la verticale : c'est la rotation qui a ouvert ce menu,
+       et c'est la rotation qui le refermera. Proposer « Reprendre » serait un
+       bouton qui ne peut pas tenir sa promesse — on le retire et on explique
+       le geste à la place. */
+    var parRotation = !!(AS.mobile && AS.mobile.isPortraitPause());
+
+    if (this.hint) {
+      this.hint.textContent = t(parRotation ? 'pause.hint.rotate' : 'pause.hint');
+    }
+
+    if (!parRotation) rows.push({
       kind: 'action', key: 'resume', primary: true,
       label: t('pause.resume'),
       run: function () { self.close(); }
@@ -10439,9 +10455,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   });
 
   /* --- Choix du menu ------------------------------------------------------ */
-  /* Rien n'est choisi d'avance : les deux décisions — le niveau et la largeur
-     des pancartes — doivent être prises avant de partir. Une valeur par défaut
-     invisible faisait qu'on descendait en « Moyen » sans l'avoir voulu. */
+  /* Rien n'est choisi d'avance : les deux décisions — le niveau des mots et le
+     nombre de réponses — doivent être prises avant de partir. Une valeur par
+     défaut invisible faisait qu'on descendait en « Moyen » sans l'avoir voulu. */
   var chosenDiff = null;
   var chosenLevel = null;
   var chosenMode = null;
@@ -10564,7 +10580,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   function startGame(mode, level) {
     AS.audio.unlock();
     AS.audio.resume();
-    var state = game.start(mode, level, chosenDiff || 'medium');
+    var state = game.start(mode, level, chosenDiff || 3);
     screen = 'play';
     hud.showGame(state);
     refreshOrientation();
@@ -11001,10 +11017,10 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         && parseInt(b.getAttribute('data-level'), 10) === chosenLevel;
     });
     paintGroup(diffButtons, function (b) {
-      return b.getAttribute('data-diff') === chosenDiff;
+      return parseInt(b.getAttribute('data-diff'), 10) === chosenDiff;
     });
 
-    hud.setDiffHint(chosenDiff ? AS.i18n.t('diff.' + chosenDiff + '.hint') : '');
+    hud.setDiffHint(chosenDiff ? AS.i18n.t('answers.' + chosenDiff + '.hint') : '');
 
     var manque = !chosenLevel && !chosenDiff ? 'menu.need.both'
       : !chosenLevel ? 'menu.need.level'
@@ -11024,7 +11040,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
   Array.prototype.forEach.call(diffButtons, function (button) {
     button.addEventListener('click', function () {
-      chosenDiff = button.getAttribute('data-diff');
+      chosenDiff = parseInt(button.getAttribute('data-diff'), 10);
       refreshQuizPick();
     });
   });
@@ -11304,7 +11320,16 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         if (musicAllowed()) AS.music.start();
       }
     },
-    atMenu: function () { return screen === 'menu'; }
+    atMenu: function () { return screen === 'menu'; },
+    /* Renvoie true si le menu pause s'est bien ouvert. Il refuse hors
+       partie — dans ce cas le module retombe sur son propre écran. */
+    openPause: function () {
+      if (pause.isOpen()) return true;
+      if (!(screen === 'play' && game.state && game.state.running)) return false;
+      pause.show(game.state);
+      return true;
+    },
+    closePause: function () { if (pause.isOpen()) pause.close(); }
   });
 
   /* --- Entrées, fenêtre --------------------------------------------------- */
@@ -11360,7 +11385,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     input: AS.input,
     start: startGame,
     menu: backToMenu,
-    setDiff: function (d) { chosenDiff = d; },
+    setAnswers: function (n) { chosenDiff = n; },
     state: function () { return game.state; },
     screenName: function () { return screen; }
   };
