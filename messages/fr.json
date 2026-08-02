@@ -411,9 +411,22 @@
         "danger_zone_desc": "Une fois supprimé, votre compte et toutes ses données ne pourront plus être récupérés.",
         "delete_account": "Supprimer mon compte"
     },
-    "game": {
+    "games": {
+        "eyebrow": "Arcades expérimentales",
         "title": "Hub de Jeux EkstremAI",
-        "subtitle": "Découvrez nos expériences de divertissement décentralisées.",
+        "subtitle": "Des expériences jouables, construites de zéro. Chaque jeu porte les technologies qui l'ont fait naître.",
+        "cta": "Jouer maintenant",
+        "forging": "Forge en cours...",
+        "category": {
+            "educational": "Éducatif",
+            "arcade": "Arcade",
+            "puzzle": "Réflexion",
+            "tech": "Démos techniques"
+        },
+        "alpineschool": {
+            "title": "Alpine School",
+            "description": "Une descente à ski en 3D pour réviser l'anglais et les tables. Cinq modes, un chrono, et pas un seul fichier importé : toute la géométrie et tout le son sont construits en code."
+        },
         "snake": {
             "title": "Snake Game",
             "description": "Le classique d'arcade multi-mode. Défiez le record d'EkstremAI Guy.",

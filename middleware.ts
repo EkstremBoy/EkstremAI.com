@@ -35,7 +35,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
+    /* `games/` AVEC la barre oblique, et c'est tout le sel : elle exclut
+       `/games/alpineschool/...` — un jeu autonome servi depuis public/, que
+       next-intl redirigerait sinon vers `/fr/games/...`, donc vers un 404 —
+       tout en laissant passer `/games` seul, que le middleware redirige bien
+       vers `/fr/games`, le hub.
+       Les extensions sont là pour la même raison : le filtre d'origine ne
+       laissait passer que les images, pas les .html ni les .js. */
     matcher: [
-        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!api|games/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff2|ico|json|webmanifest)$).*)',
     ],
 };

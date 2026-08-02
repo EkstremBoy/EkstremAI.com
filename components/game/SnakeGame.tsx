@@ -342,7 +342,7 @@ export default function SnakeGame() {
 
             <div className="flex items-center justify-between w-full glass p-6 rounded-3xl border border-white/5">
                 <div className="flex items-center gap-6">
-                    <Link href={`/${locale}/game`} className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"><ChevronLeft /></Link>
+                    <Link href={`/${locale}/games`} className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"><ChevronLeft /></Link>
                     <div>
                         <h2 className="text-white/40 text-xs font-bold uppercase tracking-widest">{t('score')}</h2>
                         <div className="flex items-baseline gap-2">
