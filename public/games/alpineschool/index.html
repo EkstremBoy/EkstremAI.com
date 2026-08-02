@@ -1516,6 +1516,101 @@ kbd {
   100% { transform: rotate(0); }
 }
 
+/* --- Mode d'emploi tactile ------------------------------------------------
+   Les pourcentages ne sont pas décoratifs : ils recopient JUMP_ZONE (0.22) et
+   SIDE_ZONE (0.38) de input.js. Si ces constantes changent, ces règles doivent
+   changer avec — sinon le mode d'emploi enseignerait un geste qui rate. */
+.m-tuto {
+  position: fixed;
+  inset: 0;
+  z-index: 86;
+  background: rgba(8, 26, 42, 0.30);
+}
+
+.m-tuto.is-off { display: none; }
+
+.m-tuto-zone {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 2px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.10);
+  text-align: center;
+  pointer-events: none;
+}
+
+.m-tuto-zone span {
+  font-size: clamp(12px, 2.6vmin, 16px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(6, 22, 36, 0.9);
+  max-width: 90%;
+}
+
+.m-tuto-jump {
+  top: 6px; left: 6px; right: 6px;
+  height: calc(22% - 12px);
+}
+
+/* Les côtés commencent sous la bande de saut. Leur texte est calé EN HAUT de
+   la boîte : centré, il se posait exactement sur les pancartes de réponses,
+   c'est-à-dire sur ce que le joueur doit justement apprendre à regarder. */
+.m-tuto-left,
+.m-tuto-right {
+  top: calc(22% + 6px);
+  bottom: 58px;
+  width: calc(38% - 12px);
+  align-items: flex-start;
+  padding-top: 14px;
+}
+
+.m-tuto-left { left: 6px; }
+.m-tuto-right { right: 6px; }
+
+.m-tuto-go {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Contenu dans les 24 % morts du milieu : il ne recouvre aucune zone. */
+  width: min(21%, 150px);
+  padding: 16px 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--coral);
+  box-shadow: 0 8px 26px rgba(6, 22, 36, 0.5);
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(18px, 4.4vmin, 26px);
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  animation: m-go 1.9s ease-in-out infinite;
+}
+
+@keyframes m-go {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.07); }
+}
+
+.m-tuto-foot {
+  position: absolute;
+  left: 6px; right: 6px; bottom: 6px;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: rgba(8, 26, 42, 0.62);
+  font-size: clamp(11px, 2.2vmin, 13px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #DCEBF6;
+  text-align: center;
+  pointer-events: none;
+}
+
 /* --- Décompte de reprise -------------------------------------------------- */
 .m-count {
   position: fixed;
@@ -1898,6 +1993,20 @@ html[lang="en"] .lang-fr { opacity: 0.55; }
       <p class="m-why" id="mPortraitBody"></p>
       <button class="m-skip" type="button" id="mPortraitInstall"></button>
     </div>
+  </div>
+
+  <!-- Le mode d'emploi tactile, au départ de chaque descente sur téléphone.
+       Les trois zones reprennent EXACTEMENT le découpage de input.js — 22 % en
+       haut pour le saut, 38 % de chaque côté — pour que le doigt apprenne le
+       bon geste et pas une approximation. Le bouton GO se pose dans les 24 %
+       du milieu, qui ne commandent rien : il ne masque donc aucune zone
+       utile. -->
+  <div class="m-tuto is-off" id="mTuto">
+    <div class="m-tuto-zone m-tuto-jump"><span id="mTutoJump"></span></div>
+    <div class="m-tuto-zone m-tuto-left"><span id="mTutoLeft"></span></div>
+    <div class="m-tuto-zone m-tuto-right"><span id="mTutoRight"></span></div>
+    <button class="m-tuto-go" type="button" id="mTutoGo">GO !</button>
+    <p class="m-tuto-foot" id="mTutoFoot"></p>
   </div>
 
   <div class="m-count is-off" id="mCount" aria-hidden="true">
@@ -2385,6 +2494,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.share.copied': "Lien copié. Colle-le dans <b>Safari</b>, puis utilise son bouton Partage — c'est le navigateur iPhone qui gère le mieux l'ajout à l'écran d'accueil.",
       'm.share.manual': "Si « Sur l'écran d'accueil » n'apparaît pas dans cette liste, utilise plutôt le bouton Partage de ton navigateur, en bas de l'écran.",
       'm.install.skip': "Jouer quand même dans le navigateur",
+      'm.tuto.jump': 'Touche ici, en haut, pour SAUTER',
+      'm.tuto.left': "Maintiens ce côté pour tourner à GAUCHE",
+      'm.tuto.right': "Maintiens ce côté pour tourner à DROITE",
+      'm.tuto.go': 'GO !',
+      'm.tuto.foot': "Mets le téléphone à la verticale pour la pause et les réglages.",
       'm.portrait.title': "Tourne ton téléphone",
       'm.portrait.body': "Le jeu se joue à l'horizontale. La piste est large : en portrait, une pancarte n'apparaît qu'une seconde avant d'être franchie, et c'est trop court pour lire.",
       'm.portrait.paused': "Pause",
@@ -2559,6 +2673,16 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.share.copied': 'Link copied. Paste it into <b>Safari</b>, then use its Share button — Safari handles Add to Home Screen best on iPhone.',
       'm.share.manual': "If \"Add to Home Screen\" is not in this list, use your browser's own Share button at the bottom of the screen instead.",
       'm.install.skip': 'Play in the browser anyway',
+      'm.tuto.jump': 'Touche ici, en haut, pour SAUTER',
+      'm.tuto.left': "Maintiens ce côté pour tourner à GAUCHE",
+      'm.tuto.right': "Maintiens ce côté pour tourner à DROITE",
+      'm.tuto.go': 'GO !',
+      'm.tuto.foot': "Mets le téléphone à la verticale pour la pause et les réglages.",
+      'm.tuto.jump': 'Tap up here to JUMP',
+      'm.tuto.left': 'Hold this side to turn LEFT',
+      'm.tuto.right': 'Hold this side to turn RIGHT',
+      'm.tuto.go': 'GO!',
+      'm.tuto.foot': 'Turn the phone upright for pause and settings.',
       'm.portrait.title': 'Turn your phone sideways',
       'm.portrait.body': 'The game is played in landscape. The slope is wide: in portrait a sign only appears a second before you reach it, which is too short to read.',
       'm.portrait.paused': 'Paused',
@@ -3730,6 +3854,8 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   var deferredPrompt = null;      // Android : l'invite d'installation captée
   var dismissed = false;          // « jouer quand même dans le navigateur »
   var frozen = false;             // figé parce qu'on est en portrait
+  var tuto = false;               // le mode d'emploi tactile est affiché
+  var tutoPending = false;        // une descente vient de commencer
   var counting = 0;               // décompte en cours, en secondes
   var countTimer = null;
 
@@ -3838,10 +3964,37 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     el.portraitInstall.textContent = t('m.portrait.install');
   }
 
+  /* Trois choses peuvent figer la partie : le portrait, le mode d'emploi, le
+     décompte. Une seule fonction en décide, sinon deux d'entre elles se
+     dégèleraient mutuellement. */
+  function applyFreeze() {
+    hooks.setFrozen(frozen || tuto || counting > 0);
+  }
+
+  function showTutorial() {
+    if (tuto) return;
+    tuto = true;
+    var t = AS.i18n.t;
+    el.tutoJump.textContent = t('m.tuto.jump');
+    el.tutoLeft.textContent = t('m.tuto.left');
+    el.tutoRight.textContent = t('m.tuto.right');
+    el.tutoGo.textContent = t('m.tuto.go');
+    el.tutoFoot.textContent = t('m.tuto.foot');
+    el.tuto.classList.remove('is-off');
+    applyFreeze();
+  }
+
+  function hideTutorial() {
+    if (!tuto) return;
+    tuto = false;
+    el.tuto.classList.add('is-off');
+    applyFreeze();
+  }
+
   function freeze() {
     if (frozen) return;
     frozen = true;
-    hooks.setFrozen(true);
+    applyFreeze();
 
     /* En pleine descente, tourner le téléphone ouvre le VRAI menu pause. Sur
        mobile il n'y a pas de touche Échap : la rotation était donc le seul
@@ -3849,6 +4002,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
        langue, recommencer, quitter — tout devient enfin atteignable au doigt.
        Hors partie, il n'y a rien à mettre en pause : on garde le simple
        conseil de tourner l'appareil. */
+    hideTutorial();
     if (hooks.isPlaying() && hooks.openPause()) {
       el.portrait.classList.add('is-off');
       return;
@@ -3864,7 +4018,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     hooks.closePause();
     /* Hors partie, rien à décompter : on rend la main tout de suite. */
     if (!hooks.isPlaying()) {
-      hooks.setFrozen(false);
+      applyFreeze();
       return;
     }
     startCountdown();
@@ -3883,7 +4037,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (countTimer) clearTimeout(countTimer);
     if (counting <= 0) {
       el.count.classList.add('is-off');
-      hooks.setFrozen(false);
+      applyFreeze();
       return;
     }
     el.countNum.textContent = String(counting);
@@ -3908,9 +4062,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
      changer la donne. C'est ce qui évite les états contradictoires. */
   function refresh() {
     if (!isPhone()) {
-      /* Sur tablette et sur ordinateur, le portrait ne gêne pas assez pour
-         qu'on bloque la partie. */
-      if (frozen) { frozen = false; el.portrait.classList.add('is-off'); hooks.setFrozen(false); }
+      /* Sur tablette et sur ordinateur, ni verrou paysage ni mode d'emploi
+         tactile : il y a un clavier, et l'aide des touches est déjà au menu. */
+      tutoPending = false;
+      hideTutorial();
+      if (frozen) { frozen = false; el.portrait.classList.add('is-off'); applyFreeze(); }
       if (shouldInvite() && isTouch()) showInvite(); else hideInvite();
       return;
     }
@@ -3920,9 +4076,25 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       hideInvite();
       freeze();
     } else {
+      /* Une descente vient de commencer : le mode d'emploi passe avant le
+         décompte, et remplace la reprise après une rotation. */
+      if (tutoPending && hooks.isPlaying()) {
+        cancelCountdown();
+        frozen = false;
+        el.portrait.classList.add('is-off');
+        hideInvite();
+        showTutorial();
+        return;
+      }
       thaw();
       if (shouldInvite()) showInvite(); else hideInvite();
     }
+  }
+
+  /* Appelé par le jeu au départ de chaque descente. */
+  function runStarted() {
+    tutoPending = isPhone();
+    refresh();
   }
 
   function init(h) {
@@ -3941,6 +4113,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     el.portraitTitle = document.getElementById('mPortraitTitle');
     el.portraitBody = document.getElementById('mPortraitBody');
     el.portraitInstall = document.getElementById('mPortraitInstall');
+    el.tuto = document.getElementById('mTuto');
+    el.tutoJump = document.getElementById('mTutoJump');
+    el.tutoLeft = document.getElementById('mTutoLeft');
+    el.tutoRight = document.getElementById('mTutoRight');
+    el.tutoGo = document.getElementById('mTutoGo');
+    el.tutoFoot = document.getElementById('mTutoFoot');
     el.count = document.getElementById('mCount');
     el.countNum = document.getElementById('mCountNum');
 
@@ -4000,6 +4178,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       hideInvite();
     });
 
+    el.tutoGo.addEventListener('click', function () {
+      tutoPending = false;
+      hideTutorial();
+    });
+
     el.portraitInstall.addEventListener('click', function () {
       dismissed = false;
       showInvite();
@@ -4025,6 +4208,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
   AS.mobile = {
     init: init,
+    runStarted: runStarted,
     /* Le menu pause interroge ceci pour savoir s'il doit afficher le rappel de
        rotation à la place de la ligne « Reprendre » — sur un téléphone en
        portrait, reprendre ne se fait pas en cliquant. */
@@ -4033,7 +4217,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     isPhone: isPhone,
     isTouch: isTouch,
     isStandalone: isStandalone,
-    isFrozen: function () { return frozen || counting > 0; }
+    isFrozen: function () { return frozen || tuto || counting > 0; }
   };
 })((window.AlpineSchool = window.AlpineSchool || {}));
 
@@ -10704,6 +10888,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         { compact: true, seconds: 3.4 }
       );
     }
+    /* Sur téléphone, chaque descente s'ouvre sur le mode d'emploi tactile :
+       il n'y a pas de clavier, donc pas d'aide des touches au menu. */
+    AS.mobile.runStarted();
     loopOn();
   }
 
