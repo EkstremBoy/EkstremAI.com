@@ -1,0 +1,77 @@
+# =============================================================================
+#  Garde-fou — ce qui est vérifié avant qu'un jeu n'atteigne le site
+# -----------------------------------------------------------------------------
+#  Vercel construit déjà le site Next.js et refuse de déployer s'il ne compile
+#  pas. Ce contrôle-ci comble le trou que Vercel ne voit pas : Alpine School
+#  n'est PAS construit par Vercel. C'est un fichier déjà fabriqué, déposé dans
+#  public/, que Vercel se contente de recopier. Il ne regarde jamais ses
+#  sources — un jeu cassé se déploierait donc sans la moindre alerte, et on ne
+#  le découvrirait qu'en y jouant.
+#
+#  Trois vérifications, de la plus bête à la plus utile.
+# =============================================================================
+name: Vérification
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  alpine-school:
+    name: Alpine School
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 1. Deux secondes, et ça attrape la classe d'erreur la plus bête et la
+      #    plus fréquente : une apostrophe mal échappée qui casse une chaîne et
+      #    empêche le jeu entier de démarrer. C'est arrivé deux fois le jour où
+      #    ce fichier a été écrit.
+      - name: Chaque fichier du jeu se lit sans erreur
+        working-directory: games/alpineschool
+        run: |
+          erreurs=0
+          for f in $(find src -name '*.js' | sort); do
+            if ! node --check "$f" 2>/tmp/err; then
+              echo "::error file=games/alpineschool/$f::$(head -3 /tmp/err | tr '\n' ' ')"
+              erreurs=$((erreurs + 1))
+            fi
+          done
+          echo "$(find src -name '*.js' | wc -l) fichiers lus, $erreurs en erreur"
+          exit $erreurs
+
+      - name: Le build fonctionne toujours
+        working-directory: games/alpineschool
+        run: node build-standalone.mjs
+
+      # 3. La plus utile, et la moins évidente. Le vrai risque de cette façon
+      #    de travailler n'est pas qu'un fichier soit cassé : c'est qu'on
+      #    modifie les sources, qu'on oublie de reconstruire, et que le site
+      #    continue de servir l'ancien jeu — sans erreur nulle part.
+      #
+      #    Les fins de ligne sont normalisées avant la comparaison : Windows
+      #    écrit CRLF, le build écrit LF, et sans ce nettoyage le contrôle
+      #    hurlerait à chaque envoi pour rien. Un garde-fou qui aboie sans
+      #    raison est un garde-fou qu'on finit par ignorer.
+      - name: Le jeu publié correspond bien aux sources
+        run: |
+          tr -d '\r' < games/alpineschool/dist/public/index.html > /tmp/construit
+          tr -d '\r' < public/games/alpineschool/index.html      > /tmp/publie
+          if cmp -s /tmp/construit /tmp/publie; then
+            echo "Identiques : le site sert la dernière version."
+          else
+            echo "::error::Le jeu publié ne correspond pas à ses sources."
+            echo ""
+            echo "Pour corriger, dans games/alpineschool :"
+            echo "    node build-standalone.mjs"
+            echo "puis recopier dist/public/index.html vers"
+            echo "    public/games/alpineschool/index.html"
+            echo ""
+            echo "Construit : $(wc -c < /tmp/construit) octets"
+            echo "Publié    : $(wc -c < /tmp/publie) octets"
+            exit 1
+          fi

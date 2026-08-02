@@ -29,3 +29,7 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+# Produits du build du jeu : regeneres par build-standalone.mjs, donc jamais
+# versionnes. Seules les sources ont leur place ici.
+games/alpineschool/dist/
+games/alpineschool/alpine-school.html
