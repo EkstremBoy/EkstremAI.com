@@ -1403,6 +1403,42 @@ kbd {
   text-align: center;
 }
 
+/* Le bouton qui ouvre la feuille de partage du système. */
+.m-share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 12px 16px;
+  border: 2px solid var(--coral);
+  border-radius: 14px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--coral);
+  cursor: pointer;
+}
+
+.m-share:hover { background: rgba(242, 100, 60, 0.12); }
+.m-share.is-off { display: none; }
+.m-share svg { width: 20px; height: 20px; flex: 0 0 auto; }
+
+.m-share-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #9FC0D8;
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.m-share-note.is-off { display: none; }
+.m-share-note b { color: #fff; }
+
 /* La flèche qui descend vers le bouton de partage de Safari. Elle ne
    s'affiche que sur iPhone, où ce bouton est effectivement en bas. */
 .m-arrow {
@@ -1837,17 +1873,18 @@ html[lang="en"] .lang-fr { opacity: 0.55; }
       <p class="m-why" id="mInviteWhy"></p>
       <button class="btn btn--primary is-off" type="button" id="mInviteGo">Installer</button>
       <ol class="m-steps is-off" id="mInviteSteps"></ol>
-      <div class="m-arrow is-off" id="mInviteArrow" aria-hidden="true">
-        <!-- L'icône Partager d'iOS, dessinée : le glyphe SF Symbols n'existe
-             que dans la police d'Apple et s'affichait en carré vide. -->
-        <svg class="m-arrow-share" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <!-- Un vrai bouton, pas une décoration. Le pictogramme seul invitait au
+           clic et ne faisait rien, ce qui est pire que pas de pictogramme. -->
+      <button class="m-share is-off" type="button" id="mShare">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 3v11M12 3l-3.4 3.4M12 3l3.4 3.4" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M6 11H4.6v9.4h14.8V11H18" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="m-arrow-line"></span>
-      </div>
+        <span id="mShareLabel">Ouvrir le menu de partage</span>
+      </button>
+      <p class="m-share-note is-off" id="mShareNote"></p>
       <button class="m-skip" type="button" id="mInviteSkip">Jouer dans le navigateur</button>
     </div>
   </div>
@@ -2032,8 +2069,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     RACE_BOOST_CAP: 12,      // au-delà de la cible : la marge que donne un tremplin
     RACE_DRIFT: 1.9,         // durée du dérapage d'arrivée, s
 
-    SPEED_GAIN_QUIZ: 1.1,    // par point de combo
-    SPEED_CAP_QUIZ: 44,
+    SPEED_GAIN_QUIZ: 0.8,    // par point de combo
+    /* Abaissé de 44 : le plafond décidait du temps de lecture, puisque celui-ci
+       vaut « distance à laquelle la pancarte devient lisible » divisé par la
+       vitesse. À 44 il ne restait qu'une seconde et demie pour lire trois mots
+       sur un téléphone. */
+    SPEED_CAP_QUIZ: 35,
     SPEED_SMOOTH: 0.6,       // lissage vers la vitesse cible, /s
     CARVE_DRAG: 1.6,         // perte de vitesse en virage × |vitesse latérale|
     /* Plancher relevé de 11 à 16 sur demande. À 11 (≈ 40 km/h) labourer un
@@ -2117,6 +2158,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     Z_FAR: 122,              // les objets naissent à cette distance devant
     Z_CULL: -9,              // et sont recyclés une fois derrière
     FOG_DENSITY: 0.0112,     // exponentiel, raccordé à la couleur du ciel
+    /* Brume allégée dans les modes à questions — et seulement là. La brume
+       est la seconde moitié du problème de lecture : à 0,0112 une pancarte
+       n'émerge qu'à soixante-quinze mètres. L'alléger la fait sortir du voile
+       nettement plus tôt, sans toucher au Freestyle ni à la Course, qui
+       tiennent leur atmosphère de cette brume. */
+    FOG_DENSITY_QUIZ: 0.0082,
     GATE_SPACING: 62,        // un portique tous les N mètres
     GATE_LEAD: 44,           // on prépare le suivant à cette avance
 
@@ -2329,11 +2376,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.install.title': "Ajoute le jeu à ton écran d'accueil",
       'm.install.why': "Lancé depuis ton écran d'accueil, le jeu s'ouvre en vrai plein écran, sans barre d'adresse. C'est un tiers de piste en plus — assez pour voir arriver les mots et les sapins à temps. Dans le navigateur, la barre mange justement la partie de l'écran où ils apparaissent.",
       'm.install.go': "Installer maintenant",
-      'm.install.ios.1': "Touche <b>Partager</b> en bas de l'écran.",
+      'm.install.ios.1': "Touche le bouton ci-dessous, ou celui de <b>Partage</b> de ton navigateur.",
       'm.install.ios.2': "Fais défiler et choisis <b>Sur l'écran d'accueil</b>.",
       'm.install.ios.3': "Ouvre <b>Alpine School</b> depuis ton écran d'accueil : plein écran, à l'horizontale.",
       'm.install.other.1': "Ouvre le menu de ton navigateur.",
       'm.install.other.2': "Choisis <b>Ajouter à l'écran d'accueil</b>, puis lance le jeu depuis là.",
+      'm.share': 'Ouvrir le menu de partage',
+      'm.share.copied': "Lien copié. Colle-le dans <b>Safari</b>, puis utilise son bouton Partage — c'est le navigateur iPhone qui gère le mieux l'ajout à l'écran d'accueil.",
+      'm.share.manual': "Si « Sur l'écran d'accueil » n'apparaît pas dans cette liste, utilise plutôt le bouton Partage de ton navigateur, en bas de l'écran.",
       'm.install.skip': "Jouer quand même dans le navigateur",
       'm.portrait.title': "Tourne ton téléphone",
       'm.portrait.body': "Le jeu se joue à l'horizontale. La piste est large : en portrait, une pancarte n'apparaît qu'une seconde avant d'être franchie, et c'est trop court pour lire.",
@@ -2500,11 +2550,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.install.title': 'Add the game to your home screen',
       'm.install.why': 'Launched from your home screen, the game opens truly full screen, with no address bar. That is a third more slope — enough to see the words and the pines coming in time. In the browser, the bar covers exactly the part of the screen where they appear.',
       'm.install.go': 'Install now',
-      'm.install.ios.1': 'Tap <b>Share</b> at the bottom of the screen.',
+      'm.install.ios.1': "Tap the button below, or your browser's own <b>Share</b> button.",
       'm.install.ios.2': 'Scroll down and choose <b>Add to Home Screen</b>.',
       'm.install.ios.3': 'Open <b>Alpine School</b> from your home screen: full screen, landscape.',
       'm.install.other.1': 'Open your browser menu.',
       'm.install.other.2': 'Choose <b>Add to Home screen</b>, then launch the game from there.',
+      'm.share': 'Open the share menu',
+      'm.share.copied': 'Link copied. Paste it into <b>Safari</b>, then use its Share button — Safari handles Add to Home Screen best on iPhone.',
+      'm.share.manual': "If \"Add to Home Screen\" is not in this list, use your browser's own Share button at the bottom of the screen instead.",
       'm.install.skip': 'Play in the browser anyway',
       'm.portrait.title': 'Turn your phone sideways',
       'm.portrait.body': 'The game is played in landscape. The slope is wide: in portrait a sign only appears a second before you reach it, which is too short to read.',
@@ -3755,9 +3808,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     }
 
     el.inviteSkip.textContent = t('m.install.skip');
-    /* La flèche ne pointe vers le bas de l'écran que sur iPhone, où le bouton
-       de partage y est. Ailleurs elle mentirait. */
-    el.inviteArrow.classList.toggle('is-off', !(isIOS() && !android));
+    el.shareLabel.textContent = t('m.share');
+    /* Le bouton de partage n'a de sens que sur iOS, où l'ajout à l'écran
+       d'accueil passe par cette feuille système. Sur Android on a mieux :
+       l'invite native du navigateur. */
+    el.share.classList.toggle('is-off', !(isIOS() && !android));
+    el.shareNote.classList.add('is-off');
   }
 
   function showInvite() {
@@ -3878,7 +3934,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     el.inviteSteps = document.getElementById('mInviteSteps');
     el.inviteGo = document.getElementById('mInviteGo');
     el.inviteSkip = document.getElementById('mInviteSkip');
-    el.inviteArrow = document.getElementById('mInviteArrow');
+    el.share = document.getElementById('mShare');
+    el.shareLabel = document.getElementById('mShareLabel');
+    el.shareNote = document.getElementById('mShareNote');
     el.portrait = document.getElementById('mPortrait');
     el.portraitTitle = document.getElementById('mPortraitTitle');
     el.portraitBody = document.getElementById('mPortraitBody');
@@ -3903,6 +3961,38 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         if (res && res.outcome === 'accepted') { dismissed = true; hideInvite(); }
         else paintInvite();
       });
+    });
+
+    /* Ouvre la feuille de partage du système. Le pictogramme d'avant ne
+       faisait rien : il désignait le bouton du navigateur sans pouvoir
+       l'actionner, et on cliquait dessus pour rien.
+
+       Réserve honnête : rien ne garantit qu'« Sur l'écran d'accueil » figure
+       dans cette feuille — cette entrée appartient au navigateur, pas à nous.
+       D'où la note affichée juste après, qui indique le repli. */
+    el.share.addEventListener('click', function () {
+      var note = function (cle) {
+        el.shareNote.innerHTML = AS.i18n.t(cle);
+        el.shareNote.classList.remove('is-off');
+      };
+
+      if (navigator.share) {
+        navigator.share({ title: 'Alpine School', url: location.href })
+          .then(function () { note('m.share.manual'); })
+          .catch(function () { note('m.share.manual'); });
+        return;
+      }
+
+      /* Pas de partage natif : on copie l'adresse pour qu'elle puisse être
+         collée dans Safari, seul navigateur iPhone à gérer proprement
+         l'ajout à l'écran d'accueil. */
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(location.href)
+          .then(function () { note('m.share.copied'); })
+          .catch(function () { note('m.share.manual'); });
+      } else {
+        note('m.share.manual');
+      }
     });
 
     el.inviteSkip.addEventListener('click', function () {
@@ -8580,7 +8670,8 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     now.mogul = util.damp(now.mogul, target.mogul, 2.6, dt);
     now.night = util.damp(now.night, target.night, 1.6, dt);
 
-    this.scene.fog.density = W.FOG_DENSITY * now.fog;
+    var base = this.quizFog ? W.FOG_DENSITY_QUIZ : W.FOG_DENSITY;
+    this.scene.fog.density = base * now.fog;
     this.terrain.setMogul(now.mogul);
 
     /* Tombée du jour : la lumière faiblit et bleuit, le ciel s'assombrit.
@@ -8751,6 +8842,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   /* --- Une image --------------------------------------------------------- */
   World.prototype.update = function (state, dt) {
     this.time += dt;
+    this.quizFog = !!state.quiz;
     var travelled = state.travelled;
 
     this.setEffects(state.crazy ? AS.crazy.effects : null);
@@ -8913,6 +9005,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
       /* --- Course --------------------------------------------------------- */
       race: race,
+      quiz: quiz,
       raceLength: race ? (level || 1000) : 0,
       raceTime: 0,
       finished: false,
@@ -9280,9 +9373,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       s.nextMilestone += W.MILESTONE;
       /* Pas de jalon en Course : les distances tombent toutes sur un multiple
          de cinq cents, si bien que le dernier arrivait pile sur la ligne et
-         recouvrait le temps final. Et un grand chiffre au milieu de l'écran
-         pendant un chrono, c'est un sapin qu'on ne voit pas. */
-      if (s.race) continue;
+         recouvrait le temps final.
+
+         Pas de jalon non plus en Vocabulaire ni en Multiplications : sur un
+         téléphone, lire trois réponses avant de les atteindre est déjà juste,
+         et un grand chiffre au centre de l'écran couvrait exactement la zone
+         où elles apparaissent. L'encouragement y coûtait une bonne réponse. */
+      if (s.race || s.quiz) continue;
       if (this.hooks && this.hooks.onMilestone) this.hooks.onMilestone(reached);
     }
 
