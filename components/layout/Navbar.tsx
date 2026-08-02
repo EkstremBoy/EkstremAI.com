@@ -41,7 +41,7 @@ export default function Navbar() {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
-                            href={`/${locale}/game`}
+                            href={`/${locale}/games`}
                             className="text-sm font-medium text-white/50 hover:text-brand-cyan transition-all"
                         >
                             {t('games')}

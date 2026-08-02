@@ -411,9 +411,22 @@
         "danger_zone_desc": "Once deleted, your account and all its data cannot be recovered.",
         "delete_account": "Delete my account"
     },
-    "game": {
+    "games": {
+        "eyebrow": "Experimental arcades",
         "title": "EkstremAI Gaming Hub",
-        "subtitle": "Discover our decentralized entertainment experiences.",
+        "subtitle": "Playable experiments, built from scratch. Every game carries the technologies that made it.",
+        "cta": "Play now",
+        "forging": "In the forge...",
+        "category": {
+            "educational": "Educational",
+            "arcade": "Arcade",
+            "puzzle": "Puzzle",
+            "tech": "Tech demos"
+        },
+        "alpineschool": {
+            "title": "Alpine School",
+            "description": "A 3D downhill ski run for practising English and times tables. Five modes, a race clock, and not one imported file: every shape and every sound is built in code."
+        },
         "snake": {
             "title": "Snake Game",
             "description": "Multi-mode arcade classic. Challenge EkstremAI Guy's record.",
