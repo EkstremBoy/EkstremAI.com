@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Alpine School</title>
+<meta name="description" content="Un jeu de descente à ski en 3D pour réviser l'anglais et les tables de multiplication. Sans installation, jouable au clavier et au doigt.">
+<meta name="theme-color" content="#4FA9D6">
+
+<!-- Sur iPhone, Safari REFUSE le plein écran demandé par JavaScript : c'est
+     une limite du navigateur, pas un oubli. Ces deux balises sont le seul
+     moyen d'obtenir un vrai plein écran sans barre d'adresse — le jeu doit
+     alors être ajouté à l'écran d'accueil. Ailleurs (Android, iPad, bureau)
+     le bouton ⛶ fonctionne normalement. -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alpine School">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EkstremAI">
+<meta property="og:title" content="Alpine School">
+<meta property="og:description" content="Dévale la piste, traverse la bonne pancarte. Vocabulaire anglais et tables de multiplication, en 3D dans le navigateur.">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Alpine School">
+<meta name="twitter:description" content="Dévale la piste, traverse la bonne pancarte. Vocabulaire anglais et tables de multiplication, en 3D dans le navigateur.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="scene" data-i18n-aria="a11y.scene" aria-label="Descente à ski en 3D" role="img"></canvas>
+
+  <!-- ================= HUD ================= -->
+  <div id="hud" class="hud" aria-hidden="true">
+    <div class="banner" id="banner">
+      <span class="banner-eyebrow" id="bannerEyebrow">TRADUIS</span>
+      <span class="banner-prompt" id="bannerPrompt">—</span>
+    </div>
+
+    <!-- Cœurs dessinés en SVG plutôt qu'avec le caractère ♥ : le glyphe
+         change de dessin d'une plateforme à l'autre, et sur iOS il arrive
+         qu'il soit remplacé par un emoji en couleur. -->
+    <div class="lives" id="lives" role="img" data-i18n-aria="a11y.lives" aria-label="Vies restantes">
+      <i><svg viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.3 3.7 13a5.4 5.4 0 0 1 0-7.6 5.4 5.4 0 0 1 7.6 0l.7.7.7-.7a5.4 5.4 0 0 1 7.6 0 5.4 5.4 0 0 1 0 7.6z"/></svg></i>
+      <i><svg viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.3 3.7 13a5.4 5.4 0 0 1 0-7.6 5.4 5.4 0 0 1 7.6 0l.7.7.7-.7a5.4 5.4 0 0 1 7.6 0 5.4 5.4 0 0 1 0 7.6z"/></svg></i>
+      <i><svg viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.3 3.7 13a5.4 5.4 0 0 1 0-7.6 5.4 5.4 0 0 1 7.6 0l.7.7.7-.7a5.4 5.4 0 0 1 7.6 0 5.4 5.4 0 0 1 0 7.6z"/></svg></i>
+    </div>
+
+    <!-- Folies en cours, en Crazy Mode. -->
+    <div class="spells is-off" id="spells" aria-live="polite"></div>
+
+    <!-- Les bonus de série apparaissent ici, à l'endroit de la pancarte
+         franchie, puis s'effacent. -->
+    <!-- Bandeau du mode Course : chrono, mètres restants, écart avec son
+         meilleur temps. Il remplace la question, qui n'existe pas ici. -->
+    <div class="racebar is-off" id="raceBar">
+      <span class="race-clock" id="raceClock">0.00</span>
+      <span class="race-left" id="raceLeft">1000 m</span>
+      <span class="race-delta" id="raceDelta"></span>
+    </div>
+
+    <div class="bonus-layer" id="bonusLayer" aria-hidden="true"></div>
+
+    <!-- Jalon des 500 m. Au centre mais très transparent et bref : on doit
+         pouvoir lire la piste au travers pendant qu'il s'efface. -->
+    <div class="milestone" id="milestone" aria-hidden="true">
+      <span class="milestone-ring"></span>
+      <span class="milestone-dist" id="milestoneDist">500 m</span>
+      <span class="milestone-word" id="milestoneWord"></span>
+    </div>
+
+    <div class="readout readout--left">
+      <span class="readout-label" data-i18n="hud.distance">Distance</span>
+      <span class="readout-value" id="distValue">0 m</span>
+    </div>
+
+    <div class="readout readout--right">
+      <span class="readout-label" id="scoreLabel">Score</span>
+      <span class="readout-value" id="scoreValue">0</span>
+    </div>
+  </div>
+
+  <div class="corner">
+    <!-- Bascule de langue : l'interface en français fait pratiquer l'anglais,
+         et réciproquement. La langue active est en gras. -->
+    <button id="langBtn" class="lang" type="button" data-i18n-aria="a11y.lang">
+      <span class="lang-fr">FR</span><span class="lang-sep">/</span><span class="lang-en">EN</span>
+    </button>
+    <!-- Retiré du document au démarrage sur ordinateur : là-bas F11 fait
+         mieux, et un bouton qui ne sert à rien est pire que pas de bouton.
+         Voir main.js — on l'enlève vraiment, on ne le masque pas. -->
+    <button id="fsBtn" class="mute" type="button" hidden data-i18n-aria="a11y.fullscreen">
+      <span aria-hidden="true">⛶</span>
+    </button>
+    <button id="muteBtn" class="mute" type="button" data-i18n-aria="a11y.mute" aria-pressed="false">
+      <span aria-hidden="true">♪</span>
+    </button>
+  </div>
+
+  <!-- ================= MENU ================= -->
+  <div class="layer" id="menu">
+    <div class="card">
+      <h1>Alpine School</h1>
+      <p class="lede" data-i18n="menu.lede">Choisis ce que tu veux pratiquer, puis à quel point la piste sera difficile.</p>
+
+      <p class="eyebrow" id="practiceLabel" data-i18n="menu.practice">Ce que tu pratiques</p>
+      <div class="modes" role="group" aria-labelledby="practiceLabel">
+
+        <button class="mode" type="button" data-start="freestyle">
+          <span class="mode-title" data-i18n="mode.freestyle">Freestyle</span>
+          <span class="mode-desc" data-i18n="mode.freestyle.desc">Aucune question. Un arbre et c'est fini.</span>
+        </button>
+
+        <button class="mode" type="button" data-category="words" aria-expanded="false" aria-controls="levels-words">
+          <span class="mode-title" data-i18n="mode.words">Vocabulaire</span>
+          <span class="mode-desc" data-i18n="mode.words.desc">Traverse la pancarte qui traduit bien le mot.</span>
+        </button>
+        <div class="levels" id="levels-words" data-for="words">
+          <p class="eyebrow eyebrow--tight" data-i18n="menu.level">Niveau des mots</p>
+          <button class="level" type="button" data-mode="words" data-level="1" aria-pressed="false"><b data-i18n="words.1">Débutant</b><span data-i18n="words.1.sample">chat, pomme, rouge</span></button>
+          <button class="level" type="button" data-mode="words" data-level="2" aria-pressed="false"><b data-i18n="words.2">Courant</b><span data-i18n="words.2.sample">emprunter, réussir</span></button>
+          <button class="level" type="button" data-mode="words" data-level="3" aria-pressed="false"><b data-i18n="words.3">Littéraire</b><span data-i18n="words.3.sample">crépuscule, orgueil</span></button>
+        </div>
+
+        <button class="mode" type="button" data-category="math" aria-expanded="false" aria-controls="levels-math">
+          <span class="mode-title" data-i18n="mode.math">Multiplications</span>
+          <span class="mode-desc" data-i18n="mode.math.desc">Vise la bonne réponse en dévalant.</span>
+        </button>
+        <div class="levels" id="levels-math" data-for="math">
+          <p class="eyebrow eyebrow--tight" data-i18n="menu.level.math">Table à réviser</p>
+          <button class="level" type="button" data-mode="math" data-level="1" aria-pressed="false"><b data-i18n="math.1">Niveau 1</b><span data-i18n="math.1.sample">jusqu'à 6</span></button>
+          <button class="level" type="button" data-mode="math" data-level="2" aria-pressed="false"><b data-i18n="math.2">Niveau 2</b><span data-i18n="math.2.sample">jusqu'à 12</span></button>
+          <button class="level" type="button" data-mode="math" data-level="3" aria-pressed="false"><b data-i18n="math.3">Niveau 3</b><span data-i18n="math.3.sample">jusqu'à 20</span></button>
+        </div>
+
+        <!-- Mode Course : trois distances, trois étoiles chacune. La piste
+             est semée à graine fixe, donc identique à chaque tentative — sans
+             cela, comparer deux temps n'aurait aucun sens. -->
+        <button class="mode" type="button" data-category="race" aria-expanded="false" aria-controls="levels-race">
+          <span class="mode-title" data-i18n="mode.race">Course</span>
+          <span class="mode-desc" data-i18n="mode.race.desc">Chrono, ligne d'arrivée et trois étoiles à décrocher.</span>
+        </button>
+        <div class="levels levels--race" id="levels-race" data-for="race">
+          <p class="eyebrow eyebrow--tight" data-i18n="race.pick">Distance</p>
+          <div class="race-pick" id="racePick"></div>
+          <p class="catalogue-hint" data-i18n="race.hint">Même piste à chaque essai. Tout droit pour accélérer, les turbos donnent un coup de vitesse. Certains se cachent derrière un mur de sapins.</p>
+          <p class="eyebrow eyebrow--tight" data-i18n="race.board">Meilleurs temps</p>
+          <div class="board" id="raceBoard"></div>
+          <button class="btn btn--ghost" type="button" id="boardReset" data-i18n="race.reset">Effacer les temps</button>
+        </div>
+
+        <!-- Crazy Mode : verrouillé tant que 2000 m n'ont pas été bouclés en
+             Freestyle. Le bouton reste visible mais inerte, pour qu'on sache
+             qu'il existe quelque chose à débloquer. -->
+        <button class="mode mode--crazy is-locked" type="button" data-category="crazy"
+                aria-expanded="false" aria-controls="levels-crazy">
+          <span class="mode-title" data-i18n="mode.crazy">Crazy Mode</span>
+          <span class="mode-desc" id="crazyDesc" data-i18n="crazy.locked">Fais 2000 m en Freestyle pour ouvrir.</span>
+          <span class="lock" id="crazyLock" aria-hidden="true">🔒</span>
+        </button>
+        <div class="levels levels--crazy" id="levels-crazy" data-for="crazy">
+          <p class="eyebrow eyebrow--tight" data-i18n="crazy.catalogue">Catalogue des folies</p>
+          <p class="catalogue-hint" data-i18n="crazy.catalogue.hint">Décoche ce que tu ne veux pas voir apparaître.</p>
+          <label class="cat-toggle">
+            <input type="checkbox" id="catAll" checked>
+            <span class="cat-switch" aria-hidden="true"></span>
+            <span class="cat-toggle-label" id="catAllLabel">Tout décocher</span>
+          </label>
+          <div class="catalogue" id="catalogue"></div>
+          <!-- UNE seule ligne d'état, jamais deux : l'avertissement et le
+               conseil disaient des choses contradictoires quand ils
+               s'affichaient ensemble. -->
+          <p class="cat-status" id="catStatus"></p>
+          <button class="btn btn--primary" type="button" id="crazyStart" data-i18n="crazy.start">Lancer le Crazy Mode</button>
+          <!-- Le mode surprise s'ouvre à 2000 m de Crazy Mode : il se mérite
+               dans le mode dont il est la variante, pas ailleurs. -->
+          <button class="btn btn--mystery" type="button" id="mysteryStart">
+            <span class="mystery-mark" aria-hidden="true">?</span>
+            <span id="mysteryLabel">Mode surprise</span>
+          </button>
+          <p class="cat-status" id="mysteryHint"></p>
+        </div>
+      </div>
+
+      <!-- Ce bloc se déplace : il est inséré dans le panneau du mode ouvert,
+           sous ses niveaux, parce que les deux choix se font ensemble. Il
+           n'apparaît donc jamais pour le Freestyle ni le Crazy Mode, qui n'ont
+           pas de pancartes à écarter. -->
+      <div class="descent-pick" id="descentPick" hidden>
+        <p class="eyebrow eyebrow--tight" id="diffLabel" data-i18n="menu.answers">Combien de réponses</p>
+        <div class="difficulty" role="group" aria-labelledby="diffLabel">
+          <button class="diff" type="button" data-diff="2" aria-pressed="false" data-i18n="answers.2">2 réponses</button>
+          <button class="diff" type="button" data-diff="3" aria-pressed="false" data-i18n="answers.3">3 réponses</button>
+        </div>
+        <p class="hint" id="diffHint"></p>
+        <button class="btn btn--primary" type="button" id="quizStart" data-i18n="menu.go">Descendre</button>
+        <p class="cat-status" id="quizStatus"></p>
+      </div>
+
+      <p class="keys" id="keysHelp"></p>
+    </div>
+  </div>
+
+  <!-- ================= FIN DE PARTIE ================= -->
+  <div class="layer is-hidden" id="over">
+    <div class="card card--over">
+      <p class="over-course is-off" id="overCourse"></p>
+      <div class="stars is-off" id="overStars" aria-hidden="true"></div>
+      <h2 id="overTitle">Fin de la descente</h2>
+      <p class="lede" id="overSub">—</p>
+      <div class="stats" id="overStats"></div>
+      <!-- Saisie du nom : n'apparaît qu'en entrant dans les trois meilleurs
+           temps. Sans elle, le tableau ne dit pas qui a fait quoi. -->
+      <form class="name-entry is-off" id="nameEntry">
+        <label for="nameInput" id="nameAsk" data-i18n="race.name.ask">Tu entres dans le top 3 ! Ton nom :</label>
+        <div class="name-row">
+          <input id="nameInput" type="text" maxlength="12" autocomplete="off" spellcheck="false">
+          <button class="btn btn--primary" type="submit" id="nameSave" data-i18n="race.name.save">Enregistrer</button>
+        </div>
+      </form>
+
+      <button class="btn btn--primary" type="button" id="againBtn" data-i18n="over.again">Redescendre</button>
+      <button class="btn" type="button" id="backBtn" data-i18n="over.back">Changer de mode</button>
+    </div>
+  </div>
+
+  <!-- ============ TÉLÉPHONE : installation, portrait, décompte ============ -->
+  <div class="m-layer is-off" id="mInvite">
+    <div class="m-card">
+      <div class="m-icon" aria-hidden="true">⛰</div>
+      <h2 id="mInviteTitle">Installe le jeu</h2>
+      <p class="m-why" id="mInviteWhy"></p>
+      <button class="btn btn--primary is-off" type="button" id="mInviteGo">Installer</button>
+      <ol class="m-steps is-off" id="mInviteSteps"></ol>
+      <!-- Un vrai bouton, pas une décoration. Le pictogramme seul invitait au
+           clic et ne faisait rien, ce qui est pire que pas de pictogramme. -->
+      <button class="m-share is-off" type="button" id="mShare">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3v11M12 3l-3.4 3.4M12 3l3.4 3.4" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 11H4.6v9.4h14.8V11H18" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="mShareLabel">Ouvrir le menu de partage</span>
+      </button>
+      <p class="m-share-note is-off" id="mShareNote"></p>
+      <button class="m-skip" type="button" id="mInviteSkip">Jouer dans le navigateur</button>
+    </div>
+  </div>
+
+  <div class="m-layer m-layer--portrait is-off" id="mPortrait">
+    <div class="m-card">
+      <div class="m-rotate" aria-hidden="true">
+        <span class="m-phone"></span>
+      </div>
+      <h2 id="mPortraitTitle">Tourne ton téléphone</h2>
+      <p class="m-why" id="mPortraitBody"></p>
+      <button class="m-skip" type="button" id="mPortraitInstall"></button>
+    </div>
+  </div>
+
+  <!-- Le mode d'emploi tactile, au départ de chaque descente sur téléphone.
+       Les trois zones reprennent EXACTEMENT le découpage de input.js — 22 % en
+       haut pour le saut, 38 % de chaque côté — pour que le doigt apprenne le
+       bon geste et pas une approximation. Le bouton GO se pose dans les 24 %
+       du milieu, qui ne commandent rien : il ne masque donc aucune zone
+       utile. -->
+  <div class="m-tuto is-off" id="mTuto">
+    <div class="m-tuto-zone m-tuto-jump"><span id="mTutoJump"></span></div>
+    <div class="m-tuto-zone m-tuto-left"><span id="mTutoLeft"></span></div>
+    <div class="m-tuto-zone m-tuto-right"><span id="mTutoRight"></span></div>
+    <button class="m-tuto-go" type="button" id="mTutoGo">GO !</button>
+    <p class="m-tuto-foot" id="mTutoFoot"></p>
+  </div>
+
+  <div class="m-count is-off" id="mCount" aria-hidden="true">
+    <span class="m-count-num" id="mCountNum">3</span>
+  </div>
+
+  <!-- ================= PAUSE ================= -->
+  <!-- Conseil discret, seulement sur petit écran tenu à la verticale. -->
+  <div class="rotate-hint is-hidden" id="rotateHint">
+    <span class="rotate-icon" aria-hidden="true">⟳</span>
+    <span data-i18n="hint.rotate">Tourne ton téléphone : la piste est bien plus lisible à l'horizontale.</span>
+  </div>
+
+  <div class="layer is-hidden" id="pause">
+    <div class="card card--pause">
+      <h2 data-i18n="pause.title">Pause</h2>
+      <p class="lede" data-i18n="pause.hint">Flèches pour naviguer, Entrée pour valider, Échap pour reprendre.</p>
+      <div class="rows" id="pauseRows" role="menu"></div>
+    </div>
+  </div>
+
+  <div class="layer is-hidden" id="fatal">
+    <div class="card">
+      <h2 data-i18n="fatal.title">La montagne est fermée</h2>
+      <p class="lede" id="fatalMsg">Ce navigateur ne sait pas afficher la 3D.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Three.js par CDN, avec une copie locale en filet. Si le CDN est lent,
+     bloqué ou hors ligne, document.write injecte la copie vendue AVANT que
+     les scripts suivants ne s'exécutent : le jeu démarre quand même, y
+     compris en ouvrant index.html directement depuis le disque. -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+<script>
+  if (typeof THREE === 'undefined') {
+    document.write('<script src="vendor/three.min.js"><\/script>');
+  }
+</script>
+
+<script src="src/constants.js"></script>
+<script src="src/util.js"></script>
+<script src="src/i18n.js"></script>
+<script src="src/data/words.js"></script>
+<script src="src/data/quiz.js"></script>
+<script src="src/data/modifiers.js"></script>
+<script src="src/crazy.js"></script>
+<script src="src/race.js"></script>
+<script src="src/mobile.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/music.js"></script>
+<script src="src/input.js"></script>
+
+<script src="src/world/terrain.js"></script>
+<script src="src/world/sky.js"></script>
+<script src="src/world/models.js"></script>
+<script src="src/world/forest.js"></script>
+<script src="src/world/props.js"></script>
+<script src="src/world/wildlife.js"></script>
+<script src="src/world/gates.js"></script>
+<script src="src/world/finish.js"></script>
+<script src="src/world/particles.js"></script>
+<script src="src/world/post.js"></script>
+<script src="src/world/scene.js"></script>
+
+<script src="src/game.js"></script>
+<script src="src/pause.js"></script>
+<script src="src/hud.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
