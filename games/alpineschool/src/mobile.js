@@ -171,9 +171,16 @@
     if (tuto) return;
     tuto = true;
     var t = AS.i18n.t;
-    el.tutoJump.textContent = t('m.tuto.jump');
-    el.tutoLeft.textContent = t('m.tuto.left');
-    el.tutoRight.textContent = t('m.tuto.right');
+
+    /* Le mode d'emploi doit decrire le pilotage REELLEMENT actif. En mode
+       inclinaison, montrer des zones a toucher enseignerait un geste qui ne
+       repond plus : les cadres sont donc masques et le texte change. */
+    var tilt = AS.input.getMode() === 'tilt';
+    el.tuto.classList.toggle('is-tilt', tilt);
+
+    el.tutoJump.textContent = t(tilt ? 'm.tuto.tilt.jump' : 'm.tuto.jump');
+    el.tutoLeft.textContent = t(tilt ? 'm.tuto.tilt.left' : 'm.tuto.left');
+    el.tutoRight.textContent = t(tilt ? 'm.tuto.tilt.right' : 'm.tuto.right');
     el.tutoGo.textContent = t('m.tuto.go');
     el.tutoFoot.textContent = t('m.tuto.foot');
     el.tuto.classList.remove('is-off');
@@ -184,6 +191,11 @@
     if (!tuto) return;
     tuto = false;
     el.tuto.classList.add('is-off');
+    /* Le zero de l'inclinaison se prend ICI, au moment exact ou le joueur
+       reprend la main -- pas quand il a choisi le mode dans le menu, souvent
+       le telephone pose a plat. Sinon cette position-la deviendrait le
+       « tout droit » de toute la descente. */
+    AS.input.recalibrateTilt();
     applyFreeze();
   }
 
@@ -236,6 +248,9 @@
     if (countTimer) clearTimeout(countTimer);
     if (counting <= 0) {
       el.count.classList.add('is-off');
+      /* On vient de tourner le telephone : l'inclinaison de reference n'a plus
+         rien a voir avec celle d'avant la pause. */
+      AS.input.recalibrateTilt();
       applyFreeze();
       return;
     }

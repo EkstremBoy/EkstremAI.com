@@ -32,6 +32,13 @@
 
   Pause.prototype.isOpen = function () { return this.open; };
 
+  Pause.prototype.paintHint = function () {
+    if (!this.hint) return;
+    this.hint.textContent = this.deniedHint
+      ? AS.i18n.t('pause.controls.denied')
+      : this.normalHint;
+  };
+
   /* --- Construction ------------------------------------------------------ */
 
   Pause.prototype.build = function (state) {
@@ -45,9 +52,13 @@
        le geste à la place. */
     var parRotation = !!(AS.mobile && AS.mobile.isPortraitPause());
 
-    if (this.hint) {
-      this.hint.textContent = t(parRotation ? 'pause.hint.rotate' : 'pause.hint');
-    }
+    /* Texte normal du bas de carte, et un drapeau distinct pour le message
+       de refus de permission -- lui doit pouvoir remplacer ce texte APRES
+       coup, une fois que le systeme a repondu a la demande d'inclinaison,
+       sans attendre une reconstruction complete du menu. */
+    this.normalHint = t(parRotation ? 'pause.hint.rotate' : 'pause.hint');
+    this.deniedHint = false;
+    this.paintHint();
 
     if (!parRotation) rows.push({
       kind: 'action', key: 'resume', primary: true,
@@ -87,6 +98,37 @@
         get: function () { return AS.crazySpan(); },
         set: function (v) { AS.crazy.setSpan(v); }
       });
+    }
+
+    /* Choix des commandes : incliner le telephone plutot que d'appuyer sur
+       l'ecran. Seulement sur telephone, et seulement si les capteurs
+       existent -- proposer un mode qui ne peut jamais s'activer serait pire
+       qu'aucun bouton. La permission iOS est demandee exactement ici, dans
+       le gestionnaire du clic : c'est le seul endroit ou le systeme
+       l'accepte, jamais apres une attente. */
+    if (AS.mobile && AS.mobile.isPhone() && AS.input.tiltAvailable()) {
+      var controlsRow = {
+        kind: 'choice', key: 'controls',
+        label: t('pause.controls'),
+        values: ['touch', 'tilt'],
+        valueLabel: function (v) { return t('pause.controls.' + v); },
+        get: function () { return AS.input.getMode(); },
+        set: function (v) {
+          AS.input.setMode(v).then(function (applied) {
+            /* setMode() est asynchrone : la permission iOS se repond apres
+               le clic. Sans ce repeint differe, le libelle resterait sur
+               l'ancien mode jusqu'au prochain geste, ce qui a l'air d'un
+               bouton mort -- et sans message, un refus ressemble a un bug
+               plutot qu'a une decision du joueur. */
+            self.deniedHint = (applied !== v);
+            self.paintHint();
+            if (controlsRow.valueEl && controlsRow.el && controlsRow.el.parentNode) {
+              controlsRow.valueEl.textContent = controlsRow.valueLabel(applied);
+            }
+          });
+        }
+      };
+      rows.push(controlsRow);
     }
 
     rows.push({

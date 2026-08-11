@@ -1485,6 +1485,19 @@ kbd {
 
 .m-tuto.is-off { display: none; }
 
+/* En mode inclinaison, les cadres pointilles n'ont plus de sens : il n'y a
+   plus de zone a toucher. On garde les memes emplacements pour les textes --
+   gauche a gauche, droite a droite, saut en haut -- mais sans le contour ni
+   le fond, qui inviteraient a poser le doigt sur un ecran devenu muet. */
+.m-tuto.is-tilt .m-tuto-zone {
+  border: 0;
+  background: none;
+}
+
+.m-tuto.is-tilt .m-tuto-zone span {
+  font-size: clamp(13px, 3vmin, 18px);
+}
+
 .m-tuto-zone {
   position: absolute;
   display: flex;

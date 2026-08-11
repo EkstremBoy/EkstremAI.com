@@ -1529,6 +1529,19 @@ kbd {
 
 .m-tuto.is-off { display: none; }
 
+/* En mode inclinaison, les cadres pointilles n'ont plus de sens : il n'y a
+   plus de zone a toucher. On garde les memes emplacements pour les textes --
+   gauche a gauche, droite a droite, saut en haut -- mais sans le contour ni
+   le fond, qui inviteraient a poser le doigt sur un ecran devenu muet. */
+.m-tuto.is-tilt .m-tuto-zone {
+  border: 0;
+  background: none;
+}
+
+.m-tuto.is-tilt .m-tuto-zone span {
+  font-size: clamp(13px, 3vmin, 18px);
+}
+
 .m-tuto-zone {
   position: absolute;
   display: flex;
@@ -2520,6 +2533,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.share.copied': "Lien copié. Colle-le dans <b>Safari</b>, puis utilise son bouton Partage — c'est le navigateur iPhone qui gère le mieux l'ajout à l'écran d'accueil.",
       'm.share.manual': "Si « Sur l'écran d'accueil » n'apparaît pas dans cette liste, utilise plutôt le bouton Partage de ton navigateur, en bas de l'écran.",
       'm.install.skip': "Jouer quand même dans le navigateur",
+      'pause.controls': 'Commandes',
+      'pause.controls.touch': "Toucher l'écran",
+      'pause.controls.tilt': 'Incliner le téléphone',
+      'pause.controls.denied': "Ton téléphone a refusé l'accès aux capteurs. Les commandes tactiles restent actives. Tu peux réessayer depuis les réglages de Safari, section Mouvement et orientation.",
+      'm.tuto.tilt.jump': "SECOUE le téléphone d'un coup sec pour sauter",
+      'm.tuto.tilt.left': "INCLINE vers la gauche pour tourner à gauche",
+      'm.tuto.tilt.right': "INCLINE vers la droite pour tourner à droite",
       'm.tuto.jump': 'Touche ici, en haut, pour SAUTER',
       'm.tuto.left': "Maintiens ce côté pour tourner à GAUCHE",
       'm.tuto.right': "Maintiens ce côté pour tourner à DROITE",
@@ -2725,6 +2745,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.tuto.right': "Maintiens ce côté pour tourner à DROITE",
       'm.tuto.go': 'GO !',
       'm.tuto.foot': "Mets le téléphone à la verticale pour la pause et les réglages.",
+      'pause.controls': 'Controls',
+      'pause.controls.touch': 'Touch the screen',
+      'pause.controls.tilt': 'Tilt the phone',
+      'pause.controls.denied': 'Your phone refused access to the sensors. Touch controls stay active. You can try again from Safari settings, under Motion & Orientation.',
+      'm.tuto.tilt.jump': 'SHAKE the phone sharply to JUMP',
+      'm.tuto.tilt.left': 'TILT left to turn LEFT',
+      'm.tuto.tilt.right': 'TILT right to turn RIGHT',
       'm.tuto.jump': 'Tap up here to JUMP',
       'm.tuto.left': 'Hold this side to turn LEFT',
       'm.tuto.right': 'Hold this side to turn RIGHT',
@@ -4042,9 +4069,16 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (tuto) return;
     tuto = true;
     var t = AS.i18n.t;
-    el.tutoJump.textContent = t('m.tuto.jump');
-    el.tutoLeft.textContent = t('m.tuto.left');
-    el.tutoRight.textContent = t('m.tuto.right');
+
+    /* Le mode d'emploi doit decrire le pilotage REELLEMENT actif. En mode
+       inclinaison, montrer des zones a toucher enseignerait un geste qui ne
+       repond plus : les cadres sont donc masques et le texte change. */
+    var tilt = AS.input.getMode() === 'tilt';
+    el.tuto.classList.toggle('is-tilt', tilt);
+
+    el.tutoJump.textContent = t(tilt ? 'm.tuto.tilt.jump' : 'm.tuto.jump');
+    el.tutoLeft.textContent = t(tilt ? 'm.tuto.tilt.left' : 'm.tuto.left');
+    el.tutoRight.textContent = t(tilt ? 'm.tuto.tilt.right' : 'm.tuto.right');
     el.tutoGo.textContent = t('m.tuto.go');
     el.tutoFoot.textContent = t('m.tuto.foot');
     el.tuto.classList.remove('is-off');
@@ -4055,6 +4089,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (!tuto) return;
     tuto = false;
     el.tuto.classList.add('is-off');
+    /* Le zero de l'inclinaison se prend ICI, au moment exact ou le joueur
+       reprend la main -- pas quand il a choisi le mode dans le menu, souvent
+       le telephone pose a plat. Sinon cette position-la deviendrait le
+       « tout droit » de toute la descente. */
+    AS.input.recalibrateTilt();
     applyFreeze();
   }
 
@@ -4107,6 +4146,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (countTimer) clearTimeout(countTimer);
     if (counting <= 0) {
       el.count.classList.add('is-off');
+      /* On vient de tourner le telephone : l'inclinaison de reference n'a plus
+         rien a voir avec celle d'avant la pause. */
+      AS.input.recalibrateTilt();
       applyFreeze();
       return;
     }
@@ -4948,6 +4990,121 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   var SIDE_ZONE = 0.38;   // fraction de largeur, à gauche comme à droite
   var JUMP_ZONE = 0.22;   // fraction de hauteur, en haut
 
+  /* --- Inclinaison et secousse --------------------------------------------
+     Un second mode de pilotage, choisi dans le menu pause : incliner le
+     téléphone pour tourner, le secouer pour sauter, sans jamais toucher
+     l'écran. direction() en devient la seule porte de sortie -- le moteur de
+     jeu ne sait pas d'où vient la valeur qu'il lit, tactile ou capteur. */
+  var mode = 'touch';           // 'touch' | 'tilt'
+  var tiltDir = 0;              // -1..1, continu -- contrairement au tactile
+  var tiltZero = null;          // lecture prise comme référence « tout droit »
+  var motionBound = false;      // les écouteurs ne s'attachent qu'une fois
+
+  /* Un seul chiffre à retourner si le sens est inversé sur un vrai appareil --
+     ce que je ne peux pas vérifier depuis ici, faute de capteurs à simuler.
+     Passer à -1 suffit si tourner à droite fait aller à gauche. */
+  var TILT_SIGN = 1;
+  var TILT_DEAD = 2;    // degrés ignorés autour du zéro -- tremblement de main
+  var TILT_RANGE = 20;  // degrés pour atteindre l'inclinaison maximale
+
+  var SHAKE_THRESHOLD = 24;  // m/s² d'écart avec la gravité au repos (9,81)
+  var SHAKE_COOLDOWN = 450;  // ms avant qu'une nouvelle secousse compte
+  var lastShake = 0;
+
+  /* Peut-on offrir ce mode ? Absent sur ordinateur et sur les navigateurs qui
+     ne portent pas ces capteurs -- pas la peine de proposer un bouton mort. */
+  function tiltAvailable() {
+    return typeof window.DeviceOrientationEvent !== 'undefined';
+  }
+
+  /* L'axe qui bouge quand on incline « à gauche/à droite » dépend de
+     l'orientation PHYSIQUE de l'appareil, pas de l'écran : en paysage, gamma
+     et beta échangent leur rôle selon le côté vers lequel on a tourné. Le jeu
+     étant verrouillé en paysage sur mobile, seuls les deux cas ±90° comptent
+     en pratique ; le cas portrait reste en repli si jamais l'API ne rapporte
+     rien d'autre. */
+  function rawTilt(event) {
+    var angle = (window.screen && window.screen.orientation
+      && typeof window.screen.orientation.angle === 'number')
+      ? window.screen.orientation.angle
+      : (typeof window.orientation === 'number' ? window.orientation : 0);
+    var g = event.gamma || 0;
+    var b = event.beta || 0;
+    /* En paysage, le haut de l'appareil pointe vers un cote de l'ecran : faire
+       piquer ce haut vers le bas est exactement le geste « tourner de ce
+       cote-la », et c'est beta qui le mesure. Le signe s'inverse entre les
+       deux paysages, puisque le haut pointe a gauche dans l'un et a droite
+       dans l'autre.
+
+       Sens deduit par raisonnement, pas mesure : je n'ai pas de capteurs a
+       simuler. Si tourner a droite envoie a gauche sur un vrai telephone,
+       basculer TILT_SIGN a -1 suffit a tout corriger. */
+    if (angle === 90) return b;
+    if (angle === -90 || angle === 270) return -b;
+    return g;
+  }
+
+  function clamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  function onOrientation(event) {
+    if (mode !== 'tilt') return;
+    var raw = rawTilt(event);
+    if (tiltZero === null) tiltZero = raw;   // premier relevé = position neutre
+    var delta = (raw - tiltZero) * TILT_SIGN;
+    var sign = delta > 0 ? 1 : -1;
+    var mag = (Math.abs(delta) - TILT_DEAD) / (TILT_RANGE - TILT_DEAD);
+    tiltDir = Math.abs(delta) < TILT_DEAD ? 0 : sign * clamp01(mag);
+  }
+
+  function onMotion(event) {
+    if (mode !== 'tilt' || !enabled) return;
+    var a = event.accelerationIncludingGravity;
+    if (!a) return;
+    var mag = Math.sqrt(
+      (a.x || 0) * (a.x || 0) + (a.y || 0) * (a.y || 0) + (a.z || 0) * (a.z || 0)
+    );
+    var now = (window.performance && performance.now) ? performance.now() : Date.now();
+    if (Math.abs(mag - 9.81) > SHAKE_THRESHOLD && now - lastShake > SHAKE_COOLDOWN) {
+      lastShake = now;
+      pressJump();
+    }
+  }
+
+  /* iOS 13+ exige une autorisation explicite, demandée depuis un vrai geste --
+     c'est pour ça que l'appel part de la ligne du menu pause au moment du
+     clic, jamais après une attente. Ailleurs (Android, tablette) l'API
+     n'existe pas sous cette forme : rien à demander, on branche directement. */
+  function requestTiltAccess() {
+    var DM = window.DeviceMotionEvent;
+    var DO = window.DeviceOrientationEvent;
+    var gated = DM && typeof DM.requestPermission === 'function';
+    if (!gated) return Promise.resolve(true);
+
+    return DM.requestPermission().then(function (motionRes) {
+      var orientAsk = (DO && typeof DO.requestPermission === 'function')
+        ? DO.requestPermission() : Promise.resolve('granted');
+      return orientAsk.then(function (orientRes) {
+        return motionRes === 'granted' && orientRes === 'granted';
+      });
+    }).catch(function () { return false; });
+  }
+
+  function bindMotionOnce() {
+    if (motionBound) return;
+    motionBound = true;
+    window.addEventListener('deviceorientation', onOrientation);
+    window.addEventListener('devicemotion', onMotion);
+  }
+
+  /* Reprend le zéro à l'instant où l'on rend la main au joueur -- au départ de
+     chaque descente, et à la fin de chaque décompte de reprise. Sans ça, la
+     position tenue au moment du réglage du mode, souvent avant même d'avoir
+     commencé à jouer, resterait le « tout droit » de toute la partie. */
+  function recalibrateTilt() {
+    tiltZero = null;
+    tiltDir = 0;
+  }
+
   function fireFirstGesture() {
     if (onFirstGesture) {
       var fn = onFirstGesture;
@@ -5028,6 +5185,9 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
          appui né sur un contrôle. */
       if (event.target && event.target.closest
         && event.target.closest('button, a, input, label')) return;
+      /* En mode inclinaison, on ne lit plus l'écran du tout : un pouce posé
+         par mégarde ne doit ni tourner ni faire sauter. */
+      if (mode === 'tilt') return;
       event.preventDefault();
       var zone = zoneFor(surface, event.clientX, event.clientY);
       if (zone === 'jump') {
@@ -5045,7 +5205,7 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     });
 
     surface.addEventListener('pointermove', function (event) {
-      if (!enabled) return;
+      if (!enabled || mode === 'tilt') return;
       if (!(event.pointerId in pointers)) return;
       if (pointers[event.pointerId] === 'jumped') return;
       var zone = zoneFor(surface, event.clientX, event.clientY);
@@ -5097,10 +5257,38 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       enabled = value;
       if (!value) releaseAll();
     },
-    /* -1, 0 ou 1 — la direction tenue. */
+    /* -1..1 -- la direction tenue. Au tactile et au clavier c'est toujours
+       -1, 0 ou 1 ; en inclinaison c'est un vrai continu, ce qui donne un
+       pilotage plus fin qu'aucun des deux autres modes. */
     direction: function () {
+      if (mode === 'tilt') return tiltDir;
       return (state.right ? 1 : 0) - (state.left ? 1 : 0);
-    }
+    },
+
+    /* --- Choix du mode, depuis le menu pause -------------------------------
+       Renvoie une promesse du mode réellement appliqué : sur refus de
+       permission, on retombe sur le tactile plutôt que d'afficher un mode
+       inerte. */
+    tiltAvailable: tiltAvailable,
+    getMode: function () { return mode; },
+    setMode: function (next) {
+      if (next === mode) return Promise.resolve(mode);
+      if (next !== 'tilt') {
+        mode = 'touch';
+        releaseAll();
+        return Promise.resolve(mode);
+      }
+      if (!tiltAvailable()) return Promise.resolve(mode);
+      return requestTiltAccess().then(function (granted) {
+        if (!granted) return mode;
+        bindMotionOnce();
+        mode = 'tilt';
+        releaseAll();
+        recalibrateTilt();
+        return mode;
+      });
+    },
+    recalibrateTilt: recalibrateTilt
   };
 })((window.AlpineSchool = window.AlpineSchool || {}));
 
@@ -10027,6 +10215,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 
   Pause.prototype.isOpen = function () { return this.open; };
 
+  Pause.prototype.paintHint = function () {
+    if (!this.hint) return;
+    this.hint.textContent = this.deniedHint
+      ? AS.i18n.t('pause.controls.denied')
+      : this.normalHint;
+  };
+
   /* --- Construction ------------------------------------------------------ */
 
   Pause.prototype.build = function (state) {
@@ -10040,9 +10235,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
        le geste à la place. */
     var parRotation = !!(AS.mobile && AS.mobile.isPortraitPause());
 
-    if (this.hint) {
-      this.hint.textContent = t(parRotation ? 'pause.hint.rotate' : 'pause.hint');
-    }
+    /* Texte normal du bas de carte, et un drapeau distinct pour le message
+       de refus de permission -- lui doit pouvoir remplacer ce texte APRES
+       coup, une fois que le systeme a repondu a la demande d'inclinaison,
+       sans attendre une reconstruction complete du menu. */
+    this.normalHint = t(parRotation ? 'pause.hint.rotate' : 'pause.hint');
+    this.deniedHint = false;
+    this.paintHint();
 
     if (!parRotation) rows.push({
       kind: 'action', key: 'resume', primary: true,
@@ -10082,6 +10281,37 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         get: function () { return AS.crazySpan(); },
         set: function (v) { AS.crazy.setSpan(v); }
       });
+    }
+
+    /* Choix des commandes : incliner le telephone plutot que d'appuyer sur
+       l'ecran. Seulement sur telephone, et seulement si les capteurs
+       existent -- proposer un mode qui ne peut jamais s'activer serait pire
+       qu'aucun bouton. La permission iOS est demandee exactement ici, dans
+       le gestionnaire du clic : c'est le seul endroit ou le systeme
+       l'accepte, jamais apres une attente. */
+    if (AS.mobile && AS.mobile.isPhone() && AS.input.tiltAvailable()) {
+      var controlsRow = {
+        kind: 'choice', key: 'controls',
+        label: t('pause.controls'),
+        values: ['touch', 'tilt'],
+        valueLabel: function (v) { return t('pause.controls.' + v); },
+        get: function () { return AS.input.getMode(); },
+        set: function (v) {
+          AS.input.setMode(v).then(function (applied) {
+            /* setMode() est asynchrone : la permission iOS se repond apres
+               le clic. Sans ce repeint differe, le libelle resterait sur
+               l'ancien mode jusqu'au prochain geste, ce qui a l'air d'un
+               bouton mort -- et sans message, un refus ressemble a un bug
+               plutot qu'a une decision du joueur. */
+            self.deniedHint = (applied !== v);
+            self.paintHint();
+            if (controlsRow.valueEl && controlsRow.el && controlsRow.el.parentNode) {
+              controlsRow.valueEl.textContent = controlsRow.valueLabel(applied);
+            }
+          });
+        }
+      };
+      rows.push(controlsRow);
     }
 
     rows.push({
