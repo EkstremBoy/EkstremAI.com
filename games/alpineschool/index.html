@@ -252,7 +252,54 @@
           <span class="m-choice-body" id="mFirstTouchBody"></span>
         </button>
         <button class="m-choice-card" type="button" id="mFirstTilt">
-          <span class="m-choice-icon" aria-hidden="true">📱</span>
+          <!-- Le telephone a l'horizontale, comme le jeu se joue vraiment --
+               pas de coche ni de bouton d'accueil : aucun de ces details
+               iOS n'a de sens sur Android, et ils n'apprennent rien ici.
+               Une legere inclinaison, plus les fleches de chaque cote,
+               montrent le mouvement plutot que de le nommer. Le decor
+               dedans reprend les couleurs et les formes du jeu : le meme
+               sapin a trois etages, le meme skieur, la meme neige. -->
+          <svg class="m-choice-tilt-art" viewBox="0 0 200 120" aria-hidden="true">
+            <defs>
+              <linearGradient id="mFirstSky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4fa9d6"/>
+                <stop offset="100%" stop-color="#dceffa"/>
+              </linearGradient>
+              <clipPath id="mFirstScreen">
+                <rect x="53" y="36" width="94" height="48" rx="7"/>
+              </clipPath>
+            </defs>
+
+            <!-- Fleches : le telephone penche des deux cotes, pas un seul. -->
+            <path d="M27 44 L11 60 L27 76" fill="none" stroke="#E8A15C"
+                  stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M173 44 L189 60 L173 76" fill="none" stroke="#E8A15C"
+                  stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <g transform="rotate(-7 100 60)">
+              <rect x="47" y="30" width="106" height="60" rx="12" fill="#123047"/>
+              <rect x="53" y="36" width="94" height="48" rx="7" fill="url(#mFirstSky)"/>
+
+              <g clip-path="url(#mFirstScreen)">
+                <!-- La piste, en pente vers la droite comme a l'ecran. -->
+                <polygon points="53,70 147,60 147,84 53,84" fill="#ffffff"/>
+
+                <!-- Le sapin du jeu : trois etages, sombre en bas. -->
+                <polygon points="128,73 121,63 135,63" fill="#1e5340"/>
+                <polygon points="128,68 122,58 134,58" fill="#2f7a5a"/>
+                <polygon points="128,63 123,54 133,54" fill="#3e9268"/>
+                <rect x="126.5" y="72" width="3" height="5" fill="#6E4A32"/>
+
+                <!-- Le skieur : bonnet, buste, deux skis. -->
+                <rect x="80" y="65" width="3.4" height="9" rx="1.2"
+                      transform="rotate(-16 81.7 69.5)" fill="#123047"/>
+                <rect x="86" y="65" width="3.4" height="9" rx="1.2"
+                      transform="rotate(-16 87.7 69.5)" fill="#123047"/>
+                <rect x="80.5" y="58" width="9" height="10" rx="3" fill="#f2643c"/>
+                <circle cx="85" cy="55" r="4.2" fill="#ffb020"/>
+              </g>
+            </g>
+          </svg>
           <span class="m-choice-title" id="mFirstTiltTitle"></span>
           <span class="m-choice-body" id="mFirstTiltBody"></span>
           <span class="m-choice-note" id="mFirstTiltNote"></span>

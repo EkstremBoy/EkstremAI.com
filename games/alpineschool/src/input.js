@@ -104,6 +104,14 @@
     if (Math.abs(mag - 9.81) > SHAKE_THRESHOLD && now - lastShake > SHAKE_COOLDOWN) {
       lastShake = now;
       pressJump();
+      /* Le clavier et le tactile remettent state.jump à false sur un vrai
+         relâchement (keyup, pointerup) : c'est CE relâchement qui autorise
+         pressJump() à armer jumpEdge une seconde fois. Une secousse n'a pas
+         d'équivalent « relâché » -- sans cette ligne, la première secousse
+         laissait state.jump bloqué à true pour toujours, et plus aucune
+         secousse suivante ne pouvait rearmer le saut. Une secousse EST son
+         propre relâchement : l'impulsion est instantanée. */
+      state.jump = false;
     }
   }
 

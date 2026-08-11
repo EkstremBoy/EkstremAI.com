@@ -1392,6 +1392,15 @@ kbd {
 
 .m-choice-icon { font-size: 30px; line-height: 1; }
 
+/* La scene du telephone incline, dans la carte « Incliner le telephone ».
+   Plus large que le simple pictogramme de la carte tactile -- elle porte
+   du contenu, pas juste un glyphe. */
+.m-choice-tilt-art {
+  width: min(100%, 168px);
+  height: auto;
+  margin: 2px 0 4px;
+}
+
 .m-choice-title {
   font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
   font-size: 15px;
