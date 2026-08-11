@@ -120,6 +120,140 @@
     wind.filter.frequency.setTargetAtTime(320 + speed01 * 900, t, 0.3);
   }
 
+  /* --- Le "wiii" du saut ---------------------------------------------------
+     tone() ne sait tenir qu'une hauteur fixe : il fallait un vrai glissé de
+     fréquence pour une exclamation étirée sur près de deux secondes, pas un
+     bip d'un dixième de seconde. Deux oscillateurs légèrement écartés (l'un
+     à la quinte, détuné de quelques cents) donnent le battement organique
+     d'une vraie voix plutôt qu'un synthé bien droit, et un vibrato discret
+     fait vivre la tenue -- c'est ce qui transforme un glissando en un
+     vrai "wiiiiii" plutôt qu'une sirène.
+     La trajectoire suit le saut : montée franche au décollage, palier en
+     haut pendant le vol, redescente douce à la retombée -- même si la fin
+     du son déborde un peu après l'atterrissage, ce léger décalage se sent
+     comme un cri qui traîne, pas comme un bug. */
+  function wooshJump() {
+    if (!unlocked || muted) return;
+    var c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume();
+    try {
+      var t = c.currentTime;
+      var dur = 1.85;
+
+      var osc = c.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(430, t);
+      osc.frequency.exponentialRampToValueAtTime(760, t + 0.22);
+      osc.frequency.exponentialRampToValueAtTime(660, t + dur * 0.55);
+      osc.frequency.exponentialRampToValueAtTime(360, t + dur);
+
+      var osc2 = c.createOscillator();
+      osc2.type = 'sine';
+      osc2.detune.setValueAtTime(-6, t);
+      osc2.frequency.setValueAtTime(430 * 1.5, t);
+      osc2.frequency.exponentialRampToValueAtTime(760 * 1.5, t + 0.22);
+      osc2.frequency.exponentialRampToValueAtTime(660 * 1.5, t + dur * 0.55);
+      osc2.frequency.exponentialRampToValueAtTime(360 * 1.5, t + dur);
+
+      var lfo = c.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 5.4;
+      var lfoGain = c.createGain();
+      lfoGain.gain.value = 14;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfoGain.connect(osc2.frequency);
+
+      var gain = c.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.11, t + 0.05);
+      gain.gain.setValueAtTime(0.11, t + dur * 0.6);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+      var gain2 = c.createGain();
+      gain2.gain.value = 0.4;   // le second oscillateur reste en soutien
+
+      osc.connect(gain);
+      osc2.connect(gain2);
+      gain2.connect(gain);
+      gain.connect(master);
+
+      osc.start(t); osc2.start(t); lfo.start(t);
+      osc.stop(t + dur + 0.05);
+      osc2.stop(t + dur + 0.05);
+      lfo.stop(t + dur + 0.05);
+    } catch (e) { /* un wiii perdu ne doit jamais casser une partie */ }
+  }
+
+  /* Une syllabe de rire : une hauteur qui monte puis retombe très vite,
+     comme un "ha !" -- trois de suite, légèrement décalées en hauteur,
+     donnent un petit fou rire sans avoir besoin d'une voix enregistrée. */
+  function laughSyllable(c, when, baseFreq) {
+    var osc = c.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq, when);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.35, when + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.1, when + 0.11);
+    var gain = c.createGain();
+    gain.gain.setValueAtTime(0, when);
+    gain.gain.linearRampToValueAtTime(0.07, when + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.13);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(when);
+    osc.stop(when + 0.16);
+  }
+
+  /* --- Lapin percuté, confettis ---------------------------------------------
+     Avant, cet impact reprenait le buzz grave de "mauvaise réponse" -- alors
+     que visuellement c'est un accident joyeux, pas une faute : le monde
+     projette des confettis, pas un carton rouge. Le son doit le dire aussi.
+     Trois couches, à la manière d'une vraie piñata qu'on éclate : le
+     craquement (bruit filtré, très bref), la pluie de confettis (une dizaine
+     de tintements aigus, hauteur et instant légèrement randomisés pour que
+     ça tombe plutôt que ça joue une mélodie), et un petit fou rire par-dessus. */
+  function pinataConfetti() {
+    if (!unlocked || muted) return;
+    var c = ensure();
+    if (!c) return;
+    if (c.state === 'suspended') c.resume();
+    try {
+      var t = c.currentTime;
+
+      var len = Math.floor(c.sampleRate * 0.09);
+      var buf = c.createBuffer(1, len, c.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      var src = c.createBufferSource();
+      src.buffer = buf;
+      var bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 1400;
+      bp.Q.value = 0.9;
+      var whackGain = c.createGain();
+      whackGain.gain.setValueAtTime(0.22, t);
+      whackGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      src.connect(bp);
+      bp.connect(whackGain);
+      whackGain.connect(master);
+      src.start(t);
+
+      tone(140, 0.10, 'square', 0.10, 0.005);   // le poids du coup, sous le craquement
+
+      var notes = [1200, 1500, 1800, 1350, 1650, 2000, 1450, 1750, 1900, 1600];
+      for (var n = 0; n < notes.length; n++) {
+        var when = 0.06 + n * 0.045 + Math.random() * 0.02;
+        tone(notes[n] * (0.94 + Math.random() * 0.12), 0.14, 'sine', 0.045, when);
+      }
+
+      var haStarts = [0.16, 0.28, 0.40];
+      for (var h = 0; h < haStarts.length; h++) {
+        laughSyllable(c, t + haStarts[h], 560 + h * 40);
+      }
+    } catch (e) { /* un accident manqué ne doit jamais casser une partie */ }
+  }
+
   var sfx = {
     good: function () {
       tone(660, 0.12, 'triangle', 0.14, 0);
@@ -128,13 +262,14 @@
     bad: function () {
       tone(180, 0.22, 'sawtooth', 0.10, 0);
     },
+    /* Lapin percuté : un accident joyeux, pas une faute -- voir
+       pinataConfetti() ci-dessus pour le détail des trois couches. */
+    confetti: pinataConfetti,
     crash: function () {
       tone(120, 0.40, 'sawtooth', 0.13, 0);
       tone(70, 0.50, 'square', 0.08, 0.05);
     },
-    jump: function () {
-      tone(520, 0.09, 'sine', 0.08, 0);
-    },
+    jump: wooshJump,
     land: function () {
       tone(240, 0.07, 'sine', 0.07, 0);
     },

@@ -777,7 +777,7 @@
       this.world.confetti.burst(s.x, ground + s.height, 0.4);
       this.world.setFlash(AS.PALETTE.beanie, 0.7);
       this.world.kick(0.5);
-      AS.audio.sfx.bad();
+      AS.audio.sfx.confetti();
     } else {
       this.world.setFlash(AS.PALETTE.bad, 1.2);
       this.world.kick(1.4);
