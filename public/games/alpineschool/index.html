@@ -4738,60 +4738,57 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     try {
       var t = c.currentTime;
       var dur = 1.9;
-      /* Ce qui distingue un "wheee" d'un "aaahhh" tient en deux choses : le
-         REGISTRE (aigu et sifflant contre médium et ouvert) et le TIMBRE
-         (une sinusoïde pure, comme un sifflet, contre une onde pleine de
-         partiels graves, comme une voix qui gémit). Le premier essai
-         culminait à 760 Hz et retombait à 360 -- exactement la zone d'un
-         soupir. Celui-ci grimpe vite à 1480 Hz -- un vrai sifflement -- et
-         y reste le temps du cri avant de ne redescendre qu'à 950 : jamais
-         assez bas pour retomber dans le gémissement. */
-      var rise = 0.14;              // le "wh-" : un swoop bref vers l'aigu
-      var holdUntil = dur * 0.62;   // le "eee" tenu -- où vit le cri
-      var startFreq = 640;
-      var peakFreq = 1480;
-      var tailFreq = 950;
+      /* Les deux essais precedents montaient vite puis TENAIENT une note --
+         et une note qui reste plantee en haut, meme aigue, sonne comme une
+         sirene ou un theremine, pas comme une voix qui s'exclame. Ce qui
+         porte le "wheeeee", c'est le GESTE : une montee continue du debut
+         presque jusqu'a la fin, comme quelqu'un dont le cri s'emballe avec
+         la vitesse -- pas la hauteur ou elle culmine. */
+      var riseUntil = dur * 0.86;
+      var startFreq = 480;
+      var peakFreq = 1360;
+      var tailFreq = 1120;          // a bout de souffle, mais jamais grave
 
       var osc = c.createOscillator();
-      osc.type = 'sine';            // le sifflet, pas la voix qui gémit
+      osc.type = 'sawtooth';        // du grain, pas un ton pur et froid
       osc.frequency.setValueAtTime(startFreq, t);
-      osc.frequency.exponentialRampToValueAtTime(peakFreq, t + rise);
-      osc.frequency.setValueAtTime(peakFreq, t + holdUntil);
+      osc.frequency.exponentialRampToValueAtTime(peakFreq, t + riseUntil);
       osc.frequency.exponentialRampToValueAtTime(tailFreq, t + dur);
 
-      var osc2 = c.createOscillator();
-      osc2.type = 'triangle';       // une octave au-dessus, en soutien : du brillant sans dureté
-      osc2.frequency.setValueAtTime(startFreq * 2, t);
-      osc2.frequency.exponentialRampToValueAtTime(peakFreq * 2, t + rise);
-      osc2.frequency.setValueAtTime(peakFreq * 2, t + holdUntil);
-      osc2.frequency.exponentialRampToValueAtTime(tailFreq * 2, t + dur);
+      /* Le filtre s'ouvre EN MEME TEMPS que la hauteur monte : le son
+         s'eclaircit à mesure qu'il grimpe, comme une exclamation qui
+         prend de l'ampleur -- une ouverture fixe sonnerait plat. */
+      var filt = c.createBiquadFilter();
+      filt.type = 'lowpass';
+      filt.Q.value = 1.1;
+      filt.frequency.setValueAtTime(1300, t);
+      filt.frequency.exponentialRampToValueAtTime(4400, t + riseUntil);
+      filt.frequency.exponentialRampToValueAtTime(3400, t + dur);
 
+      /* Vibrato qui grandit avec le temps : presque droit au depart, un
+         tremblement net à la fin -- l'excitation qui monte, pas un
+         synthétiseur égal à lui-même du début à la fin. */
       var lfo = c.createOscillator();
       lfo.type = 'sine';
-      lfo.frequency.value = 6.2;
+      lfo.frequency.value = 7;
       var lfoGain = c.createGain();
-      lfoGain.gain.value = 26;      // vibrato élargi pour rester audible à cette hauteur
+      lfoGain.gain.setValueAtTime(4, t);
+      lfoGain.gain.linearRampToValueAtTime(38, t + riseUntil);
       lfo.connect(lfoGain);
       lfoGain.connect(osc.frequency);
-      lfoGain.connect(osc2.frequency);
 
       var gain = c.createGain();
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.11, t + 0.04);
-      gain.gain.setValueAtTime(0.11, t + holdUntil);
+      gain.gain.linearRampToValueAtTime(0.095, t + 0.05);
+      gain.gain.setValueAtTime(0.095, t + dur * 0.8);
       gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
-      var gain2 = c.createGain();
-      gain2.gain.value = 0.32;      // le second oscillateur reste en soutien
-
-      osc.connect(gain);
-      osc2.connect(gain2);
-      gain2.connect(gain);
+      osc.connect(filt);
+      filt.connect(gain);
       gain.connect(master);
 
-      osc.start(t); osc2.start(t); lfo.start(t);
+      osc.start(t); lfo.start(t);
       osc.stop(t + dur + 0.05);
-      osc2.stop(t + dur + 0.05);
       lfo.stop(t + dur + 0.05);
     } catch (e) { /* un wiii perdu ne doit jamais casser une partie */ }
   }
