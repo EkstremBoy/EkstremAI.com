@@ -237,7 +237,12 @@
     it.hit = false;
     it.type = 'runner';
     it.x = side * (P.HALF + 1.2);
-    it.vx = -side * (1.5 + Math.random() * 1.1);
+    it.vx = -side * (2.6 + Math.random() * 0.9);
+    /* Il attend au bord des sapins et ne détale qu'à l'approche. Sans cette
+       attente il traversait la piste pendant que le joueur était encore à
+       cent mètres, et elle était vide quand il arrivait : le lapin était
+       littéralement impossible à toucher. */
+    it.wait = true;
     it.z = z;
     it.scale = 1;
     it.hop = Math.random() * 6;
@@ -339,8 +344,14 @@
       it.z -= travelled;
 
       if (it.type === 'runner') {
-        it.x += it.vx * (dt || 0);
-        it.hop += (dt || 0) * 11;
+        /* Tant qu'il attend, il sautille sur place au bord de la piste. */
+        if (it.wait) {
+          if (it.z <= W.RUNNER_GO) it.wait = false;
+          it.hop += (dt || 0) * 5;
+        } else {
+          it.x += it.vx * (dt || 0);
+          it.hop += (dt || 0) * 11;
+        }
         /* Sorti de l'autre côté : il a traversé, il ne menace plus. */
         if (Math.abs(it.x) > P.HALF + 2.2) {
           it.active = false;

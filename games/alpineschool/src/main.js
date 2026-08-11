@@ -948,6 +948,13 @@
      Le module ne connaît du jeu que ces trois fonctions. Geler, c'est arrêter
      la simulation ET les commandes : reprendre une descente dont on a lâché
      l'écran depuis dix secondes n'aurait aucun sens. */
+  /* L'aide des touches décrit un clavier qui n'existe pas sur un téléphone :
+     WSAD, F11, M, Échap. Elle n'y apprend rien et occupe le bas de l'écran. */
+  if (AS.mobile.isTouch()) {
+    var aide = document.getElementById('keysHelp');
+    if (aide && aide.parentNode) aide.parentNode.removeChild(aide);
+  }
+
   AS.mobile.init({
     isPlaying: function () {
       return screen === 'play' && !!game.state && game.state.running;

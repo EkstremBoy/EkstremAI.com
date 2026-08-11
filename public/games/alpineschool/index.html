@@ -2265,6 +2265,11 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     /* Récompense visuelle tous les 500 m. */
     MILESTONE: 500,
     Z_FAR: 122,              // les objets naissent à cette distance devant
+    /* Distance à laquelle un lapin détale. Calée pour qu'il soit AU MILIEU de
+       la piste quand le joueur arrive : il part de 4,6 m sur le côté et court
+       à environ 3 m/s, donc il lui faut à peu près une seconde pour être
+       atteignable — soit une trentaine de mètres à la vitesse du mode. */
+    RUNNER_GO: 34,
     Z_CULL: -9,              // et sont recyclés une fois derrière
     FOG_DENSITY: 0.0112,     // exponentiel, raccordé à la couleur du ciel
     /* Brume allégée dans les modes à questions — et seulement là. La brume
@@ -6539,7 +6544,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     it.hit = false;
     it.type = 'runner';
     it.x = side * (P.HALF + 1.2);
-    it.vx = -side * (1.5 + Math.random() * 1.1);
+    it.vx = -side * (2.6 + Math.random() * 0.9);
+    /* Il attend au bord des sapins et ne détale qu'à l'approche. Sans cette
+       attente il traversait la piste pendant que le joueur était encore à
+       cent mètres, et elle était vide quand il arrivait : le lapin était
+       littéralement impossible à toucher. */
+    it.wait = true;
     it.z = z;
     it.scale = 1;
     it.hop = Math.random() * 6;
@@ -6641,8 +6651,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       it.z -= travelled;
 
       if (it.type === 'runner') {
-        it.x += it.vx * (dt || 0);
-        it.hop += (dt || 0) * 11;
+        /* Tant qu'il attend, il sautille sur place au bord de la piste. */
+        if (it.wait) {
+          if (it.z <= W.RUNNER_GO) it.wait = false;
+          it.hop += (dt || 0) * 5;
+        } else {
+          it.x += it.vx * (dt || 0);
+          it.hop += (dt || 0) * 11;
+        }
         /* Sorti de l'autre côté : il a traversé, il ne menace plus. */
         if (Math.abs(it.x) > P.HALF + 2.2) {
           it.active = false;
@@ -11659,6 +11675,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
      Le module ne connaît du jeu que ces trois fonctions. Geler, c'est arrêter
      la simulation ET les commandes : reprendre une descente dont on a lâché
      l'écran depuis dix secondes n'aurait aucun sens. */
+  /* L'aide des touches décrit un clavier qui n'existe pas sur un téléphone :
+     WSAD, F11, M, Échap. Elle n'y apprend rien et occupe le bas de l'écran. */
+  if (AS.mobile.isTouch()) {
+    var aide = document.getElementById('keysHelp');
+    if (aide && aide.parentNode) aide.parentNode.removeChild(aide);
+  }
+
   AS.mobile.init({
     isPlaying: function () {
       return screen === 'play' && !!game.state && game.state.running;

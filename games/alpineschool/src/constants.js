@@ -213,6 +213,11 @@
     /* Récompense visuelle tous les 500 m. */
     MILESTONE: 500,
     Z_FAR: 122,              // les objets naissent à cette distance devant
+    /* Distance à laquelle un lapin détale. Calée pour qu'il soit AU MILIEU de
+       la piste quand le joueur arrive : il part de 4,6 m sur le côté et court
+       à environ 3 m/s, donc il lui faut à peu près une seconde pour être
+       atteignable — soit une trentaine de mètres à la vitesse du mode. */
+    RUNNER_GO: 34,
     Z_CULL: -9,              // et sont recyclés une fois derrière
     FOG_DENSITY: 0.0112,     // exponentiel, raccordé à la couleur du ciel
     /* Brume allégée dans les modes à questions — et seulement là. La brume
