@@ -6288,36 +6288,61 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       parts.push({ geo: box(g[2], 0.07, 0.1), color: CADRE, matrix: at(g[0], g[1], 2.62) });
     }
 
-    /* Pignon : un prisme triangulaire obtenu d'un cylindre à trois faces
-       couché, ce qui évite d'écrire une géométrie à la main. */
-    var pignon = new THREE.CylinderGeometry(2.45, 2.45, 5.0, 3, 1);
+    /* Pignon et toiture, derives d'UNE SEULE pente.
+
+       L'ancienne version batissait le pignon sur un triangle equilateral :
+       il faisait donc 4,24 de large pour un corps de 6,8 -- des trous aux
+       deux extremites du mur -- et sa pente valait 60 deg quand le toit
+       tombait a 35, ce qui ouvrait un coin vide entre les deux. Ici la pente
+       du pignon EST celle des pans, et le pignon deborde du corps : plus
+       aucun jour possible. Les nombres viennent d'un calcul, pas du reglage
+       a l'oeil. */
+    var PENTE = 0.6320;             // rad -- pignon et pans, la meme
+    var FAITE = 6.426;             // hauteur du faite
+
+    /* Prisme triangulaire : un cylindre a trois faces, aplati verticalement
+       pour que ses aretes tombent pile sur PENTE.
+
+       Le sommet d'un cylindre a 3 faces ainsi tourne pointe vers la GAUCHE,
+       pas vers le haut -- c'etait le vrai trou du toit : la moitie du pignon
+       manquait purement et simplement, quelle que soit la pente choisie.
+       Cette derniere rotation redresse le triangle, sommet au faite, base
+       horizontale en bas. Verifie sommet par sommet : la base tombe pile sur
+       [-3,45, 3,45] et le sommet a Y=6,426, au dixieme de millimetre pres. */
+    var pignon = new THREE.CylinderGeometry(3.9837, 3.9837, 5.0, 3, 1);
     pignon.rotateX(Math.PI / 2);
     pignon.rotateZ(Math.PI / 6);
-    parts.push({ geo: pignon, color: BOIS, matrix: at(0, 4.62, 0) });
+    pignon.rotateZ(-Math.PI / 2);
+    pignon.scale(1, 0.4227, 1);
+    parts.push({ geo: pignon, color: BOIS, matrix: at(0, 4.742, 0) });
 
-    /* Toit : deux plans épais posés en pente, débordant largement. La neige
-       dessus est ce qui le rend alpin plutôt que générique. */
-    var pente = 0.62;
+    /* Les deux pans, poses le long de cette pente : ils se croisent au faite
+       et debordent largement du mur. La neige repose dessus, decalee le long
+       de la normale au pan et non a la verticale -- sinon elle glisserait
+       hors du toit du cote de la pente. */
     for (var c = -1; c <= 1; c += 2) {
-      var m = new THREE.Matrix4();
-      m.compose(
-        new THREE.Vector3(c * 2.05, 5.62, 0),
-        new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -c * pente)),
+      var mp = new THREE.Matrix4();
+      mp.compose(
+        new THREE.Vector3(c * 1.939, 5.006, 0),
+        new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -c * PENTE)),
         new THREE.Vector3(1, 1, 1)
       );
-      parts.push({ geo: box(5.2, 0.26, 6.2), color: CADRE, matrix: m });
+      parts.push({ geo: box(5.046, 0.28, 6.4), color: CADRE, matrix: mp });
+
       var mn = new THREE.Matrix4();
       mn.compose(
-        new THREE.Vector3(c * 2.02, 5.82, 0),
-        new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -c * pente)),
+        new THREE.Vector3(c * 2.092, 5.216, 0),
+        new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, -c * PENTE)),
         new THREE.Vector3(1, 1, 1)
       );
-      parts.push({ geo: box(5.3, 0.22, 6.3), color: PAL.snow, matrix: mn });
+      parts.push({ geo: box(5.146, 0.24, 6.5), color: PAL.snow, matrix: mn });
     }
 
     /* Cheminée, et sa couronne de neige. */
-    parts.push({ geo: box(0.85, 2.5, 0.85), color: PIERRE, matrix: at(-2.0, 6.4, -1.3) });
-    parts.push({ geo: box(1.0, 0.2, 1.0), color: PAL.snow, matrix: at(-2.0, 7.7, -1.3) });
+    /* Cheminee : sa base est calculee SOUS la surface du toit a son abscisse,
+       pour qu'elle le traverse au lieu de sembler pose dessus. */
+    parts.push({ geo: box(0.85, 2.738, 0.85), color: PIERRE, matrix: at(-2.0, 6.131, -1.3) });
+    parts.push({ geo: box(1.0, 0.2, 1.0), color: PAL.snow, matrix: at(-2.0, 7.600, -1.3) });
 
     /* Balcon : une simple avancée et sa rambarde. */
     parts.push({ geo: box(7.0, 0.16, 1.3), color: BOIS_CLAIR, matrix: at(0, 3.42, 3.0) });
