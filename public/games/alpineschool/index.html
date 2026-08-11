@@ -1404,6 +1404,58 @@ kbd {
 }
 
 /* Le bouton qui ouvre la feuille de partage du système. */
+/* Les deux cartes de l'ecran de premier choix, avant meme le menu du jeu.
+   Cote a cote : sur un telephone verrouille en paysage, la largeur ne
+   manque jamais, contrairement a la hauteur. */
+.m-choice {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 4px 0 14px;
+}
+
+.m-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #EAF4FB;
+  cursor: pointer;
+}
+
+.m-choice-card:hover,
+.m-choice-card:active {
+  border-color: var(--coral);
+  background: rgba(242, 100, 60, 0.10);
+}
+
+.m-choice-icon { font-size: 30px; line-height: 1; }
+
+.m-choice-title {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.m-choice-body {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #9FC0D8;
+}
+
+.m-choice-note {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #E8A15C;
+  margin-top: 2px;
+}
+
 .m-share {
   display: flex;
   align-items: center;
@@ -1844,6 +1896,11 @@ html[lang="en"] .lang-fr { opacity: 0.55; }
     <button id="muteBtn" class="mute" type="button" data-i18n-aria="a11y.mute" aria-pressed="false">
       <span aria-hidden="true">♪</span>
     </button>
+    <!-- Changer de commandes sans passer par la pause : seulement sur
+         telephone, seulement au menu principal (mobile.js decide). -->
+    <button id="controlsBtn" class="mute" type="button" hidden data-i18n-aria="a11y.controls">
+      <span aria-hidden="true">👆</span>
+    </button>
   </div>
 
   <!-- ================= MENU ================= -->
@@ -1974,6 +2031,32 @@ html[lang="en"] .lang-fr { opacity: 0.55; }
   </div>
 
   <!-- ============ TÉLÉPHONE : installation, portrait, décompte ============ -->
+  <!-- Le choix des commandes, avant même le menu du jeu : sur telephone, on
+       le decouvrait autrement au hasard d'un tour dans le menu pause, en
+       pleine descente. Une seule fois par visite -- controlsAsked dans
+       mobile.js -- puis on peut toujours en changer, d'ou le rappel en
+       bas de cet ecran. -->
+  <div class="m-layer is-off" id="mFirstControls">
+    <div class="m-card">
+      <div class="m-icon" aria-hidden="true">🎮</div>
+      <h2 id="mFirstTitle">Comment veux-tu jouer ?</h2>
+      <div class="m-choice">
+        <button class="m-choice-card" type="button" id="mFirstTouch">
+          <span class="m-choice-icon" aria-hidden="true">👆</span>
+          <span class="m-choice-title" id="mFirstTouchTitle"></span>
+          <span class="m-choice-body" id="mFirstTouchBody"></span>
+        </button>
+        <button class="m-choice-card" type="button" id="mFirstTilt">
+          <span class="m-choice-icon" aria-hidden="true">📱</span>
+          <span class="m-choice-title" id="mFirstTiltTitle"></span>
+          <span class="m-choice-body" id="mFirstTiltBody"></span>
+          <span class="m-choice-note" id="mFirstTiltNote"></span>
+        </button>
+      </div>
+      <p class="m-why" id="mFirstFoot"></p>
+    </div>
+  </div>
+
   <div class="m-layer is-off" id="mInvite">
     <div class="m-card">
       <div class="m-icon" aria-hidden="true">⛰</div>
@@ -2533,6 +2616,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.share.copied': "Lien copié. Colle-le dans <b>Safari</b>, puis utilise son bouton Partage — c'est le navigateur iPhone qui gère le mieux l'ajout à l'écran d'accueil.",
       'm.share.manual': "Si « Sur l'écran d'accueil » n'apparaît pas dans cette liste, utilise plutôt le bouton Partage de ton navigateur, en bas de l'écran.",
       'm.install.skip': "Jouer quand même dans le navigateur",
+      'm.first.title': 'Comment veux-tu jouer ?',
+      'm.first.touch.body': 'Le classique : appuie à gauche ou à droite pour tourner, en haut pour sauter.',
+      'm.first.tilt.body': "Incline ton téléphone pour tourner, secoue-le pour sauter — sans jamais toucher l'écran.",
+      'm.first.tilt.note': 'Ton téléphone te demandera une autorisation.',
+      'm.first.foot': 'Tu pourras changer ça à tout moment, depuis ce menu ou le menu Pause.',
+      'a11y.controls': 'Changer de commandes',
       'pause.controls': 'Commandes',
       'pause.controls.touch': "Toucher l'écran",
       'pause.controls.tilt': 'Incliner le téléphone',
@@ -2745,6 +2834,12 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       'm.tuto.right': "Maintiens ce côté pour tourner à DROITE",
       'm.tuto.go': 'GO !',
       'm.tuto.foot': "Mets le téléphone à la verticale pour la pause et les réglages.",
+      'm.first.title': 'How do you want to play?',
+      'm.first.touch.body': 'The classic: tap left or right to turn, up top to jump.',
+      'm.first.tilt.body': 'Tilt your phone to turn, shake it to jump — without ever touching the screen.',
+      'm.first.tilt.note': 'Your phone will ask for a permission.',
+      'm.first.foot': 'You can change this any time, from this menu or the Pause menu.',
+      'a11y.controls': 'Change controls',
       'pause.controls': 'Controls',
       'pause.controls.touch': 'Touch the screen',
       'pause.controls.tilt': 'Tilt the phone',
@@ -3928,8 +4023,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
   var deferredPrompt = null;      // Android : l'invite d'installation captée
   var dismissed = false;          // « jouer quand même dans le navigateur »
   var frozen = false;             // figé parce qu'on est en portrait
-  var tuto = false;               // le mode d'emploi tactile est affiché
+  var tuto = false;               // le mode d'emploi tactile est affiche
   var tutoPending = false;        // une descente vient de commencer
+
+  /* Le choix des commandes se pose UNE fois par visite, avant meme le menu
+     du jeu -- pas au hasard d'un tour dans le menu pause en pleine descente,
+     ce qui laissait la moitie des joueurs ignorer que ce mode existe. */
+  var controlsAsked = false;
   var counting = 0;               // décompte en cours, en secondes
   var countTimer = null;
 
@@ -4065,6 +4165,43 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     hooks.setFrozen(frozen || tuto || counting > 0);
   }
 
+  function shouldAskControls() {
+    return isPhone() && AS.input.tiltAvailable() && !controlsAsked;
+  }
+
+  function paintFirstControls() {
+    var t = AS.i18n.t;
+    el.firstTitle.textContent = t('m.first.title');
+    el.firstTouchTitle.textContent = t('pause.controls.touch');
+    el.firstTouchBody.textContent = t('m.first.touch.body');
+    el.firstTiltTitle.textContent = t('pause.controls.tilt');
+    el.firstTiltBody.textContent = t('m.first.tilt.body');
+    el.firstTiltNote.textContent = t('m.first.tilt.note');
+    el.firstFoot.textContent = t('m.first.foot');
+  }
+
+  function showFirstControls() {
+    paintFirstControls();
+    el.firstControls.classList.remove('is-off');
+  }
+
+  function hideFirstControls() {
+    el.firstControls.classList.add('is-off');
+  }
+
+  /* La pastille du menu principal : le second endroit, avec la pause, ou
+     changer de commandes -- promis dans le texte de l'ecran de premier
+     choix, donc elle doit vraiment exister. */
+  function paintControlsBtn() {
+    if (!el.controlsBtn) return;
+    var show = isPhone() && AS.input.tiltAvailable() && hooks.atMenu();
+    el.controlsBtn.hidden = !show;
+    if (!show) return;
+    var mode = AS.input.getMode();
+    el.controlsBtn.querySelector('span').textContent = mode === 'tilt' ? '📱' : '👆';
+    el.controlsBtn.setAttribute('aria-label', AS.i18n.t('pause.controls.' + mode));
+  }
+
   function showTutorial() {
     if (tuto) return;
     tuto = true;
@@ -4186,8 +4323,28 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     if (isPortrait()) {
       cancelCountdown();
       hideInvite();
+      hideFirstControls();
       freeze();
     } else {
+      /* Le choix des commandes passe avant TOUT le reste, y compris
+         l'invitation a installer : c'est la toute premiere decision du
+         joueur, avant meme de savoir quel jeu il va lancer. */
+      if (shouldAskControls()) {
+        cancelCountdown();
+        hideTutorial();
+        hideInvite();
+        /* Meme geste que la reprise apres rotation, en plus simple : on
+           efface juste l'ecran de rotation s'il etait affiche, sans passer
+           par thaw() et son decompte -- il n'y a encore aucune partie a
+           reprendre. */
+        frozen = false;
+        el.portrait.classList.add('is-off');
+        showFirstControls();
+        paintControlsBtn();
+        return;
+      }
+      hideFirstControls();
+
       /* Une descente vient de commencer : le mode d'emploi passe avant le
          décompte, et remplace la reprise après une rotation. */
       if (tutoPending && hooks.isPlaying()) {
@@ -4196,11 +4353,14 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
         el.portrait.classList.add('is-off');
         hideInvite();
         showTutorial();
+        paintControlsBtn();
         return;
       }
       thaw();
       if (shouldInvite()) showInvite(); else hideInvite();
     }
+
+    paintControlsBtn();
   }
 
   /* Appelé par le jeu au départ de chaque descente. */
@@ -4233,6 +4393,18 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
     el.tutoFoot = document.getElementById('mTutoFoot');
     el.count = document.getElementById('mCount');
     el.countNum = document.getElementById('mCountNum');
+
+    el.firstControls = document.getElementById('mFirstControls');
+    el.firstTitle = document.getElementById('mFirstTitle');
+    el.firstTouch = document.getElementById('mFirstTouch');
+    el.firstTouchTitle = document.getElementById('mFirstTouchTitle');
+    el.firstTouchBody = document.getElementById('mFirstTouchBody');
+    el.firstTilt = document.getElementById('mFirstTilt');
+    el.firstTiltTitle = document.getElementById('mFirstTiltTitle');
+    el.firstTiltBody = document.getElementById('mFirstTiltBody');
+    el.firstTiltNote = document.getElementById('mFirstTiltNote');
+    el.firstFoot = document.getElementById('mFirstFoot');
+    el.controlsBtn = document.getElementById('controlsBtn');
 
     /* Android/Chrome : le navigateur nous confie son invite. On la garde pour
        la déclencher sur un vrai geste du joueur, ce qu'il exige. */
@@ -4296,6 +4468,35 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
       tutoPending = false;
       hideTutorial();
     });
+
+    /* Choix des commandes, avant meme le menu du jeu. Le tactile n'exige
+       rien -- on avance tout de suite. L'inclinaison, elle, passe par la
+       demande de permission iOS : l'appel part ICI, dans ce gestionnaire de
+       clic, synchrone, comme l'exige le systeme. Que le joueur accepte ou
+       refuse, on considere la question posee -- il pourra toujours changer
+       d'avis depuis la pastille du menu ou la pause. */
+    el.firstTouch.addEventListener('click', function () {
+      AS.input.setMode('touch');
+      controlsAsked = true;
+      refresh();
+    });
+
+    el.firstTilt.addEventListener('click', function () {
+      AS.input.setMode('tilt').then(function () {
+        controlsAsked = true;
+        refresh();
+      });
+    });
+
+    /* La pastille du menu : le second endroit promis dans le texte
+       ci-dessus. Un tap bascule directement, meme permission demandee au
+       meme instant synchrone. */
+    if (el.controlsBtn) {
+      el.controlsBtn.addEventListener('click', function () {
+        var next = AS.input.getMode() === 'tilt' ? 'touch' : 'tilt';
+        AS.input.setMode(next).then(function () { paintControlsBtn(); });
+      });
+    }
 
     el.portraitInstall.addEventListener('click', function () {
       /* Les deux calques ont le même plan : sans masquer celui-ci, l'invitation

@@ -30,8 +30,13 @@
   var deferredPrompt = null;      // Android : l'invite d'installation captée
   var dismissed = false;          // « jouer quand même dans le navigateur »
   var frozen = false;             // figé parce qu'on est en portrait
-  var tuto = false;               // le mode d'emploi tactile est affiché
+  var tuto = false;               // le mode d'emploi tactile est affiche
   var tutoPending = false;        // une descente vient de commencer
+
+  /* Le choix des commandes se pose UNE fois par visite, avant meme le menu
+     du jeu -- pas au hasard d'un tour dans le menu pause en pleine descente,
+     ce qui laissait la moitie des joueurs ignorer que ce mode existe. */
+  var controlsAsked = false;
   var counting = 0;               // décompte en cours, en secondes
   var countTimer = null;
 
@@ -167,6 +172,43 @@
     hooks.setFrozen(frozen || tuto || counting > 0);
   }
 
+  function shouldAskControls() {
+    return isPhone() && AS.input.tiltAvailable() && !controlsAsked;
+  }
+
+  function paintFirstControls() {
+    var t = AS.i18n.t;
+    el.firstTitle.textContent = t('m.first.title');
+    el.firstTouchTitle.textContent = t('pause.controls.touch');
+    el.firstTouchBody.textContent = t('m.first.touch.body');
+    el.firstTiltTitle.textContent = t('pause.controls.tilt');
+    el.firstTiltBody.textContent = t('m.first.tilt.body');
+    el.firstTiltNote.textContent = t('m.first.tilt.note');
+    el.firstFoot.textContent = t('m.first.foot');
+  }
+
+  function showFirstControls() {
+    paintFirstControls();
+    el.firstControls.classList.remove('is-off');
+  }
+
+  function hideFirstControls() {
+    el.firstControls.classList.add('is-off');
+  }
+
+  /* La pastille du menu principal : le second endroit, avec la pause, ou
+     changer de commandes -- promis dans le texte de l'ecran de premier
+     choix, donc elle doit vraiment exister. */
+  function paintControlsBtn() {
+    if (!el.controlsBtn) return;
+    var show = isPhone() && AS.input.tiltAvailable() && hooks.atMenu();
+    el.controlsBtn.hidden = !show;
+    if (!show) return;
+    var mode = AS.input.getMode();
+    el.controlsBtn.querySelector('span').textContent = mode === 'tilt' ? '📱' : '👆';
+    el.controlsBtn.setAttribute('aria-label', AS.i18n.t('pause.controls.' + mode));
+  }
+
   function showTutorial() {
     if (tuto) return;
     tuto = true;
@@ -288,8 +330,28 @@
     if (isPortrait()) {
       cancelCountdown();
       hideInvite();
+      hideFirstControls();
       freeze();
     } else {
+      /* Le choix des commandes passe avant TOUT le reste, y compris
+         l'invitation a installer : c'est la toute premiere decision du
+         joueur, avant meme de savoir quel jeu il va lancer. */
+      if (shouldAskControls()) {
+        cancelCountdown();
+        hideTutorial();
+        hideInvite();
+        /* Meme geste que la reprise apres rotation, en plus simple : on
+           efface juste l'ecran de rotation s'il etait affiche, sans passer
+           par thaw() et son decompte -- il n'y a encore aucune partie a
+           reprendre. */
+        frozen = false;
+        el.portrait.classList.add('is-off');
+        showFirstControls();
+        paintControlsBtn();
+        return;
+      }
+      hideFirstControls();
+
       /* Une descente vient de commencer : le mode d'emploi passe avant le
          décompte, et remplace la reprise après une rotation. */
       if (tutoPending && hooks.isPlaying()) {
@@ -298,11 +360,14 @@
         el.portrait.classList.add('is-off');
         hideInvite();
         showTutorial();
+        paintControlsBtn();
         return;
       }
       thaw();
       if (shouldInvite()) showInvite(); else hideInvite();
     }
+
+    paintControlsBtn();
   }
 
   /* Appelé par le jeu au départ de chaque descente. */
@@ -335,6 +400,18 @@
     el.tutoFoot = document.getElementById('mTutoFoot');
     el.count = document.getElementById('mCount');
     el.countNum = document.getElementById('mCountNum');
+
+    el.firstControls = document.getElementById('mFirstControls');
+    el.firstTitle = document.getElementById('mFirstTitle');
+    el.firstTouch = document.getElementById('mFirstTouch');
+    el.firstTouchTitle = document.getElementById('mFirstTouchTitle');
+    el.firstTouchBody = document.getElementById('mFirstTouchBody');
+    el.firstTilt = document.getElementById('mFirstTilt');
+    el.firstTiltTitle = document.getElementById('mFirstTiltTitle');
+    el.firstTiltBody = document.getElementById('mFirstTiltBody');
+    el.firstTiltNote = document.getElementById('mFirstTiltNote');
+    el.firstFoot = document.getElementById('mFirstFoot');
+    el.controlsBtn = document.getElementById('controlsBtn');
 
     /* Android/Chrome : le navigateur nous confie son invite. On la garde pour
        la déclencher sur un vrai geste du joueur, ce qu'il exige. */
@@ -398,6 +475,35 @@
       tutoPending = false;
       hideTutorial();
     });
+
+    /* Choix des commandes, avant meme le menu du jeu. Le tactile n'exige
+       rien -- on avance tout de suite. L'inclinaison, elle, passe par la
+       demande de permission iOS : l'appel part ICI, dans ce gestionnaire de
+       clic, synchrone, comme l'exige le systeme. Que le joueur accepte ou
+       refuse, on considere la question posee -- il pourra toujours changer
+       d'avis depuis la pastille du menu ou la pause. */
+    el.firstTouch.addEventListener('click', function () {
+      AS.input.setMode('touch');
+      controlsAsked = true;
+      refresh();
+    });
+
+    el.firstTilt.addEventListener('click', function () {
+      AS.input.setMode('tilt').then(function () {
+        controlsAsked = true;
+        refresh();
+      });
+    });
+
+    /* La pastille du menu : le second endroit promis dans le texte
+       ci-dessus. Un tap bascule directement, meme permission demandee au
+       meme instant synchrone. */
+    if (el.controlsBtn) {
+      el.controlsBtn.addEventListener('click', function () {
+        var next = AS.input.getMode() === 'tilt' ? 'touch' : 'tilt';
+        AS.input.setMode(next).then(function () { paintControlsBtn(); });
+      });
+    }
 
     el.portraitInstall.addEventListener('click', function () {
       /* Les deux calques ont le même plan : sans masquer celui-ci, l'invitation

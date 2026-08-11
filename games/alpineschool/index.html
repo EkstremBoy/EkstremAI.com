@@ -101,6 +101,11 @@
     <button id="muteBtn" class="mute" type="button" data-i18n-aria="a11y.mute" aria-pressed="false">
       <span aria-hidden="true">♪</span>
     </button>
+    <!-- Changer de commandes sans passer par la pause : seulement sur
+         telephone, seulement au menu principal (mobile.js decide). -->
+    <button id="controlsBtn" class="mute" type="button" hidden data-i18n-aria="a11y.controls">
+      <span aria-hidden="true">👆</span>
+    </button>
   </div>
 
   <!-- ================= MENU ================= -->
@@ -231,6 +236,32 @@
   </div>
 
   <!-- ============ TÉLÉPHONE : installation, portrait, décompte ============ -->
+  <!-- Le choix des commandes, avant même le menu du jeu : sur telephone, on
+       le decouvrait autrement au hasard d'un tour dans le menu pause, en
+       pleine descente. Une seule fois par visite -- controlsAsked dans
+       mobile.js -- puis on peut toujours en changer, d'ou le rappel en
+       bas de cet ecran. -->
+  <div class="m-layer is-off" id="mFirstControls">
+    <div class="m-card">
+      <div class="m-icon" aria-hidden="true">🎮</div>
+      <h2 id="mFirstTitle">Comment veux-tu jouer ?</h2>
+      <div class="m-choice">
+        <button class="m-choice-card" type="button" id="mFirstTouch">
+          <span class="m-choice-icon" aria-hidden="true">👆</span>
+          <span class="m-choice-title" id="mFirstTouchTitle"></span>
+          <span class="m-choice-body" id="mFirstTouchBody"></span>
+        </button>
+        <button class="m-choice-card" type="button" id="mFirstTilt">
+          <span class="m-choice-icon" aria-hidden="true">📱</span>
+          <span class="m-choice-title" id="mFirstTiltTitle"></span>
+          <span class="m-choice-body" id="mFirstTiltBody"></span>
+          <span class="m-choice-note" id="mFirstTiltNote"></span>
+        </button>
+      </div>
+      <p class="m-why" id="mFirstFoot"></p>
+    </div>
+  </div>
+
   <div class="m-layer is-off" id="mInvite">
     <div class="m-card">
       <div class="m-icon" aria-hidden="true">⛰</div>

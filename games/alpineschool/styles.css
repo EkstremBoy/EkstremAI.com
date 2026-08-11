@@ -1360,6 +1360,58 @@ kbd {
 }
 
 /* Le bouton qui ouvre la feuille de partage du système. */
+/* Les deux cartes de l'ecran de premier choix, avant meme le menu du jeu.
+   Cote a cote : sur un telephone verrouille en paysage, la largeur ne
+   manque jamais, contrairement a la hauteur. */
+.m-choice {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 4px 0 14px;
+}
+
+.m-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #EAF4FB;
+  cursor: pointer;
+}
+
+.m-choice-card:hover,
+.m-choice-card:active {
+  border-color: var(--coral);
+  background: rgba(242, 100, 60, 0.10);
+}
+
+.m-choice-icon { font-size: 30px; line-height: 1; }
+
+.m-choice-title {
+  font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.m-choice-body {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #9FC0D8;
+}
+
+.m-choice-note {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #E8A15C;
+  margin-top: 2px;
+}
+
 .m-share {
   display: flex;
   align-items: center;
