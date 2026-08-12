@@ -34,6 +34,7 @@ const ORDER = [
   'src/data/words.js',
   'src/data/quiz.js',
   'src/data/modifiers.js',
+  'src/data/sfx.js',
   'src/crazy.js',
   'src/race.js',
   'src/mobile.js',

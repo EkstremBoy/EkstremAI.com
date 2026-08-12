@@ -1,7 +1,11 @@
 /* =========================================================================
    Alpine School — audio
    -------------------------------------------------------------------------
-   Tout est synthétisé : aucun fichier, le jeu marche hors ligne.
+   Presque tout est synthétisé : une seule exception, le sifflet du saut
+   (voir src/data/sfx.js), un enregistrement encodé en base64 exactement
+   comme les polices -- toujours aucun fichier séparé, toujours hors ligne.
+   Trois tentatives de synthèse pour ce son précis ont été jugées mauvaises
+   à l'oreille ; un vrai sifflet réussit là où la synthèse échouait.
 
    Deux règles tenues strictement :
      — le contexte audio n'est créé qu'au premier geste de l'utilisateur, donc
@@ -37,6 +41,52 @@
     unlocked = true;
     var c = ensure();
     if (c && c.state === 'suspended') c.resume();
+    loadJumpSample();   // décodage lancé tout de suite : prêt bien avant le premier saut
+  }
+
+  /* --- L'échantillon du saut -----------------------------------------------
+     Décodé une seule fois, mis en cache, puis rejoué depuis ce cache à
+     chaque saut -- décoder du base64 à chaque appel serait un gâchis. Tant
+     que le décodage n'est pas terminé (ou s'il échoue -- vieux navigateur,
+     format refusé), sfx.jump() retombe sur le bip synthétisé d'origine :
+     jamais de silence surprise à la place du saut. */
+  var jumpBuffer = null;
+  var jumpBufferTried = false;
+
+  function b64ToBytes(b64) {
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  function loadJumpSample() {
+    if (jumpBufferTried) return;
+    var c = ensure();
+    var b64 = AS.SFX_JUMP_WAV_B64;
+    if (!c || !b64) return;
+    jumpBufferTried = true;
+    try {
+      c.decodeAudioData(b64ToBytes(b64), function (buf) {
+        jumpBuffer = buf;
+      }, function () { /* décodage refusé : le repli suffit */ });
+    } catch (e) { /* voir plus haut */ }
+  }
+
+  function playJumpSample() {
+    if (!jumpBuffer || !unlocked || muted) return false;
+    var c = ensure();
+    if (!c) return false;
+    try {
+      var src = c.createBufferSource();
+      src.buffer = jumpBuffer;
+      var g = c.createGain();
+      g.gain.value = 0.85;
+      src.connect(g);
+      g.connect(master);
+      src.start(c.currentTime);
+      return true;
+    } catch (e) { return false; }
   }
 
   function resume() {
@@ -203,12 +253,10 @@
       tone(120, 0.40, 'sawtooth', 0.13, 0);
       tone(70, 0.50, 'square', 0.08, 0.05);
     },
-    /* Le saut avait droit à trois essais de "wiii" étiré cette semaine,
-       tous jugés mauvais à l'oreille -- retour au bip d'origine, court et
-       inoffensif, en attendant un vrai son (enregistré ou trouvé) que
-       l'utilisateur apportera lui-même. */
+    /* Le vrai sifflet s'il est prêt, sinon le bip d'origine -- jamais de
+       silence à la place d'un saut. */
     jump: function () {
-      tone(520, 0.09, 'sine', 0.08, 0);
+      if (!playJumpSample()) tone(520, 0.09, 'sine', 0.08, 0);
     },
     land: function () {
       tone(240, 0.07, 'sine', 0.07, 0);
