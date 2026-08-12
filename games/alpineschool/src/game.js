@@ -353,7 +353,8 @@
       s.jumpBuffer = 0;
       s.airborne = true;
       s.airV = P.JUMP_V;
-      AS.audio.sfx.jump();
+      /* Le saut est silencieux : trois essais de synthèse puis un vrai
+         sifflet enregistré, tous jugés fatigants à l'usage. */
     }
     if (s.airborne) {
       s.airV -= P.GRAVITY * dt;

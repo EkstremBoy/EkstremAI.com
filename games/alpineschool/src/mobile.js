@@ -301,7 +301,7 @@
     el.countNum.classList.remove('is-tick');
     void el.countNum.offsetWidth;
     el.countNum.classList.add('is-tick');
-    AS.audio.sfx.jump();
+    AS.audio.sfx.tick();
     counting--;
     countTimer = setTimeout(tickCountdown, 700);
   }
