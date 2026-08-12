@@ -120,81 +120,6 @@
     wind.filter.frequency.setTargetAtTime(320 + speed01 * 900, t, 0.3);
   }
 
-  /* --- Le "wiii" du saut ---------------------------------------------------
-     tone() ne sait tenir qu'une hauteur fixe : il fallait un vrai glissé de
-     fréquence pour une exclamation étirée sur près de deux secondes, pas un
-     bip d'un dixième de seconde. Deux oscillateurs légèrement écartés (l'un
-     à la quinte, détuné de quelques cents) donnent le battement organique
-     d'une vraie voix plutôt qu'un synthé bien droit, et un vibrato discret
-     fait vivre la tenue -- c'est ce qui transforme un glissando en un
-     vrai "wiiiiii" plutôt qu'une sirène.
-     La trajectoire suit le saut : montée franche au décollage, palier en
-     haut pendant le vol, redescente douce à la retombée -- même si la fin
-     du son déborde un peu après l'atterrissage, ce léger décalage se sent
-     comme un cri qui traîne, pas comme un bug. */
-  function wooshJump() {
-    if (!unlocked || muted) return;
-    var c = ensure();
-    if (!c) return;
-    if (c.state === 'suspended') c.resume();
-    try {
-      var t = c.currentTime;
-      var dur = 1.9;
-      /* Les deux essais precedents montaient vite puis TENAIENT une note --
-         et une note qui reste plantee en haut, meme aigue, sonne comme une
-         sirene ou un theremine, pas comme une voix qui s'exclame. Ce qui
-         porte le "wheeeee", c'est le GESTE : une montee continue du debut
-         presque jusqu'a la fin, comme quelqu'un dont le cri s'emballe avec
-         la vitesse -- pas la hauteur ou elle culmine. */
-      var riseUntil = dur * 0.86;
-      var startFreq = 480;
-      var peakFreq = 1360;
-      var tailFreq = 1120;          // a bout de souffle, mais jamais grave
-
-      var osc = c.createOscillator();
-      osc.type = 'sawtooth';        // du grain, pas un ton pur et froid
-      osc.frequency.setValueAtTime(startFreq, t);
-      osc.frequency.exponentialRampToValueAtTime(peakFreq, t + riseUntil);
-      osc.frequency.exponentialRampToValueAtTime(tailFreq, t + dur);
-
-      /* Le filtre s'ouvre EN MEME TEMPS que la hauteur monte : le son
-         s'eclaircit à mesure qu'il grimpe, comme une exclamation qui
-         prend de l'ampleur -- une ouverture fixe sonnerait plat. */
-      var filt = c.createBiquadFilter();
-      filt.type = 'lowpass';
-      filt.Q.value = 1.1;
-      filt.frequency.setValueAtTime(1300, t);
-      filt.frequency.exponentialRampToValueAtTime(4400, t + riseUntil);
-      filt.frequency.exponentialRampToValueAtTime(3400, t + dur);
-
-      /* Vibrato qui grandit avec le temps : presque droit au depart, un
-         tremblement net à la fin -- l'excitation qui monte, pas un
-         synthétiseur égal à lui-même du début à la fin. */
-      var lfo = c.createOscillator();
-      lfo.type = 'sine';
-      lfo.frequency.value = 7;
-      var lfoGain = c.createGain();
-      lfoGain.gain.setValueAtTime(4, t);
-      lfoGain.gain.linearRampToValueAtTime(38, t + riseUntil);
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc.frequency);
-
-      var gain = c.createGain();
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.095, t + 0.05);
-      gain.gain.setValueAtTime(0.095, t + dur * 0.8);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-
-      osc.connect(filt);
-      filt.connect(gain);
-      gain.connect(master);
-
-      osc.start(t); lfo.start(t);
-      osc.stop(t + dur + 0.05);
-      lfo.stop(t + dur + 0.05);
-    } catch (e) { /* un wiii perdu ne doit jamais casser une partie */ }
-  }
-
   /* Une syllabe de rire : une hauteur qui monte puis retombe très vite,
      comme un "ha !" -- trois de suite, légèrement décalées en hauteur,
      donnent un petit fou rire sans avoir besoin d'une voix enregistrée. */
@@ -278,7 +203,13 @@
       tone(120, 0.40, 'sawtooth', 0.13, 0);
       tone(70, 0.50, 'square', 0.08, 0.05);
     },
-    jump: wooshJump,
+    /* Le saut avait droit à trois essais de "wiii" étiré cette semaine,
+       tous jugés mauvais à l'oreille -- retour au bip d'origine, court et
+       inoffensif, en attendant un vrai son (enregistré ou trouvé) que
+       l'utilisateur apportera lui-même. */
+    jump: function () {
+      tone(520, 0.09, 'sine', 0.08, 0);
+    },
     land: function () {
       tone(240, 0.07, 'sine', 0.07, 0);
     },
