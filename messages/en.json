@@ -435,6 +435,10 @@
         "coming_soon": {
             "title": "Coming Soon",
             "description": "New intelligent experiences are being forged..."
+        },
+        "lependu": {
+            "title": "Hangman",
+            "description": "A gentle bilingual hangman. Save Leo before the last letter — Mini, Normal or Expert, nine categories, and a character who would really rather come down."
         }
     },
     "snake": {

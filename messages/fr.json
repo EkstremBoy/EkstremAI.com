@@ -435,6 +435,10 @@
         "coming_soon": {
             "title": "Bientôt disponible",
             "description": "De nouvelles expériences intelligentes sont en cours de forge..."
+        },
+        "lependu": {
+            "title": "Le Pendu",
+            "description": "Un pendu tout doux, bilingue français-anglais. Sauve Léo avant la dernière lettre — Mini, Normal ou Expert, neuf catégories, et un personnage qui n'a vraiment pas envie de rester là."
         }
     },
     "snake": {

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { motion } from 'framer-motion';
-import { Gamepad2, ArrowRight, Dices, Trophy, Snowflake, ExternalLink } from 'lucide-react';
+import { Gamepad2, ArrowRight, Dices, Trophy, Snowflake, ExternalLink, Puzzle } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 
@@ -40,6 +40,15 @@ const JEUX: Jeu[] = [
         href: '/games/snake',
         status: 'active',
         tags: ['React', 'Canvas 2D', 'Temps réel']
+    },
+    {
+        id: 'lependu',
+        category: 'puzzle',
+        icon: Puzzle,
+        href: '/games/le-pendu/',
+        external: true,
+        status: 'active',
+        tags: ['React', 'SVG', 'Bilingue']
     },
     {
         id: 'coming_soon',
