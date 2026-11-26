@@ -12,6 +12,20 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
+    // Icônes fichier de Next (app/favicon.ico, app/icon.png, app/apple-icon.png).
+    // Elles sont servies à la racine. next-intl ne doit pas les préfixer d'une
+    // locale — y compris `/icon` et `/apple-icon`, que le routeur sert parfois
+    // sans extension. Un préfixe `/fr` les enverrait en 404.
+    if (
+        pathname === '/favicon.ico' ||
+        pathname === '/icon' ||
+        pathname.startsWith('/icon.') ||
+        pathname === '/apple-icon' ||
+        pathname.startsWith('/apple-icon.')
+    ) {
+        return NextResponse.next();
+    }
+
     // 1. Transparent rewrite for sot-companion
     if (pathname === '/sot-companion' || pathname === '/sot-companion/') {
         return NextResponse.rewrite(new URL(`/${defaultLocale}/sot-companion`, request.url));
@@ -43,6 +57,6 @@ export const config = {
        Les extensions sont là pour la même raison : le filtre d'origine ne
        laissait passer que les images, pas les .html ni les .js. */
     matcher: [
-        '/((?!api|games/|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff2|ico|json|webmanifest)$).*)',
+        '/((?!api|games/|_next/static|_next/image|favicon.ico|icon$|apple-icon$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|html|js|css|woff2|ico|json|webmanifest)$).*)',
     ],
 };
