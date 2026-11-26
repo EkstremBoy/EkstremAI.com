@@ -23,17 +23,17 @@ export default function Navbar() {
 
     return (
         <header className="fixed top-0 left-0 right-0 py-4 glass border-b border-white/5" style={{ zIndex: 9999 }}>
-            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
 
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-8 min-w-0">
                     {/* Logo */}
-                    <Link href={`/${locale}`} className="flex items-center group transition-transform hover:scale-[1.02]">
+                    <Link href={`/${locale}`} className="flex items-center min-w-0 group transition-transform hover:scale-[1.02]">
                         <Image
-                            src="/images/logo.png"
-                            alt="EkstremAI"
-                            width={150}
-                            height={54}
-                            className="h-12 w-auto object-contain"
+                            src="/brand/logo-horizontal.png"
+                            alt="Ekstrem AI"
+                            width={267}
+                            height={48}
+                            className="h-9 w-auto max-w-full object-contain sm:h-10 md:h-12"
                             priority
                         />
                     </Link>
@@ -50,7 +50,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-5 border-l border-white/10 pl-8">
+                    <div className="flex shrink-0 items-center gap-2 border-l border-white/10 pl-3 sm:gap-5 sm:pl-8">
                         {/* BOUTON LANGUE DYNAMIQUE */}
                         <Link
                             href={getTargetLocalePath()}
